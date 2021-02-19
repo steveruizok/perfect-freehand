@@ -2,7 +2,7 @@
 
 Perfect freehand is a library for creating freehand paths. By [@steveruizok](https://twitter.com/steveruizok).
 
-[!Screenshot](/screenshot.png)
+![Screenshot](/screenshot.png)
 
 ## Installation
 
