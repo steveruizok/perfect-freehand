@@ -88,8 +88,8 @@ getPath(myPoints, {
 import * as React from "react"
 import getPath from "perfect-freehand"
 
-function Example() {
-  const [currentType, setCurrentType] = React.useState([])
+export default function Example() {
+  const [currentType, setCurrentType] = React.useState("mouse")
   const [currentMark, setCurrentMark] = React.useState([])
 
   function handlePointerDown(e: React.PointerEvent) {
@@ -115,3 +115,5 @@ function Example() {
   )
 }
 ```
+
+[![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
