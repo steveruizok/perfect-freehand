@@ -4,6 +4,8 @@ Perfect freehand is a library for creating freehand paths by [@steveruizok](http
 
 ![Screenshot](/screenshot.png)
 
+🔗 [Demo](https://perfect-freehand-example.vercel.app/)
+
 ## Installation
 
 ```bash
