@@ -11,6 +11,7 @@ export default function Home() {
   useDarkMode()
   const marks = useSelector(state => state.data.marks)
   const currentMark = useSelector(state => state.data.currentMark)
+  const darkMode = useSelector(state => state.data.settings.darkMode)
   const showControls = useSelector(state => state.data.settings.showControls)
   const ref = React.useRef<SVGSVGElement>(null)
 
@@ -42,10 +43,21 @@ export default function Home() {
       <main>
         <svg ref={ref} viewBox={'0 0 800 600'}>
           {marks.map((mark, i) => (
-            <path key={i} d={mark.path} strokeWidth={0} fill="#000" />
+            <path
+              key={i}
+              d={mark.path}
+              strokeWidth={2}
+              stroke={darkMode ? '#fff' : '#000'}
+              fill={darkMode ? '#fff' : '#000'}
+            />
           ))}
           {currentMark && (
-            <path d={currentMark.path} strokeWidth={0} fill="#000" />
+            <path
+              d={currentMark.path}
+              strokeWidth={2}
+              stroke={darkMode ? '#fff' : '#000'}
+              fill={darkMode ? '#fff' : '#000'}
+            />
           )}
         </svg>
         {showControls && <Controls />}

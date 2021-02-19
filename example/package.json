@@ -13,6 +13,7 @@
     "@types/react-dom": "^17.0.1",
     "@types/styled-components": "^5.1.7",
     "next": "10.0.7",
+    "perfect-freehand": "^0.1.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-feather": "^2.0.9",

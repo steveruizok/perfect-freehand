@@ -6,7 +6,7 @@ html,
 }
 
 :root {
-  --color-background: #fff;
+  --color-background: #f7f3f3;
   --color-text: #1d1d1d;
   --color-border: rgba(144, 144, 144, 0.4);
   --color-hover: rgba(144, 144, 144, 0.1);

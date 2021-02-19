@@ -131,11 +131,7 @@ const state = createState({
     },
     beginMark(data) {
       const { x, y, p, type } = getPointer()
-      if (type === 'pen') {
-        data.settings.penMode = true
-      }
-
-      if (data.settings.penMode && type !== 'pen') return
+      data.settings.penMode = type === 'pen'
 
       data.redos = []
 
