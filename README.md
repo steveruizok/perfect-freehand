@@ -110,7 +110,7 @@ function Example() {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >
-    <path d={getPath(currentMark, { type: currentType })}>
+      <path d={getPath(currentMark, { type: currentType })}/>
     </svg>
   )
 }
