@@ -20,21 +20,41 @@ yarn add perfect-freehand
 
 The library export one default function, `getPath`, that accepts an array of points and an (optional) options object and returns SVG path data for a stroke.
 
-The array of points may be _either_ an array of number pairs or an array of objects with `x` and `y` properties.
+The array of points may be _either_ an array of number pairs representing the point's x, y, and (optionally) pressure...
 
 ```js
-getPath([
+import getPath from 'perfect-freehand'
+
+const path = getPath([
   [0, 0],
   [10, 5],
   [20, 8],
 ])
 
+const path = getPath([
+  [0, 0, 0],
+  [10, 5, 0.5],
+  [20, 8, 0.3],
+])
+```
+
+...or an array of objects with `x`, `y`, and (optionally) `pressure` properties.
+
+```
 getPath([
   { x: 0, y: 0 },
   { x: 10, y: 5 },
   { x: 20, y: 8 },
 ])
+
+getPath([
+  { x: 0, y: 0, pressure: 0, },
+  { x: 10, y: 5, pressure: 0.5 },
+  { x: 20, y: 8, pressure: 0.3 },
+])
 ```
+
+
 
 ### Options
 
