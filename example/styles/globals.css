@@ -52,3 +52,7 @@ body {
   color: var(--color-text);
   background-color: var(--color-background);
 }
+
+svg {
+  touch-action: none;
+}
