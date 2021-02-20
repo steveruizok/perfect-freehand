@@ -71,12 +71,12 @@ The options object is optional, as are its properties.
 
 ```js
 getPath(myPoints, {
-  type: 'pen',
   minSize: 2.5,
   maxSize: 8,
-  simulatePressure: true,
+  pressure: true,
   streamline: 0.5,
   smooth: 0.5,
+  clip: true,
 })
 ```
 
