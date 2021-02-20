@@ -62,16 +62,14 @@ export interface StrokeOptions extends StrokeOutlineOptions {
 /* --------------------- Methods -------------------- */
 
 /**
+ * ## getStrokePoints
+ * @description Get points for a stroke.
+ * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
+ * @param options An (optional) object with options.
+ */
+export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): string {
-  const {
-    type = 'mouse',
-    simulatePressure = true,
-    streamline = 0.5,
-    minSize = 2.5,
-    maxSize = 8,
-    smooth = 8,
 >(
   points: (T | K)[],
   options: StrokePointsOptions = {} as StrokePointsOptions

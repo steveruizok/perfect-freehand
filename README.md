@@ -60,13 +60,13 @@ getPath([
 
 The options object is optional, as are its properties.
 
-| Property           | Type    | Default | Description                                                           |
-| ------------------ | ------- | ------- | --------------------------------------------------------------------- |
-| `minSize`          | number  | 2.5     | The thinnest size of the stroke.                                      |
-| `maxSize`          | number  | 8       | The thickest size of the stroke.                                      |
-| `simulatePressure` | boolean | true    | Whether to interpret velocity as pressure for mouse and touch inputs. |
-| `streamline`       | number  | .5      | How much to streamline the stroke.                                    |
-| `smooth`           | number  | .5      | How much to soften the stroke's edges.                                |
+| Property     | Type    | Default | Description                                                    |
+| ------------ | ------- | ------- | -------------------------------------------------------------- |
+| `minSize`    | number  | 2.5     | The thinnest size of the stroke.                               |
+| `maxSize`    | number  | 8       | The thickest size of the stroke.                               |
+| `pressure`   | boolean | true    | Whether to apply (or simulate) pressure from the input device. |
+| `streamline` | number  | .5      | How much to streamline the stroke.                             |
+| `smooth`     | number  | .5      | How much to soften the stroke's edges.                         |
 
 ```js
 getPath(myPoints, {
