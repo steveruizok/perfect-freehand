@@ -56,8 +56,6 @@ getPath([
 ])
 ```
 
-
-
 ### Options
 
 The options object is optional, as are its properties.
@@ -85,19 +83,19 @@ getPath(myPoints, {
 ## Example
 
 ```jsx
-import * as React from "react"
-import getPath from "perfect-freehand"
+import * as React from 'react'
+import getPath from 'perfect-freehand'
 
 export default function Example() {
-  const [currentType, setCurrentType] = React.useState("mouse")
+  const [currentType, setCurrentType] = React.useState('mouse')
   const [currentMark, setCurrentMark] = React.useState([])
 
-  function handlePointerDown(e: React.PointerEvent) {
+  function handlePointerDown(e) {
     setCurrentType(e.pointerType)
     setCurrentMark([[e.pageX, e.pageY, e.pressure]])
   }
 
-  function handlePointerMove(e: React.PointerEvent) {
+  function handlePointerMove(e) {
     if (e.buttons === 1 && e.pointerType === currentType) {
       setCurrentMark([...currentMark, [e.pageX, e.pageY, e.pressure]])
     }
@@ -110,7 +108,7 @@ export default function Example() {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >
-      <path d={getPath(currentMark, { type: currentType })}/>
+      <path d={getPath(currentMark, { type: currentType })} />
     </svg>
   )
 }
