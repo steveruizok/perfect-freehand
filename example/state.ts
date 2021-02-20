@@ -5,7 +5,6 @@ import { Mark, CompleteMark } from './types'
 import pathAlgorithm from 'perfect-freehand'
 
 const defaultOptions = {
-  type: 'mouse',
   pressure: true,
   streamline: 0.5,
   minSize: 2.5,
