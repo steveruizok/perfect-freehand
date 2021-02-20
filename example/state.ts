@@ -2,10 +2,9 @@ import * as React from 'react'
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
 import { Mark, CompleteMark } from './types'
-import pathAlgorithm from 'perfect-freehand'
+import pathAlgorithm, { StrokeOptions } from 'perfect-freehand'
 
-const defaultOptions = {
-  type: 'mouse',
+const defaultOptions: StrokeOptions = {
   pressure: true,
   streamline: 0.5,
   minSize: 2.5,
