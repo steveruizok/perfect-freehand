@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
 import { Mark, CompleteMark } from './types'

@@ -87,16 +87,14 @@ import * as React from 'react'
 import getPath from 'perfect-freehand'
 
 export default function Example() {
-  const [currentType, setCurrentType] = React.useState('mouse')
   const [currentMark, setCurrentMark] = React.useState([])
 
   function handlePointerDown(e) {
-    setCurrentType(e.pointerType)
     setCurrentMark([[e.pageX, e.pageY, e.pressure]])
   }
 
   function handlePointerMove(e) {
-    if (e.buttons === 1 && e.pointerType === currentType) {
+    if (e.buttons === 1) {
       setCurrentMark([...currentMark, [e.pageX, e.pageY, e.pressure]])
     }
   }
@@ -107,6 +105,7 @@ export default function Example() {
       height={600}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
+      style={{ touchAction: 'none' }}
     >
       <path d={getPath(currentMark)} />
     </svg>
