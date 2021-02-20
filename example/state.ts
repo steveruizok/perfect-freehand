@@ -6,14 +6,12 @@ import pathAlgorithm from 'perfect-freehand'
 
 const defaultOptions = {
   type: 'mouse',
-  simulatePressure: true,
+  pressure: true,
   streamline: 0.5,
   minSize: 2.5,
   maxSize: 8,
   smooth: 8,
-  pressureChangeRate: 0.5,
-  pressureMaxVelocity: 8,
-  pressureVelocityEffect: 8,
+  clip: true,
 }
 
 const defaultSettings = {
@@ -23,8 +21,6 @@ const defaultSettings = {
   showControls: false,
   recomputePaths: true,
 }
-
-type Settings = typeof defaultSettings
 
 const state = createState({
   data: {
@@ -108,7 +104,7 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, { type: mark.type }),
+        path: pathAlgorithm(mark.points, alg),
       }))
 
       data.settings = {
@@ -153,20 +149,14 @@ const state = createState({
         distance: 0,
       })
 
-      currentMark!.path = pathAlgorithm(currentMark!.points, {
-        ...alg,
-        type: currentMark!.type,
-      })
+      currentMark!.path = pathAlgorithm(currentMark!.points, alg)
     },
     completeMark(data) {
       const { currentMark, alg } = data
 
       data.marks.push({
         ...currentMark!,
-        path: pathAlgorithm(currentMark!.points, {
-          ...alg,
-          type: currentMark!.type,
-        }),
+        path: pathAlgorithm(currentMark!.points, alg),
       })
 
       data.currentMark = null
@@ -176,12 +166,10 @@ const state = createState({
       data.redos = []
     },
     loadData(data, payload: { marks: Mark[] }) {
+      const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, {
-          ...data.alg,
-          type: mark.type,
-        }),
+        path: pathAlgorithm(mark.points, alg),
       }))
     },
     undoMark(data) {
@@ -217,17 +205,11 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = pathAlgorithm(mark.points, {
-          ...alg,
-          type: mark.type,
-        })
+        mark.path = pathAlgorithm(mark.points, alg)
       }
 
       if (currentMark) {
-        currentMark.path = pathAlgorithm(currentMark.points, {
-          ...alg,
-          type: currentMark.type,
-        })
+        currentMark.path = pathAlgorithm(currentMark.points, alg)
       }
     },
   },

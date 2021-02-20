@@ -37,9 +37,14 @@ export default function Controls() {
   return (
     <StyledControls onPointerDown={e => e.stopPropagation()}>
       <BooleanInput
-        label="Simulate Pressure"
-        value={options.simulatePressure}
-        onChange={v => state.send('CHANGED_OPTIONS', { simulatePressure: v })}
+        label="Clip Path"
+        value={options.clip}
+        onChange={v => state.send('CHANGED_OPTIONS', { clip: v })}
+      />
+      <BooleanInput
+        label="Pressure"
+        value={options.pressure}
+        onChange={v => state.send('CHANGED_OPTIONS', { pressure: v })}
       />
       <NumberInput
         value={options.streamline}

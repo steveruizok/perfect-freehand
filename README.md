@@ -20,7 +20,7 @@ yarn add perfect-freehand
 
 ## Usage
 
-The library export one default function, `getPath`, that accepts an array of points and an (optional) options object and returns SVG path data for a stroke.
+The library exports a default function, `getPath`, that accepts an array of points and an (optional) options object and returns SVG path data for a stroke.
 
 The array of points may be _either_ an array of number pairs representing the point's x, y, and (optionally) pressure...
 
@@ -60,14 +60,13 @@ getPath([
 
 The options object is optional, as are its properties.
 
-| Property           | Type    | Default | Description                                                                                 |
-| ------------------ | ------- | ------- | ------------------------------------------------------------------------------------------- |
-| `type`             | string  | 'mouse' | A [pointerType](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pointerType). |
-| `minSize`          | number  | 2.5     | The thinnest size of the stroke.                                                            |
-| `maxSize`          | number  | 8       | The thickest size of the stroke.                                                            |
-| `simulatePressure` | boolean | true    | Whether to interpret velocity as pressure for mouse and touch inputs.                       |
-| `streamline`       | number  | .5      | How much to streamline the stroke.                                                          |
-| `smooth`           | number  | .5      | How much to soften the stroke's edges.                                                      |
+| Property           | Type    | Default | Description                                                           |
+| ------------------ | ------- | ------- | --------------------------------------------------------------------- |
+| `minSize`          | number  | 2.5     | The thinnest size of the stroke.                                      |
+| `maxSize`          | number  | 8       | The thickest size of the stroke.                                      |
+| `simulatePressure` | boolean | true    | Whether to interpret velocity as pressure for mouse and touch inputs. |
+| `streamline`       | number  | .5      | How much to streamline the stroke.                                    |
+| `smooth`           | number  | .5      | How much to soften the stroke's edges.                                |
 
 ```js
 getPath(myPoints, {
@@ -115,3 +114,23 @@ export default function Example() {
 ```
 
 [![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
+
+## Advanced Usage
+
+In addition to `getPath`, the library also exports smaller functions that `getPath` uses to generate its SVG data. While you can use `getPath`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
+
+#### `getStrokePoints`
+
+Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and returns a set of streamlined points as `[x, y, pressure, angle, distance, length]`. The path's total length will be the length of the last point in the array.
+
+#### `getStrokeOutlinePoints`
+
+Accepts an array of points (formatted as as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
+
+#### `getShortStrokeOutlinePoints`
+
+Works like `getStrokeOutlinePoints`, but designed to work with short paths.
+
+#### `clipPath`
+
+Accepts a series of points (formatted as `[x, y]`, i.e. the output of `getStrokeOutlinePoints` or `getShortStrokeOutlinePoints`) and returns a polygon (a series of faces) from the stroke.

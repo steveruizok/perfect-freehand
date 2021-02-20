@@ -1,14 +1,18 @@
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 import * as React from 'react'
 import { useSelector } from '../state'
 import useEvents from '../hooks/useEvents'
+import useLocalData from '../hooks/useLocalData'
 import useDarkMode from '../hooks/useDarkMode'
-import Toolbar from '../components/toolbar'
-import Controls from '../components/controls'
+const Toolbar = dynamic(() => import('../components/toolbar'), { ssr: false })
+const Controls = dynamic(() => import('../components/controls'), { ssr: false })
 
 export default function Home() {
   useEvents()
   useDarkMode()
+  useLocalData()
+
   const marks = useSelector(state => state.data.marks)
   const currentMark = useSelector(state => state.data.currentMark)
   const darkMode = useSelector(state => state.data.settings.darkMode)
