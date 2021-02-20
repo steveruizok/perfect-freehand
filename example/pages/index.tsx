@@ -13,6 +13,7 @@ export default function Home() {
   const currentMark = useSelector(state => state.data.currentMark)
   const darkMode = useSelector(state => state.data.settings.darkMode)
   const showControls = useSelector(state => state.data.settings.showControls)
+  const showTrace = useSelector(state => state.data.settings.showTrace)
   const ref = React.useRef<SVGSVGElement>(null)
 
   React.useEffect(() => {
@@ -48,7 +49,7 @@ export default function Home() {
               d={mark.path}
               strokeWidth={2}
               stroke={darkMode ? '#fff' : '#000'}
-              fill={darkMode ? '#fff' : '#000'}
+              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
             />
           ))}
           {currentMark && (
@@ -56,7 +57,7 @@ export default function Home() {
               d={currentMark.path}
               strokeWidth={2}
               stroke={darkMode ? '#fff' : '#000'}
-              fill={darkMode ? '#fff' : '#000'}
+              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
             />
           )}
         </svg>

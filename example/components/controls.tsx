@@ -41,43 +41,6 @@ export default function Controls() {
         value={options.simulatePressure}
         onChange={v => state.send('CHANGED_OPTIONS', { simulatePressure: v })}
       />
-      {options.simulatePressure && (
-        <>
-          <NumberInput
-            label="Pressure Max Velocity"
-            value={options.pressureMaxVelocity}
-            min={0}
-            max={10}
-            onChange={v =>
-              state.send('CHANGED_OPTIONS', {
-                pressureMaxVelocity: v,
-              })
-            }
-          />
-          <NumberInput
-            value={options.pressureChangeRate}
-            onChange={v =>
-              state.send('CHANGED_OPTIONS', {
-                pressureChangeRate: v,
-              })
-            }
-            min={0.001}
-            max={2}
-            label="Pressure Change Rate"
-          />
-          <NumberInput
-            value={options.pressureVelocityEffect}
-            min={0.001}
-            max={50}
-            onChange={v =>
-              state.send('CHANGED_OPTIONS', {
-                pressureVelocityEffect: v,
-              })
-            }
-            label="Pressure Velocity Effect"
-          />
-        </>
-      )}
       <NumberInput
         value={options.streamline}
         onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
