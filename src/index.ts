@@ -56,9 +56,6 @@ export default function getPath<
     minSize = 2.5,
     maxSize = 8,
     smooth = 8,
-    pressureChangeRate = 0.5,
-    pressureMaxVelocity = 8,
-    pressureVelocityEffect = 8,
   } = options
 
   const aPoints = toPointsArray(points)
@@ -70,11 +67,11 @@ export default function getPath<
     distance = 0,
     p0 = aPoints[0],
     p1 = aPoints[len - 1],
-    prev = p0,
     t0 = p0,
     t1 = p1,
     m0 = p0,
     m1 = p0,
+    prev = p0,
     length = 0,
     x: number,
     y: number,
@@ -119,16 +116,16 @@ export default function getPath<
       // Pressure
       if (type === 'pen') {
         // If pen, accellerate the reported pressure
-        ip = pp + (ip - pp) * pressureChangeRate
+        ip = pp + (ip - pp) / 2
       } else {
         // If too short (or if not simulating pressure), use the max size.
         if (!simulatePressure) {
           ip = 1
         } else {
           // Calculate pressure based on velocity (slower = more pressure)
-          let rp = 1 - distance / pressureMaxVelocity
-          const sp = Math.min(distance / pressureVelocityEffect, 1)
-          ip = Math.min(1, pp + (rp - pp) * (pressureChangeRate * sp))
+          let rp = 1 - distance / maxSize
+          const sp = min(distance / maxSize, 1)
+          ip = min(1, pp + (rp - pp) * (sp / 2))
         }
       }
 
