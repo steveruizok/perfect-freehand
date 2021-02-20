@@ -82,6 +82,10 @@ export default function getPath<
     size: number,
     d = ''
 
+  if (len === 0) {
+    return ''
+  }
+
   if (len < 4) {
     // Just draw a dot on very short marks
     const [x, y, pressure] = p1
@@ -124,12 +128,12 @@ export default function getPath<
           // Calculate pressure based on velocity (slower = more pressure)
           let rp = 1 - distance / pressureMaxVelocity
           const sp = Math.min(distance / pressureVelocityEffect, 1)
-          ip = clamp(pp + (rp - pp) * (pressureChangeRate * sp), 0, 1)
+          ip = Math.min(1, pp + (rp - pp) * (pressureChangeRate * sp))
         }
       }
 
       // Size is based on pressure
-      size = minSize + ip * (maxSize - minSize)
+      size = clamp(minSize + ip * (maxSize - minSize), minSize, maxSize)
 
       // Taper start
       if (length < 16) {
@@ -161,7 +165,7 @@ export default function getPath<
         }
       }
 
-      prev = [x, y, angle, distance, size]
+      prev = [x, y, ip]
     }
 
     pts.push(prev)

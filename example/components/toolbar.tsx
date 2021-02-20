@@ -57,7 +57,10 @@ export default function Toolbar() {
         </IconButton>
       </ButtonGroup>
       <div>
-        by <a href="https://twitter.com/steveruizok">@steveruizok</a>
+        <a href="https://github.com/steveruizok/perfect-freehand">
+          perfect-freehand
+        </a>{' '}
+        | <a href="https://twitter.com/steveruizok">@steveruizok</a>
       </div>
       <ButtonGroup>
         <IconButton onClick={() => state.send('TOGGLED_CONTROLS')}>

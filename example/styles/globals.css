@@ -33,7 +33,7 @@ button {
 
 a {
   color: var(--color-text);
-  text-decoration: none;
+  text-decoration: underline;
   font-weight: bold;
 }
 

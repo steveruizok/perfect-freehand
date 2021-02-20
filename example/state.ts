@@ -30,11 +30,6 @@ const state = createState({
   data: {
     settings: { ...defaultSettings },
     alg: { ...defaultOptions },
-    refs: null as {
-      canvas: React.RefObject<HTMLCanvasElement>
-      overlay: React.RefObject<HTMLCanvasElement>
-      frame: React.RefObject<HTMLDivElement>
-    } | null,
     restore: [] as { clear?: boolean; marks: CompleteMark[] }[],
     redos: [] as { clear?: boolean; marks: CompleteMark[] }[],
     marks: [] as CompleteMark[],
@@ -123,12 +118,7 @@ const state = createState({
       }
     },
     cleanup(data) {},
-    resize(data) {
-      const { canvas, frame } = data.refs!
-      var rect = frame.current!.getBoundingClientRect()
-      canvas.current!.width = rect.width //* dpr
-      canvas.current!.height = rect.height //* dpr
-    },
+    resize(data) {},
     beginMark(data) {
       const { x, y, p, type } = getPointer()
       data.settings.penMode = type === 'pen'
