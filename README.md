@@ -67,6 +67,7 @@ The options object is optional, as are its properties.
 | `pressure`   | boolean | true    | Whether to apply (or simulate) pressure from the input device. |
 | `streamline` | number  | .5      | How much to streamline the stroke.                             |
 | `smooth`     | number  | .5      | How much to soften the stroke's edges.                         |
+| `clip`       | boolean | true    | Whether to flatten the stroke into a single polygon.           |
 
 ```js
 getPath(myPoints, {
@@ -107,7 +108,7 @@ export default function Example() {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >
-      <path d={getPath(currentMark, { type: currentType })} />
+      <path d={getPath(currentMark)} />
     </svg>
   )
 }
@@ -117,7 +118,7 @@ export default function Example() {
 
 ## Advanced Usage
 
-In addition to `getPath`, the library also exports smaller functions that `getPath` uses to generate its SVG data. While you can use `getPath`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
+For advanced usage, the library also exports smaller functions that `getPath` uses to generate its SVG data. While you can use `getPath`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
 
 #### `getStrokePoints`
 
@@ -125,7 +126,7 @@ Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: numb
 
 #### `getStrokeOutlinePoints`
 
-Accepts an array of points (formatted as as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
+Accepts an array of points (formatted as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
 #### `getShortStrokeOutlinePoints`
 
