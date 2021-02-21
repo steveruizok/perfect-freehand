@@ -60,19 +60,21 @@ getPath([
 
 The options object is optional, as are its properties.
 
-| Property     | Type    | Default | Description                                                    |
-| ------------ | ------- | ------- | -------------------------------------------------------------- |
-| `minSize`    | number  | 2.5     | The thinnest size of the stroke.                               |
-| `maxSize`    | number  | 8       | The thickest size of the stroke.                               |
-| `pressure`   | boolean | true    | Whether to apply (or simulate) pressure from the input device. |
-| `streamline` | number  | .5      | How much to streamline the stroke.                             |
-| `smooth`     | number  | .5      | How much to soften the stroke's edges.                         |
-| `clip`       | boolean | true    | Whether to flatten the stroke into a single polygon.           |
+| Property           | Type    | Default | Description                                          |
+| ------------------ | ------- | ------- | ---------------------------------------------------- |
+| `minSize`          | number  | 2.5     | The thinnest size of the stroke.                     |
+| `maxSize`          | number  | 8       | The thickest size of the stroke.                     |
+| `simulatePressure` | boolean | true    | Whether to simulate pressure based on velocity.      |
+| `pressure`         | boolean | true    | Whether to apply pressure.                           |
+| `streamline`       | number  | .5      | How much to streamline the stroke.                   |
+| `smooth`           | number  | .5      | How much to soften the stroke's edges.               |
+| `clip`             | boolean | true    | Whether to flatten the stroke into a single polygon. |
 
 ```js
 getPath(myPoints, {
   minSize: 2.5,
   maxSize: 8,
+  simulatePressure: true,
   pressure: true,
   streamline: 0.5,
   smooth: 0.5,
@@ -87,15 +89,21 @@ import * as React from 'react'
 import getPath from 'perfect-freehand'
 
 export default function Example() {
-  const [currentMark, setCurrentMark] = React.useState([])
+  const [currentMark, setCurrentMark] = React.useState()
 
   function handlePointerDown(e) {
-    setCurrentMark([[e.pageX, e.pageY, e.pressure]])
+    setCurrentMark({
+      type: e.pointerType,
+      points: [[e.pageX, e.pageY, e.pressure]],
+    })
   }
 
   function handlePointerMove(e) {
     if (e.buttons === 1) {
-      setCurrentMark([...currentMark, [e.pageX, e.pageY, e.pressure]])
+      setCurrentMark({
+        ...currentMark,
+        points: [...currentMark.points, [e.pageX, e.pageY, e.pressure]],
+      })
     }
   }
 
@@ -107,7 +115,13 @@ export default function Example() {
       onPointerMove={handlePointerMove}
       style={{ touchAction: 'none' }}
     >
-      <path d={getPath(currentMark)} />
+      {currentMark && (
+        <path
+          d={getPath(currentMark.points, {
+            simulatePressure: currentMark.type !== 'pen',
+          })}
+        />
+      )}
     </svg>
   )
 }

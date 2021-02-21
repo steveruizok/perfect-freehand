@@ -4,6 +4,7 @@ import { Mark, CompleteMark } from './types'
 import pathAlgorithm, { StrokeOptions } from 'perfect-freehand'
 
 const defaultOptions: StrokeOptions = {
+  simulatePressure: true,
   pressure: true,
   streamline: 0.5,
   minSize: 2.5,
@@ -147,14 +148,20 @@ const state = createState({
         distance: 0,
       })
 
-      currentMark!.path = pathAlgorithm(currentMark!.points, alg)
+      currentMark!.path = pathAlgorithm(currentMark!.points, {
+        ...alg,
+        simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
+      })
     },
     completeMark(data) {
       const { currentMark, alg } = data
 
       data.marks.push({
         ...currentMark!,
-        path: pathAlgorithm(currentMark!.points, alg),
+        path: pathAlgorithm(currentMark!.points, {
+          ...alg,
+          simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
+        }),
       })
 
       data.currentMark = null
@@ -167,7 +174,10 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, alg),
+        path: pathAlgorithm(mark.points, {
+          ...alg,
+          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
+        }),
       }))
     },
     undoMark(data) {
@@ -203,11 +213,17 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = pathAlgorithm(mark.points, alg)
+        mark.path = pathAlgorithm(mark.points, {
+          ...alg,
+          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
+        })
       }
 
       if (currentMark) {
-        currentMark.path = pathAlgorithm(currentMark.points, alg)
+        currentMark.path = pathAlgorithm(currentMark.points, {
+          ...alg,
+          simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
+        })
       }
     },
   },

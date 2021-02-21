@@ -49,6 +49,7 @@ export interface StrokePointsOptions {
 }
 
 export interface StrokeOutlineOptions extends StrokePointsOptions {
+  simulatePressure?: boolean
   pressure?: boolean
   minSize?: number
   maxSize?: number
@@ -127,7 +128,7 @@ export function getShortStrokeOutlinePoints(
   points: number[][],
   options: StrokeOutlineOptions = {} as StrokeOutlineOptions
 ) {
-  const { maxSize = 8 } = options
+  const { minSize = 2.5, maxSize = 8 } = options
 
   const len = points.length
 
@@ -137,9 +138,9 @@ export function getShortStrokeOutlinePoints(
   }
 
   // Draw a kind of shitty shape around the start and end points.
-  const size = maxSize,
-    p0 = points[0],
+  const p0 = points[0],
     p1 = points[len - 1],
+    size = p0[2] === p1[2] ? maxSize : minSize + (maxSize - minSize) * p1[2],
     a =
       p0 === p1
         ? Math.random() * (PI * 2)
@@ -165,7 +166,13 @@ export function getStrokeOutlinePoints(
   points: number[][],
   options: StrokeOutlineOptions = {} as StrokeOutlineOptions
 ): number[][] {
-  const { pressure = true, minSize = 2.5, maxSize = 8, smooth = 8 } = options
+  const {
+    simulatePressure = true,
+    pressure = true,
+    minSize = 2.5,
+    maxSize = 8,
+    smooth = 8,
+  } = options
 
   let d0: number,
     d1: number, // first / last
@@ -193,15 +200,15 @@ export function getStrokeOutlinePoints(
 
     // Size
     if (pressure) {
-      // Accellerate the reported pressure.
-      let rp = min(1 - distance / maxSize, 1)
-      const sp = min(distance / maxSize, 1)
-      ip = min(1, pp + (rp - pp) * (sp / 2))
-
+      if (simulatePressure) {
+        // Simulate pressure by accellerating the reported pressure.
+        let rp = min(1 - distance / maxSize, 1)
+        const sp = min(distance / maxSize, 1)
+        ip = min(1, pp + (rp - pp) * (sp / 2))
+      }
       // Compute the size based on the pressure.
       size = clamp(minSize + ip * (maxSize - minSize), minSize, maxSize)
     } else {
-      // If we're not using pressure, size is maxSize.
       size = maxSize
     }
 

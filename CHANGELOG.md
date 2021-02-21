@@ -1,4 +1,16 @@
-# 0.1.5
+# 0.2.3
+
+- Brings back `simulatePressure` until I have a better way of guessing.
+
+# 0.2.2
+
+- Slight fix to line starts.
+
+# 0.2.1
+
+- Fixes actual pressure sensitivity.
+
+# 0.2.0
 
 - Breaks up algorithm into smaller functions. Because `getPath` returns an SVG path data, you can use `getPath` only with the Path2D element (for HTML Canvas) or SVG paths. These new functions will allow you to create paths in other rendering technologies.
 
