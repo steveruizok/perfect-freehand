@@ -1,3 +1,7 @@
+# 0.2.4
+
+- Adds `getPathGenerator`, a function that uses closures to prevent re-calculating solved points, angles and distances.
+
 # 0.2.3
 
 - Brings back `simulatePressure` until I have a better way of guessing.

@@ -48,21 +48,31 @@ export default function Home() {
       <main>
         <svg ref={ref} viewBox={'0 0 800 600'}>
           {marks.map((mark, i) => (
-            <path
-              key={i}
-              d={mark.path}
-              strokeWidth={2}
-              stroke={darkMode ? '#fff' : '#000'}
-              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-            />
+            <g>
+              <path
+                key={i}
+                d={mark.path}
+                strokeWidth={2}
+                stroke={darkMode ? '#fff' : '#000'}
+                fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+              />
+              {/* {mark.points.map(([x, y]) => (
+                <circle cx={x} cy={y} r={3} fill="red" />
+              ))} */}
+            </g>
           ))}
           {currentMark && (
-            <path
-              d={currentMark.path}
-              strokeWidth={2}
-              stroke={darkMode ? '#fff' : '#000'}
-              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-            />
+            <g>
+              <path
+                d={currentMark.path}
+                strokeWidth={2}
+                stroke={darkMode ? '#fff' : '#000'}
+                fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+              />
+              {/* {currentMark.points.map(([x, y]) => (
+                <circle cx={x} cy={y} r={3} fill="red" />
+              ))} */}
+            </g>
           )}
         </svg>
         {showControls && <Controls />}

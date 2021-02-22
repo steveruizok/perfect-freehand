@@ -53,6 +53,7 @@
     "typescript": "^4.1.5"
   },
   "dependencies": {
-    "polygon-clipping": "^0.15.2"
+    "polygon-clipping": "^0.15.2",
+    "simplify-js": "^1.2.4"
   }
 }

@@ -129,6 +129,25 @@ export default function Example() {
 
 [![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
 
+## `getPathGenerator`
+
+The library also exports `getPathGenerator`, a function that uses closures to avoid re-calculating solved points, angles and distances. This provides a more efficient way of extending a line point-by-point. Call the function with the path's initial set of points (or an empty array) and the same options object shown above.
+
+```js
+const { addPoint, path, points, totalLength } = getPathGenerator(
+  initialPoints,
+  options
+)
+```
+
+The function returns a new function, `addPoint`, that you can use to extend the path.
+
+```js
+const { path, points, totalLength } = addPoint({ x: 10, y: 20, pressure: 0.5 }) // or [10, 20, .5]
+```
+
+Both `getPathGenerator` and `addPoint` return the path's SVG data string, along with the current (streamlined) points and the total length of the path.
+
 ## Advanced Usage
 
 For advanced usage, the library also exports smaller functions that `getPath` uses to generate its SVG data. While you can use `getPath`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.

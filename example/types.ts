@@ -1,12 +1,6 @@
 export interface Mark {
   type: 'pen' | 'mouse' | 'touch'
-  points: {
-    x: number
-    y: number
-    angle: number
-    pressure: number
-    distance: number
-  }[]
+  points: number[][]
   path: string
 }
 

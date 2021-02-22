@@ -1,7 +1,7 @@
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
 import { Mark, CompleteMark } from './types'
-import pathAlgorithm, { StrokeOptions } from 'perfect-freehand'
+import getPath, { getPathGenerator, StrokeOptions } from 'perfect-freehand'
 
 const defaultOptions: StrokeOptions = {
   simulatePressure: true,
@@ -20,6 +20,8 @@ const defaultSettings = {
   showControls: false,
   recomputePaths: true,
 }
+
+let generator: ReturnType<typeof getPathGenerator>
 
 const state = createState({
   data: {
@@ -103,7 +105,10 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, alg),
+        path: getPathGenerator(mark.points, {
+          ...data.alg,
+          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
+        }).path,
       }))
 
       data.settings = {
@@ -118,50 +123,54 @@ const state = createState({
       const { x, y, p, type } = getPointer()
       data.settings.penMode = type === 'pen'
 
+      generator = getPathGenerator([], { ...data.alg })
+      const { path } = generator.addPoint([x, y, p])
+
       data.redos = []
 
       data.currentMark = {
         type,
-        points: [
-          {
-            x,
-            y,
-            angle: 0,
-            pressure: p,
-            distance: 0,
-          },
-        ],
-        path: '',
+        points: [[x, y, p]],
+        path,
       }
     },
     addPointToMark(data) {
       const { x, y, p, type } = getPointer()
-      const { currentMark, alg } = data
+      const { alg } = data
+      const currentMark = data.currentMark!
 
-      if (type !== currentMark!.type) return
+      if (type !== currentMark.type) return
 
-      currentMark!.points.push({
-        x: Math.round(x),
-        y: Math.round(y),
-        angle: 0,
-        pressure: p,
-        distance: 0,
-      })
+      // {
+      //   let ppp = ''
+      //   let t = Date.now()
 
-      currentMark!.path = pathAlgorithm(currentMark!.points, {
-        ...alg,
-        simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-      })
+      //   let pts = [...currentMark.points]
+      //   for (let i = 0; i < 100; i++) {
+      //     pts.push([Math.round(x + i), Math.round(y + i), p])
+      //     ppp = getPath(pts)
+      //   }
+      //   console.log('Get path point approach', Date.now() - t, ppp.length)
+      // }
+      // {
+      //   let ppp = ''
+      //   let t = Date.now()
+      //   for (let i = 0; i < 100; i++) {
+      //     ppp = generator.addPoint([Math.round(x + i), Math.round(y + i), p])
+      //       .path
+      //   }
+      //   console.log('Add point approach', Date.now() - t, ppp.length)
+      // }
+
+      const { path } = generator.addPoint([Math.round(x), Math.round(y), p])
+      currentMark.path = path
+      currentMark.points.push([x, y, p])
     },
     completeMark(data) {
       const { currentMark, alg } = data
 
       data.marks.push({
         ...currentMark!,
-        path: pathAlgorithm(currentMark!.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-        }),
       })
 
       data.currentMark = null
@@ -174,10 +183,10 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, {
+        path: getPathGenerator(mark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && mark.type !== 'pen',
-        }),
+        }).path,
       }))
     },
     undoMark(data) {
@@ -213,17 +222,17 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = pathAlgorithm(mark.points, {
+        mark.path = getPathGenerator(mark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && mark.type !== 'pen',
-        })
+        }).path
       }
 
       if (currentMark) {
-        currentMark.path = pathAlgorithm(currentMark.points, {
+        currentMark.path = getPathGenerator(currentMark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-        })
+        }).path
       }
     },
   },
