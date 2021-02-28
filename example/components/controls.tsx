@@ -7,19 +7,20 @@ import styled from 'styled-components'
 const StyledControls = styled.div`
   position: absolute;
   top: 44px;
-  left: 0;
   right: 0;
+  width: 100%;
+  max-width: 512px;
   display: grid;
   grid-template-columns: auto 1fr 48px;
   gap: 4px 8px;
   font-size: 13px;
-  padding: 16px 8px;
+  padding: 16px;
   background-color: var(--color-scrim);
-  border-bottom: 1px solid var(--color-border);
   backdrop-filter: blur(30px);
 `
 
 const ButtonGroup = styled.div`
+  padding-top: 16px;
   grid-column: 1 / span 3;
   display: grid;
   grid-auto-flow: column;
