@@ -1,7 +1,9 @@
 import * as React from 'react'
-import state from '../state'
+import state, { useSelector } from '../state'
+import Alert from './alert'
+import copySvgToClipboard from '../utils/copySvgToClipboard'
 import styled from 'styled-components'
-import { Trash, RotateCcw, RotateCw, Settings } from 'react-feather'
+import { Trash, RotateCcw, RotateCw, Settings, Clipboard } from 'react-feather'
 
 const ToolbarContainer = styled.div`
   position: absolute;
@@ -16,12 +18,14 @@ const ToolbarContainer = styled.div`
   background-color: var(--color-scrim);
   backdrop-filter: blur(30px);
   user-select: none;
+  overflow: visible;
 `
 
 const ButtonGroup = styled.div`
   padding: 0 4px;
   display: flex;
   align-items: center;
+  overflow: inherit;
 `
 
 const IconButton = styled.button`
@@ -46,6 +50,8 @@ const IconButton = styled.button`
 `
 
 export default function Toolbar() {
+  const clipboardMessage = useSelector(state => state.data.clipboardMessage)
+
   return (
     <ToolbarContainer onPointerDown={e => e.stopPropagation()}>
       <ButtonGroup>
@@ -63,6 +69,20 @@ export default function Toolbar() {
         | <a href="https://twitter.com/steveruizok">@steveruizok</a>
       </div>
       <ButtonGroup>
+        <Alert
+          animationLength={150}
+          visibilityDuration={1200}
+          alertText={clipboardMessage}
+          onFinish={() => state.send('SET_CLIPBOARD_MESSAGE', null)}
+        >
+          <IconButton
+            onClick={async () => {
+              state.send('SET_CLIPBOARD_MESSAGE', await copySvgToClipboard())
+            }}
+          >
+            <Clipboard />
+          </IconButton>
+        </Alert>
         <IconButton onClick={() => state.send('TOGGLED_CONTROLS')}>
           <Settings />
         </IconButton>

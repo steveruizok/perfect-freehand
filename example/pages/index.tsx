@@ -46,7 +46,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <svg ref={ref} viewBox={'0 0 800 600'}>
+        <svg ref={ref} viewBox={'0 0 800 600'} id="drawable-svg">
           {marks.map((mark, i) => (
             <path
               key={i}
