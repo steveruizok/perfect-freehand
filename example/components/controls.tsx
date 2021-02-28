@@ -72,7 +72,7 @@ export default function Controls() {
       <NumberInput
         value={options.smooth}
         onChange={v => state.send('CHANGED_OPTIONS', { smooth: v })}
-        label="smooth"
+        label="Smooth"
         min={0}
         max={50}
       />
