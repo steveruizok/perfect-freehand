@@ -7,7 +7,12 @@ export default async function copySvgToClipboard() {
     // Get the SVG's bounding box
     var bbox = element.getBBox()
     let tViewBox = element.getAttribute('viewBox')
-    var viewBox = [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
+    var viewBox = [
+      bbox.x - 16,
+      bbox.y - 16,
+      bbox.width + 32,
+      bbox.height + 32,
+    ].join(' ')
     let tW = element.getAttribute('width')
     let tH = element.getAttribute('height')
 
