@@ -11,7 +11,7 @@ html,
   --color-border: rgba(144, 144, 144, 0.4);
   --color-hover: rgba(144, 144, 144, 0.1);
   --color-scrim: rgba(255, 255, 255, 0.9);
-  --color-alert-background: #2d2d2d;
+  --color-alert-background: #1d1d1d;
   --color-alert-text: #ffffff;
 }
 
