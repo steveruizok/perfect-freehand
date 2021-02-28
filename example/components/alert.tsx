@@ -39,7 +39,7 @@ const AlertWrapper = styled.div`
   overflow: inherit;
 `
 
-const Alert = styled.div`
+const StyledAlert = styled.div`
   position: absolute;
   margin-top: 5px;
   padding: 4px 10px;
@@ -59,7 +59,7 @@ const Alert = styled.div`
   ${animation};
 `
 
-export default function({
+export default function Alert({
   children,
   animationLength,
   visibilityDuration,
@@ -85,14 +85,14 @@ export default function({
     <AlertWrapper>
       {children}
       {alertText ? (
-        <Alert
+        <StyledAlert
           aria-live="polite"
           role="alert"
           animation={alertFading ? fadeOut : flyIn}
           animationLength={animationLength}
         >
           {alertText.message}
-        </Alert>
+        </StyledAlert>
       ) : null}
     </AlertWrapper>
   )
