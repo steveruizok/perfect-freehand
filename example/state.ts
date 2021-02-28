@@ -1,6 +1,6 @@
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
-import { Mark, CompleteMark } from './types'
+import { Mark, CompleteMark, ClipboardMessage } from './types'
 import pathAlgorithm, { StrokeOptions } from 'perfect-freehand'
 
 const defaultOptions: StrokeOptions = {
@@ -29,6 +29,7 @@ const state = createState({
     redos: [] as { clear?: boolean; marks: CompleteMark[] }[],
     marks: [] as CompleteMark[],
     currentMark: null as Mark | null,
+    clipboardMessage: null as ClipboardMessage | null,
   },
   on: {
     RESET_OPTIONS: [d => (d.alg = { ...defaultOptions }), 'updatePaths'],
@@ -51,6 +52,7 @@ const state = createState({
     UNDO: ['undoMark'],
     REDO: ['redoMark'],
     TOGGLED_DARK_MODE: ['toggleDarkMode', 'setDarkMode'],
+    SET_CLIPBOARD_MESSAGE: (d, p) => (d.clipboardMessage = p),
   },
   states: {
     pointer: {

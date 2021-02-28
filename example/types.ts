@@ -35,3 +35,8 @@ export interface Pointer extends Point {
   p: number
   type: 'pen' | 'mouse' | 'touch'
 }
+
+export interface ClipboardMessage {
+  error: boolean
+  message: string
+}

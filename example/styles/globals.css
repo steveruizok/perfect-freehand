@@ -11,12 +11,16 @@ html,
   --color-border: rgba(144, 144, 144, 0.4);
   --color-hover: rgba(144, 144, 144, 0.1);
   --color-scrim: rgba(255, 255, 255, 0.9);
+  --color-alert-background: #2d2d2d;
+  --color-alert-text: #ffffff;
 }
 
 .dark {
   --color-background: #1d1d1d;
   --color-text: #cfcfcf;
   --color-scrim: rgba(20, 0, 0, 0.3);
+  --color-alert-background: #ffffff;
+  --color-alert-text: #1d1d1d;
 }
 
 button {
