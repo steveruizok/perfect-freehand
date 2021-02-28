@@ -58,6 +58,13 @@ const StyledAlert = styled.div`
 
   ${animation};
 `
+interface AlertProps {
+  children: React.ReactNode
+  animationLength: number
+  visibilityDuration: number
+  alertText: { error: boolean; message: string }
+  onFinish: () => void
+}
 
 export default function Alert({
   children,
@@ -65,7 +72,7 @@ export default function Alert({
   visibilityDuration,
   alertText,
   onFinish,
-}) {
+}: AlertProps) {
   const [alertFading, setAlertFading] = React.useState(false)
 
   React.useEffect(() => {

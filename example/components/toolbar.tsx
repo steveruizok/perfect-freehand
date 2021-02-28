@@ -1,7 +1,6 @@
 import * as React from 'react'
 import state, { useSelector } from '../state'
 import Alert from './alert'
-import copySvgToClipboard from '../utils/copySvgToClipboard'
 import styled from 'styled-components'
 import { Trash, RotateCcw, RotateCw, Settings, Clipboard } from 'react-feather'
 
@@ -73,13 +72,9 @@ export default function Toolbar() {
           animationLength={150}
           visibilityDuration={1200}
           alertText={clipboardMessage}
-          onFinish={() => state.send('SET_CLIPBOARD_MESSAGE', null)}
+          onFinish={() => state.send('CLEARED_CLIPBOARD_MESSAGE', null)}
         >
-          <IconButton
-            onClick={async () => {
-              state.send('SET_CLIPBOARD_MESSAGE', await copySvgToClipboard())
-            }}
-          >
+          <IconButton onClick={async () => state.send('COPIED_TO_CLIPBOARD')}>
             <Clipboard />
           </IconButton>
         </Alert>
