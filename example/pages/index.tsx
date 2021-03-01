@@ -31,7 +31,7 @@ export default function Home() {
       )
     }
     resize()
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
       window.addEventListener('resize', resize)
       return () => {
         window.removeEventListener('resize', resize)
