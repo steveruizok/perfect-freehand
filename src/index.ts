@@ -132,15 +132,20 @@ export function getStrokePoints<
  * ## getShortStrokeOutlinePoints
  * @description Draw an outline around a short stroke.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
- * @param options An (optional) object with options.
+ * @param options An (optional) object with stroke outline options.
  */
-export function getShortStrokeOutlinePoints(
-  points: number[][],
+export function getShortStrokeOutlinePoints<
+  T extends number[],
+  K extends { x: number; y: number; pressure?: number }
+>(
+  points: (T | K)[],
   options: StrokeOutlineOptions = {} as StrokeOutlineOptions
 ) {
   const { minSize = 2.5, maxSize = 8 } = options
 
-  const len = points.length
+  const aPoints = toPointsArray(points)
+
+  const len = aPoints.length
 
   // Can't draw an outline without any points
   if (len === 0) {
@@ -148,8 +153,8 @@ export function getShortStrokeOutlinePoints(
   }
 
   // Draw a kind of shitty shape around the start and end points.
-  const p0 = points[0],
-    p1 = points[len - 1],
+  const p0 = aPoints[0],
+    p1 = aPoints[len - 1],
     size = p0[2] === p1[2] ? maxSize : minSize + (maxSize - minSize) * p1[2],
     a =
       p0 === p1
@@ -170,10 +175,13 @@ export function getShortStrokeOutlinePoints(
  * ## getStrokeOutlinePoints
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
- * @param options An (optional) object with options.
+ * @param options An (optional) object with stroke outline options.
  */
-export function getStrokeOutlinePoints(
-  points: number[][],
+export function getStrokeOutlinePoints<
+  T extends number[],
+  K extends { x: number; y: number; pressure?: number }
+>(
+  points: (T | K)[],
   options: StrokeOutlineOptions = {} as StrokeOutlineOptions
 ): number[][] {
   const {
@@ -184,9 +192,11 @@ export function getStrokeOutlinePoints(
     smooth = 8,
   } = options
 
-  let len = points.length,
-    p0 = points[0],
-    p1 = points[0],
+  const aPoints = toPointsArray(points)
+
+  let len = aPoints.length,
+    p0 = aPoints[0],
+    p1 = aPoints[0],
     t0 = p0,
     t1 = p1,
     m0 = p0,
@@ -208,7 +218,7 @@ export function getStrokeOutlinePoints(
   // of the shape is determined by the pressure at each point.
 
   for (let i = 1; i < len; i++) {
-    let [x, y, ip, angle, distance] = points[i]
+    let [x, y, ip, angle, distance] = aPoints[i]
     length += distance
 
     // Size
