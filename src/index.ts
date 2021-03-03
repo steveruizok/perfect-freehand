@@ -2,17 +2,22 @@ import polygonClipping from 'polygon-clipping'
 
 /* --------------------- Helpers -------------------- */
 
-const { hypot, cos, max, min, sin, atan2, PI } = Math
-const TAU = PI / 2
+const { abs, hypot, cos, max, min, sin, atan2, PI } = Math,
+  TAU = PI / 2,
+  PI2 = PI * 2
 
 function projectPoint(x0: number, y0: number, a: number, d: number) {
   return [cos(a) * d + x0, sin(a) * d + y0]
 }
 
 function shortAngleDist(a0: number, a1: number) {
-  var max = Math.PI * 2
+  var max = PI2
   var da = (a1 - a0) % max
   return ((2 * da) % max) - da
+}
+
+export function lerpAngles(a0: number, a1: number, t: number) {
+  return a0 + shortAngleDist(a0, a1) * t
 }
 
 function angleDelta(a0: number, a1: number) {
@@ -27,6 +32,13 @@ function getPointBetween(
   d = 0.5
 ) {
   return [x0 + (x1 - x0) * d, y0 + (y1 - y0) * d]
+}
+function getAngle(x0: number, y0: number, x1: number, y1: number) {
+  return atan2(y1 - y0, x1 - x0)
+}
+
+function getDistance(x0: number, y0: number, x1: number, y1: number) {
+  return hypot(y1 - y0, x1 - x0)
 }
 
 function clamp(n: number, a: number, b: number) {
@@ -110,13 +122,17 @@ export function getStrokePoints<
     x = px + (ix - px) * (1 - streamline)
     y = py + (iy - py) * (1 - streamline)
 
-    // Angle
-    angle = atan2(y - py, x - px)
-
     // Distance
-    distance = hypot(y - py, x - px)
+    distance = getDistance(x, y, px, py)
+
+    // Angle
+    angle = getAngle(px, py, x, y)
+
+    // If distance is very short, blend the angles
+    if (distance < 1) angle = lerpAngles(prev[2], angle, 0.5)
+
     length += distance
-    prev = [x, y, ip, angle, distance, length]
+    prev = [x, y, angle, ip, distance, length]
     pts.push(prev)
   }
 
@@ -139,7 +155,6 @@ export function getShortStrokeOutlinePoints(
   options: StrokeOutlineOptions = {} as StrokeOutlineOptions
 ) {
   const { minSize = 2.5, maxSize = 8 } = options
-
   const len = points.length
 
   // Can't draw an outline without any points
@@ -147,23 +162,24 @@ export function getShortStrokeOutlinePoints(
     return []
   }
 
-  // Draw a kind of shitty shape around the start and end points.
-  const p0 = points[0],
-    p1 = points[len - 1],
-    size = p0[2] === p1[2] ? maxSize : minSize + (maxSize - minSize) * p1[2],
-    a =
-      p0 === p1
-        ? Math.random() * (PI * 2)
-        : atan2(p1[1] - p0[1], p1[0] - p0[0]),
-    m = getPointBetween(p0[0], p0[1], p1[0], p1[1], 0.5)
+  const [x0, y0] = points[0],
+    [x1, y1] = points[len - 1],
+    p = points[len - 1][3],
+    leftPts: number[][] = [],
+    rightPts: number[][] = [],
+    size = clamp(
+      minSize + (maxSize - minSize) * (p ? p : 0.5),
+      minSize,
+      maxSize
+    ),
+    angle = x0 === x1 ? 0 : getAngle(x0, y0, x1, y1)
 
-  return [
-    projectPoint(m[0], m[1], a + TAU, size),
-    projectPoint(p0[0], p0[1], a + PI, size),
-    projectPoint(m[0], m[1], a - TAU, size),
-    projectPoint(p1[0], p1[1], a, size),
-    projectPoint(m[0], m[1], a + TAU, size),
-  ]
+  for (let t = 0, step = 0.1; t <= 1; t += step) {
+    leftPts.push(projectPoint(x1, y1, angle + TAU - t * PI, size - 1))
+    rightPts.push(projectPoint(x0, y0, angle + TAU + t * PI, size - 1))
+  }
+
+  return leftPts.concat(rightPts.reverse())
 }
 
 /**
@@ -193,10 +209,10 @@ export function getStrokeOutlinePoints(
     m1 = p0,
     size = 0,
     pp = 0.5,
-    prev = p1,
+    started = false,
     length = 0,
-    leftPts: number[][] = [],
-    rightPts: number[][] = [],
+    leftPts: number[][] = [p0],
+    rightPts: number[][] = [p0],
     d0: number,
     d1: number
 
@@ -208,14 +224,16 @@ export function getStrokeOutlinePoints(
   // of the shape is determined by the pressure at each point.
 
   for (let i = 1; i < len; i++) {
-    let [x, y, ip, angle, distance] = points[i]
-    length += distance
+    const [px, py, pa] = points[i - 1]
+    let [x, y, angle, ip, distance, clen] = points[i]
+
+    length += clen
 
     // Size
     if (pressure) {
       if (simulatePressure) {
         // Simulate pressure by accellerating the reported pressure.
-        let rp = min(1 - distance / maxSize, 1)
+        const rp = min(1 - distance / maxSize, 1)
         const sp = min(distance / maxSize, 1)
         ip = min(1, pp + (rp - pp) * (sp / 2))
       }
@@ -225,70 +243,59 @@ export function getStrokeOutlinePoints(
       size = maxSize
     }
 
+    // Handle line start
+    if (!started && length > size / 2) {
+      const [sx, sy] = points[0]
+
+      for (let t = 0, step = 0.25; t <= 1; t += step) {
+        m0 = projectPoint(sx, sy, angle + TAU + t * PI, size - 1)
+        leftPts.push(m0)
+
+        m1 = projectPoint(sx, sy, angle - TAU + t * -PI, size - 1)
+        rightPts.push(m1)
+      }
+      started = true
+      continue
+    }
+
     // 3. Shape
     p0 = projectPoint(x, y, angle - TAU, size) // left
     p1 = projectPoint(x, y, angle + TAU, size) // right
 
-    // // Add more points to the first and p1 points
-    if (i === 0) {
-      t0 = p0
-      t1 = p1
+    const delta = angleDelta(pa, angle)
 
-      for (let t = 0, step = 0.33; t <= 1; t += step) {
-        m1 = projectPoint(prev[0], prev[1], angle - TAU + t * -PI, size * 2)
+    // Handle sharp corners differently
+    if (i === points.length - 1 || (abs(delta) > PI * 0.75 && length > size)) {
+      const [mx, my] = getPointBetween(px, py, x, y, 0.5)
+
+      for (let t = 0, step = 0.25; t <= 1; t += step) {
+        m0 = projectPoint(mx, my, pa - TAU + t * PI, size - 1)
+        leftPts.push(m0)
+
+        m1 = projectPoint(mx, my, pa + TAU + t * -PI, size - 1)
         rightPts.push(m1)
-        t1 = m1
       }
+      t0 = m0
+      t1 = m1
     } else {
-      const delta = angleDelta(angle, prev[2])
+      // Project sideways
+      d0 = getDistance(p0[0], p0[1], t0[0], t0[1])
+      if (d0 > smooth) {
+        leftPts.push(m0)
+        m0 = getPointBetween(t0[0], t0[1], p0[0], p0[1], 0.5)
+        t0 = p0
+      }
 
-      // Handle sharp corners differently
-      if (Math.abs(delta) > PI * 0.72 && length > size * 2) {
-        if (delta > 0) {
-          m0 = prev
-          leftPts.push(m0)
-          t0 = m0
-
-          for (let t = 0, step = 0.3; t <= 1; t += step) {
-            m1 = projectPoint(prev[0], prev[1], angle - TAU + t * -PI, size)
-            rightPts.push(m1)
-            t1 = m1
-          }
-        } else {
-          for (let t = 0, step = 0.3; t <= 1; t += step) {
-            m0 = projectPoint(prev[0], prev[1], angle + TAU + t * PI, size)
-            leftPts.push(m0)
-            t0 = m0
-          }
-
-          m1 = prev
-          rightPts.push(m1)
-          t1 = m1
-        }
-      } else {
-        // Project sideways
-        d0 = Math.hypot(p0[0] - t0[0], p0[1] - t0[1])
-        if (d0 > smooth) {
-          leftPts.push(m0)
-          m0 = getPointBetween(t0[0], t0[1], p0[0], p0[1], 0.5)
-          t0 = p0
-        }
-
-        d1 = Math.hypot(p1[0] - t1[0], p1[1] - t1[1])
-        if (d1 > smooth) {
-          rightPts.push(m1)
-          m1 = getPointBetween(t1[0], t1[1], p1[0], p1[1], 0.5)
-          t1 = p1
-        }
+      d1 = getDistance(p1[0], p1[1], t1[0], t1[1])
+      if (d1 > smooth) {
+        rightPts.push(m1)
+        m1 = getPointBetween(t1[0], t1[1], p1[0], p1[1], 0.5)
+        t1 = p1
       }
     }
 
     pp = ip
-    prev = [x, y, angle]
   }
-
-  leftPts.push(prev)
-  rightPts.push(prev)
 
   return leftPts.concat(rightPts.reverse())
 }
@@ -321,7 +328,7 @@ export default function getPath<
   let ps = getStrokePoints(points, options),
     totalLength = ps[ps.length - 1][5],
     pts =
-      totalLength < maxSize * 2
+      totalLength < maxSize
         ? getShortStrokeOutlinePoints(ps, options)
         : getStrokeOutlinePoints(ps, options),
     d: string[] = []
@@ -360,6 +367,8 @@ export default function getPath<
       v1 = pts[i + 1]
     }
   }
+
+  d.push('Z')
 
   return d.join(' ')
 }
