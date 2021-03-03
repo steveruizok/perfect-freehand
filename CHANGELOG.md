@@ -1,3 +1,7 @@
+# 0.2.4
+
+- Improves sharp corners.
+
 # 0.2.3
 
 - Brings back `simulatePressure` until I have a better way of guessing.
