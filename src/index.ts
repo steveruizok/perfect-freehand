@@ -9,6 +9,16 @@ function projectPoint(x0: number, y0: number, a: number, d: number) {
   return [cos(a) * d + x0, sin(a) * d + y0]
 }
 
+function shortAngleDist(a0: number, a1: number) {
+  var max = Math.PI * 2
+  var da = (a1 - a0) % max
+  return ((2 * da) % max) - da
+}
+
+function angleDelta(a0: number, a1: number) {
+  return shortAngleDist(a0, a1)
+}
+
 function getPointBetween(
   x0: number,
   y0: number,
@@ -174,9 +184,7 @@ export function getStrokeOutlinePoints(
     smooth = 8,
   } = options
 
-  let d0: number,
-    d1: number, // first / last
-    len = points.length,
+  let len = points.length,
     p0 = points[0],
     p1 = points[0],
     t0 = p0,
@@ -186,7 +194,11 @@ export function getStrokeOutlinePoints(
     size = 0,
     pp = 0.5,
     prev = p1,
-    pts: number[][] = []
+    length = 0,
+    leftPts: number[][] = [],
+    rightPts: number[][] = [],
+    d0: number,
+    d1: number
 
   if (len === 0) {
     return []
@@ -197,6 +209,7 @@ export function getStrokeOutlinePoints(
 
   for (let i = 1; i < len; i++) {
     let [x, y, ip, angle, distance] = points[i]
+    length += distance
 
     // Size
     if (pressure) {
@@ -220,30 +233,64 @@ export function getStrokeOutlinePoints(
     if (i === 0) {
       t0 = p0
       t1 = p1
-    } else {
-      d0 = Math.hypot(p0[0] - t0[0], p0[1] - t0[1])
-      if (d0 > smooth) {
-        pts.push(m0)
-        m0 = getPointBetween(t0[0], t0[1], p0[0], p0[1], 0.5)
-        t0 = p0
-      }
 
-      d1 = Math.hypot(p1[0] - t1[0], p1[1] - t1[1])
-      if (d1 > smooth) {
-        pts.unshift(m1)
-        m1 = getPointBetween(t1[0], t1[1], p1[0], p1[1], 0.5)
-        t1 = p1
+      for (let t = 0, step = 0.33; t <= 1; t += step) {
+        m1 = projectPoint(prev[0], prev[1], angle - TAU + t * -PI, size * 2)
+        rightPts.push(m1)
+        t1 = m1
+      }
+    } else {
+      const delta = angleDelta(angle, prev[2])
+
+      // Handle sharp corners differently
+      if (Math.abs(delta) > PI * 0.72 && length > size * 2) {
+        if (delta > 0) {
+          m0 = prev
+          leftPts.push(m0)
+          t0 = m0
+
+          for (let t = 0, step = 0.3; t <= 1; t += step) {
+            m1 = projectPoint(prev[0], prev[1], angle - TAU + t * -PI, size)
+            rightPts.push(m1)
+            t1 = m1
+          }
+        } else {
+          for (let t = 0, step = 0.3; t <= 1; t += step) {
+            m0 = projectPoint(prev[0], prev[1], angle + TAU + t * PI, size)
+            leftPts.push(m0)
+            t0 = m0
+          }
+
+          m1 = prev
+          rightPts.push(m1)
+          t1 = m1
+        }
+      } else {
+        // Project sideways
+        d0 = Math.hypot(p0[0] - t0[0], p0[1] - t0[1])
+        if (d0 > smooth) {
+          leftPts.push(m0)
+          m0 = getPointBetween(t0[0], t0[1], p0[0], p0[1], 0.5)
+          t0 = p0
+        }
+
+        d1 = Math.hypot(p1[0] - t1[0], p1[1] - t1[1])
+        if (d1 > smooth) {
+          rightPts.push(m1)
+          m1 = getPointBetween(t1[0], t1[1], p1[0], p1[1], 0.5)
+          t1 = p1
+        }
       }
     }
 
     pp = ip
-    prev = [x, y]
+    prev = [x, y, angle]
   }
 
-  pts.push(prev)
-  pts.unshift(prev)
+  leftPts.push(prev)
+  rightPts.push(prev)
 
-  return pts
+  return leftPts.concat(rightPts.reverse())
 }
 
 /**
