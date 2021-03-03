@@ -1,3 +1,8 @@
+# 0.2.5
+
+- Improves caps for start and end.
+- Improves handling of short moves.
+
 # 0.2.4
 
 - Improves sharp corners.
