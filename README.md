@@ -2,7 +2,7 @@
 
 Perfect freehand is a library for creating freehand paths by [@steveruizok](https://twitter.com/steveruizok).
 
-![Screenshot](/screenshot.png)
+![Screenshot](https://github.com/steveruizok/perfect-freehand/raw/main/screenshot.png)
 
 🔗 [Demo](https://perfect-freehand-example.vercel.app/)
 
