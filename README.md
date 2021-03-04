@@ -76,8 +76,6 @@ While `getStroke` returns an array of points representing a stroke, it's up to y
 For example, here is a function that takes in a stroke and returns SVG path data. You can use the string returned by this function in two ways. For SVG, you can pass the data into `path` element's [`d` property](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d). For HTML canvas, you can pass the string into the [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths) and then stroke or fill the path.
 
 ```js
-import getStroke from 'perfect-freehand'
-
 // Create SVG path data using the points from perfect-freehand.
 function getSvgPathFromStroke(stroke) {
   const d = []
@@ -105,38 +103,36 @@ function getSvgPathFromStroke(stroke) {
 ```jsx
 import * as React from 'react'
 import getStroke from 'perfect-freehand'
-import getSvgPathFromStroke from './utils' // See "Rendering" section above.
+import { getSvgPathFromStroke } from './utils'
 
 export default function Example() {
   const [currentMark, setCurrentMark] = React.useState()
 
   function handlePointerDown(e) {
-    const point = [e.pageX, e.pageY, e.pressure]
-
     setCurrentMark({
       type: e.pointerType,
-      points: [point],
+      points: [[e.pageX, e.pageY, e.pressure]],
     })
   }
 
   function handlePointerMove(e) {
-    const point = [e.pageX, e.pageY, e.pressure]
-
     if (e.buttons === 1) {
       setCurrentMark({
         ...currentMark,
-        points: [...currentMark.points, point],
+        points: [...currentMark.points, [e.pageX, e.pageY, e.pressure]],
       })
     }
   }
 
-  const stroke = getStroke(currentMark.points, {
-    size: 8,
-    thinning: 0.5,
-    smoothing: 0.5,
-    streamline: 0.5,
-    simulatePressure: currentMark.type !== 'pen',
-  })
+  const stroke = currentMark
+    ? getStroke(currentMark.points, {
+        size: 16,
+        thinning: 0.75,
+        smoothing: 0.5,
+        streamline: 0.5,
+        simulatePressure: currentMark.type !== 'pen',
+      })
+    : []
 
   return (
     <svg
