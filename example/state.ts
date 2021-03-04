@@ -1,15 +1,17 @@
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
-import { Mark, CompleteMark, ClipboardMessage } from './types'
-import pathAlgorithm, { StrokeOptions } from 'perfect-freehand'
+import { Mark, ClipboardMessage } from './types'
+import getStroke, { StrokeOptions } from 'perfect-freehand'
+import polygonClipping from 'polygon-clipping'
 
-const defaultOptions: StrokeOptions = {
-  simulatePressure: true,
-  pressure: true,
+type AppOptions = StrokeOptions & { clip: boolean }
+
+const defaultOptions: AppOptions = {
+  size: 16,
+  thinning: 0.75,
+  smoothing: 0.5,
   streamline: 0.5,
-  minSize: 2.5,
-  maxSize: 8,
-  smooth: 8,
+  simulatePressure: true,
   clip: true,
 }
 
@@ -21,13 +23,69 @@ const defaultSettings = {
   recomputePaths: true,
 }
 
+function getSvgPathFromStroke(stroke: number[][]) {
+  const d = []
+
+  let [p0, p1] = stroke
+
+  d.push(`M ${p0[0]} ${p0[1]} Q`)
+
+  for (let i = 1; i < stroke.length; i++) {
+    const mpx = p0[0] + (p1[0] - p0[0]) / 2
+    const mpy = p0[1] + (p1[1] - p0[1]) / 2
+    d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
+    p0 = p1
+    p1 = stroke[i + 1]
+  }
+
+  d.push('Z')
+
+  return d.join(' ')
+}
+
+function getFlatSvgPathFromStroke(stroke: number[][]) {
+  const poly = polygonClipping.union([stroke] as any)
+
+  const d = []
+
+  for (let face of poly) {
+    for (let pts of face) {
+      let [p0, p1] = pts
+
+      d.push(`M ${p0[0]} ${p0[1]} Q`)
+
+      for (let i = 1; i < pts.length; i++) {
+        const mpx = p0[0] + (p1[0] - p0[0]) / 2
+        const mpy = p0[1] + (p1[1] - p0[1]) / 2
+        d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
+        p0 = p1
+        p1 = pts[i + 1]
+      }
+
+      d.push('Z')
+    }
+  }
+
+  return d.join(' ')
+}
+
+function getStrokePath(points: Mark['points'], options: AppOptions) {
+  const stroke = getStroke(points, options)
+
+  if (options.clip) {
+    return getFlatSvgPathFromStroke(stroke)
+  }
+
+  return getSvgPathFromStroke(stroke)
+}
+
 const state = createState({
   data: {
     settings: { ...defaultSettings },
     alg: { ...defaultOptions },
-    restore: [] as { clear?: boolean; marks: CompleteMark[] }[],
-    redos: [] as { clear?: boolean; marks: CompleteMark[] }[],
-    marks: [] as CompleteMark[],
+    restore: [] as { clear?: boolean; marks: Mark[] }[],
+    redos: [] as { clear?: boolean; marks: Mark[] }[],
+    marks: [] as Mark[],
     currentMark: null as Mark | null,
     clipboardMessage: null as ClipboardMessage | null,
   },
@@ -95,7 +153,7 @@ const state = createState({
         down: {
           on: {
             LIFTED_POINTER: {
-              do: ['completeMark'],
+              do: ['Mark'],
               to: 'up',
             },
             MOVED_POINTER: {
@@ -153,7 +211,10 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, alg),
+        path: getStrokePath(mark.points, {
+          ...alg,
+          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
+        }),
       }))
 
       data.settings = {
@@ -165,23 +226,25 @@ const state = createState({
     cleanup(data) {},
     resize(data) {},
     beginMark(data) {
+      const { alg } = data
       const { x, y, p, type } = getPointer()
       data.settings.penMode = type === 'pen'
 
       data.redos = []
 
+      const point = {
+        x,
+        y,
+        pressure: p,
+      }
+
       data.currentMark = {
         type,
-        points: [
-          {
-            x,
-            y,
-            angle: 0,
-            pressure: p,
-            distance: 0,
-          },
-        ],
-        path: '',
+        points: [point],
+        path: getStrokePath([point], {
+          ...alg,
+          simulatePressure: alg.simulatePressure && type !== 'pen',
+        }),
       }
     },
     addPointToMark(data) {
@@ -191,24 +254,22 @@ const state = createState({
       if (type !== currentMark!.type) return
 
       currentMark!.points.push({
-        x: Math.round(x),
-        y: Math.round(y),
-        angle: 0,
+        x,
+        y,
         pressure: p,
-        distance: 0,
       })
 
-      currentMark!.path = pathAlgorithm(currentMark!.points, {
+      currentMark!.path = getStrokePath(currentMark!.points, {
         ...alg,
         simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
       })
     },
-    completeMark(data) {
+    Mark(data) {
       const { currentMark, alg } = data
 
       data.marks.push({
         ...currentMark!,
-        path: pathAlgorithm(currentMark!.points, {
+        path: getStrokePath(currentMark!.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
         }),
@@ -224,7 +285,7 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: pathAlgorithm(mark.points, {
+        path: getStrokePath(mark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && mark.type !== 'pen',
         }),
@@ -263,14 +324,14 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = pathAlgorithm(mark.points, {
+        mark.path = getStrokePath(mark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && mark.type !== 'pen',
         })
       }
 
       if (currentMark) {
-        currentMark.path = pathAlgorithm(currentMark.points, {
+        currentMark.path = getStrokePath(currentMark.points, {
           ...alg,
           simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
         })
@@ -330,19 +391,6 @@ const state = createState({
       return navigator.clipboard.writeText(svgString)
     },
   },
-})
-
-state.onUpdate(d => {
-  if (d.isIn('up')) {
-    localStorage.setItem(
-      'pressure_lines',
-      JSON.stringify({
-        alg: d.data.alg,
-        marks: d.data.marks,
-        settings: d.data.settings,
-      })
-    )
-  }
 })
 
 export const useSelector = createSelectorHook(state)

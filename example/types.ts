@@ -3,14 +3,8 @@ export interface Mark {
   points: {
     x: number
     y: number
-    angle: number
     pressure: number
-    distance: number
   }[]
-  path: string
-}
-
-export interface CompleteMark extends Mark {
   path: string
 }
 

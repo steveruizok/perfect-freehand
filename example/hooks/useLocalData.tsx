@@ -22,7 +22,21 @@ export default function useLocalData() {
       32
     )
 
+    const unsub = state.onUpdate(d => {
+      if (d.isIn('up')) {
+        localStorage.setItem(
+          'pressure_lines',
+          JSON.stringify({
+            alg: d.data.alg,
+            marks: d.data.marks,
+            settings: d.data.settings,
+          })
+        )
+      }
+    })
+
     return () => {
+      unsub()
       state.send('UNLOADED')
     }
   }, [])

@@ -1,3 +1,24 @@
+# 0.3.0
+
+This version has breaking changes.
+
+- Removes polygon-clipping as a dependency. The problems it solved are no longer problems but a developer might still use it separately for aesthetic reasons.
+- Removes `clipPath`.
+- Removes options types other than `StrokeOptions`.
+- Removes `getShortStrokeOutlinePoints`.
+- Removes `pressure` option.
+- Removes `minSize` and `maxSize` options.
+- Adds `size` and `thinning` options.
+- Renames `smooth` to `smoothing`.
+- Improves caps.
+- Improves dots and short strokes.
+- You can now use `thinning` to create strokes that shink at high pressure as well as at low pressure. This is a normalized value based on the `size` option:
+  - at `0` the `thinning` property will have no effect on a stroke's width.
+  - at `1` a stroke will reach zero width at the lowest pressure and its full width (`size`) at the highest pressure
+  - at `-1` a stroke will reach zero width at the highest pressure and its full width at the lowest pressure.
+- Setting `thinning` to zero has the same effect as had setting the now removed `pressure` option to `false`.
+- Improves code organization and comments.
+
 # 0.2.5
 
 - Improves caps for start and end.

@@ -42,11 +42,6 @@ export default function Controls() {
         value={options.clip}
         onChange={v => state.send('CHANGED_OPTIONS', { clip: v })}
       />
-      <BooleanInput
-        label="Pressure"
-        value={options.pressure}
-        onChange={v => state.send('CHANGED_OPTIONS', { pressure: v })}
-      />
       <NumberInput
         value={options.streamline}
         onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
@@ -55,26 +50,26 @@ export default function Controls() {
         max={1}
       />
       <NumberInput
-        label="Min Size"
-        value={options.minSize}
+        label="Size"
+        value={options.size}
         min={1}
         max={64}
-        onChange={v => state.send('CHANGED_OPTIONS', { minSize: v })}
+        onChange={v => state.send('CHANGED_OPTIONS', { size: v })}
       />
       <NumberInput
-        label="Max Size"
-        value={options.maxSize}
-        min={1}
-        max={64}
-        onChange={v => state.send('CHANGED_OPTIONS', { maxSize: v })}
+        label="Thinning"
+        value={options.thinning}
+        min={-1}
+        max={1}
+        onChange={v => state.send('CHANGED_OPTIONS', { thinning: v })}
       />
 
       <NumberInput
-        value={options.smooth}
-        onChange={v => state.send('CHANGED_OPTIONS', { smooth: v })}
+        value={options.smoothing}
+        onChange={v => state.send('CHANGED_OPTIONS', { smoothing: v })}
         label="Smooth"
         min={0}
-        max={50}
+        max={2}
       />
       <BooleanInput
         label="Dark Mode"

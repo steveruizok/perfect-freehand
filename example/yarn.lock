@@ -1645,10 +1645,10 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-perfect-freehand@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.2.3.tgz#dc2edbabd81433f860f2a2f4f018f3480dda792f"
-  integrity sha512-6u+RLAYa1wzQVHC4HxW59flOUyoeNTS9Fy46LESiOVgA9en75bLDqnsrC5/zFK0XKIAsylGdLGxnrhmT1x7rgQ==
+perfect-freehand@latest:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.2.5.tgz#d497e48f62d5f956eaaab9ef4dd7213ec77e6b3a"
+  integrity sha512-myGFhaM24+t3dQ9fnrcpyRYqqLcI7Hi7g8wv8RmjLJLDP30+d67g9uxOmHUhTcNbXnrPkN/eTUMNnBdoCN7BDQ==
   dependencies:
     polygon-clipping "^0.15.2"
 

@@ -1,110 +1,35 @@
-import polygonClipping from 'polygon-clipping'
+import {
+  toPointsArray,
+  clamp,
+  getAngle,
+  getAngleDelta,
+  getDistance,
+  getPointBetween,
+  projectPoint,
+  lerp,
+} from './utils'
+import { StrokeOptions } from './types'
 
-/* --------------------- Helpers -------------------- */
-
-const { abs, hypot, cos, max, min, sin, atan2, PI } = Math,
+const { abs, min, PI } = Math,
   TAU = PI / 2,
-  PI2 = PI * 2
-
-function projectPoint(x0: number, y0: number, a: number, d: number) {
-  return [cos(a) * d + x0, sin(a) * d + y0]
-}
-
-function shortAngleDist(a0: number, a1: number) {
-  var max = PI2
-  var da = (a1 - a0) % max
-  return ((2 * da) % max) - da
-}
-
-export function lerpAngles(a0: number, a1: number, t: number) {
-  return a0 + shortAngleDist(a0, a1) * t
-}
-
-function angleDelta(a0: number, a1: number) {
-  return shortAngleDist(a0, a1)
-}
-
-function getPointBetween(
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-  d = 0.5
-) {
-  return [x0 + (x1 - x0) * d, y0 + (y1 - y0) * d]
-}
-function getAngle(x0: number, y0: number, x1: number, y1: number) {
-  return atan2(y1 - y0, x1 - x0)
-}
-
-function getDistance(x0: number, y0: number, x1: number, y1: number) {
-  return hypot(y1 - y0, x1 - x0)
-}
-
-function clamp(n: number, a: number, b: number) {
-  return max(a, min(b, n))
-}
-
-function toPointsArray<
-  T extends number[],
-  K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[]): number[][] {
-  if (Array.isArray(points[0])) {
-    return (points as number[][]).map(([x, y, pressure = 0.5]) => [
-      x,
-      y,
-      pressure,
-    ])
-  } else {
-    return (points as {
-      x: number
-      y: number
-      pressure?: number
-    }[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
-  }
-}
-
-/* ---------------------- Types --------------------- */
-
-export interface StrokePointsOptions {
-  streamline?: number
-}
-
-export interface StrokeOutlineOptions extends StrokePointsOptions {
-  simulatePressure?: boolean
-  pressure?: boolean
-  minSize?: number
-  maxSize?: number
-  smooth?: number
-}
-
-export interface StrokeOptions extends StrokeOutlineOptions {
-  clip?: boolean
-}
-
-/* --------------------- Methods -------------------- */
+  SHARP = PI * 0.7
 
 /**
  * ## getStrokePoints
  * @description Get points for a stroke.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
- * @param options An (optional) object with options.
+ * @param streamline How much to streamline the stroke.
  */
 export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(
-  points: (T | K)[],
-  options: StrokePointsOptions = {} as StrokePointsOptions
-): number[][] {
-  const { streamline = 0.5 } = options
-
+>(points: (T | K)[], streamline = 0.5): number[][] {
   const aPoints = toPointsArray(points)
 
   let x: number,
     y: number,
     angle: number,
-    length = 0,
+    totalLength = 0,
     distance = 0.01,
     len = aPoints.length,
     prev = [...aPoints[0], 0, 0, 0],
@@ -123,63 +48,20 @@ export function getStrokePoints<
     y = py + (iy - py) * (1 - streamline)
 
     // Distance
-    distance = getDistance(x, y, px, py)
+    distance = getDistance([x, y], prev)
 
     // Angle
-    angle = getAngle(px, py, x, y)
+    angle = getAngle(prev, [x, y])
 
-    // If distance is very short, blend the angles
-    if (distance < 1) angle = lerpAngles(prev[2], angle, 0.5)
+    // Increment total length
+    totalLength += distance
 
-    length += distance
-    prev = [x, y, angle, ip, distance, length]
+    prev = [x, y, ip, angle, distance, totalLength]
+
     pts.push(prev)
   }
 
-  // Assign second angle to first point
-  if (pts.length > 1) {
-    pts[0][2] = pts[1][2]
-  }
-
   return pts
-}
-
-/**
- * ## getShortStrokeOutlinePoints
- * @description Draw an outline around a short stroke.
- * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
- * @param options An (optional) object with options.
- */
-export function getShortStrokeOutlinePoints(
-  points: number[][],
-  options: StrokeOutlineOptions = {} as StrokeOutlineOptions
-) {
-  const { minSize = 2.5, maxSize = 8 } = options
-  const len = points.length
-
-  // Can't draw an outline without any points
-  if (len === 0) {
-    return []
-  }
-
-  const [x0, y0] = points[0],
-    [x1, y1] = points[len - 1],
-    p = points[len - 1][3],
-    leftPts: number[][] = [],
-    rightPts: number[][] = [],
-    size = clamp(
-      minSize + (maxSize - minSize) * (p ? p : 0.5),
-      minSize,
-      maxSize
-    ),
-    angle = x0 === x1 ? 0 : getAngle(x0, y0, x1, y1)
-
-  for (let t = 0, step = 0.1; t <= 1; t += step) {
-    leftPts.push(projectPoint(x1, y1, angle + TAU - t * PI, size - 1))
-    rightPts.push(projectPoint(x0, y0, angle + TAU + t * PI, size - 1))
-  }
-
-  return leftPts.concat(rightPts.reverse())
 }
 
 /**
@@ -187,188 +69,185 @@ export function getShortStrokeOutlinePoints(
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
  * @param options An (optional) object with options.
+ * @param options.size	The base size (diameter) of the stroke.
+ * @param options.thinning The effect of pressure on the stroke's size.
+ * @param options.smoothing	How much to soften the stroke's edges.
+ * @param options.simulatePressure Whether to simulate pressure based on velocity.
  */
 export function getStrokeOutlinePoints(
   points: number[][],
-  options: StrokeOutlineOptions = {} as StrokeOutlineOptions
+  options: StrokeOptions = {} as StrokeOptions
 ): number[][] {
   const {
+    size = 8,
+    thinning = 0.5,
+    smoothing = 0.5,
     simulatePressure = true,
-    pressure = true,
-    minSize = 2.5,
-    maxSize = 8,
-    smooth = 8,
   } = options
 
-  let len = points.length,
-    p0 = points[0],
-    p1 = points[0],
-    t0 = p0,
-    t1 = p1,
-    m0 = p0,
-    m1 = p0,
-    size = 0,
-    pp = 0.5,
-    started = false,
-    length = 0,
-    leftPts: number[][] = [p0],
-    rightPts: number[][] = [p0],
-    d0: number,
-    d1: number
+  const len = points.length,
+    totalLength = points[len - 1][5], // The total length of the line
+    minDist = size * smoothing, // The minimum distance for measurements
+    leftPts: number[][] = [], // Our collected left and right points
+    rightPts: number[][] = []
 
+  let pl = points[0], // Previous left and right points
+    pr = points[0],
+    tl = pl, // Points to test distance from
+    tr = pr,
+    pp = 0, // Previous (maybe simulated) pressure
+    r = size / 2, // The current point radius
+    short = true // Whether the line is drawn far enough
+
+  // We can't do anything with an empty array.
   if (len === 0) {
     return []
   }
 
-  // Use the points to create an outline shape, where the width
-  // of the shape is determined by the pressure at each point.
+  // If the point is only one point long, draw two caps at either end.
+  if (len === 1 || totalLength < size / 2) {
+    let first = points[0],
+      last = points[len - 1],
+      angle = getAngle(first, last)
 
+    if (thinning) {
+      const pressure = last[3] ? clamp(last[3], 0, 1) : 0.5
+
+      r =
+        (thinning > 0
+          ? lerp(size - size * thinning, size, clamp(pressure, 0, 1))
+          : lerp(size, size + size * thinning, clamp(pressure, 0, 1))) / 2
+    }
+
+    for (let t = 0, step = 0.1; t <= 1; t += step) {
+      tl = projectPoint(first, angle + PI + TAU - t * PI, r - 1)
+      tr = projectPoint(last, angle + TAU - t * PI, r - 1)
+      leftPts.push(tl)
+      rightPts.push(tr)
+    }
+
+    return leftPts.concat(rightPts)
+  }
+
+  // For a point with more than one point, create an outline shape.
   for (let i = 1; i < len; i++) {
-    const [px, py, pa] = points[i - 1]
-    let [x, y, angle, ip, distance, clen] = points[i]
+    const prev = points[i - 1],
+      pa = prev[3]
 
-    length += clen
+    let [x, y, pressure, angle, distance, clen] = points[i]
 
-    // Size
-    if (pressure) {
+    // 1.
+    // Calculate the size of the current point.
+    if (thinning) {
       if (simulatePressure) {
         // Simulate pressure by accellerating the reported pressure.
-        const rp = min(1 - distance / maxSize, 1)
-        const sp = min(distance / maxSize, 1)
-        ip = min(1, pp + (rp - pp) * (sp / 2))
+        const rp = min(1 - distance / size, 1)
+        const sp = min(distance / size, 1)
+        pressure = min(1, pp + (rp - pp) * (sp / 2))
       }
-      // Compute the size based on the pressure.
-      size = clamp(minSize + ip * (maxSize - minSize), minSize, maxSize)
+
+      // Compute the size based on the pressure and thinning.
+      r =
+        (thinning > 0
+          ? lerp(size - size * thinning, size, clamp(pressure, 0, 1))
+          : lerp(size, size + size * thinning, clamp(pressure, 0, 1))) / 2
+    }
+
+    // 2.
+    // Draw a cap once we've reached the minimum length.
+    if (short) {
+      if (clen < size / 2) {
+        continue
+      }
+
+      // The first point after we've reached the minimum length.
+      short = false
+
+      // Draw a cap at the first point angled toward the current point.
+      const first = points[0]
+
+      for (let t = 0, step = 0.1; t <= 1; t += step) {
+        tl = projectPoint(first, angle + TAU + t * PI, r - 1)
+        leftPts.push(tl)
+      }
+
+      tr = projectPoint(first, angle + TAU, r - 1)
+      rightPts.push(tr)
+    }
+
+    // 3.
+    // Add points for the current point.
+    if (i === len - 1) {
+      // The last point in the line.
+
+      // Add points for an end cap.
+      for (let t = 0, step = 0.1; t <= 1; t += step) {
+        tr = projectPoint([x, y], angle + TAU - t * PI, r - 1)
+        rightPts.push(tr)
+      }
     } else {
-      size = maxSize
+      // Find the delta between the current and previous angle.
+      const delta = getAngleDelta(prev[3], angle)
+
+      if (abs(delta) > SHARP && clen > r) {
+        // A sharp corner.
+
+        // Project points (left and right) for a cap.
+        const mid = getPointBetween(prev, [x, y], 0.5)
+
+        for (let t = 0, step = 0.25; t <= 1; t += step) {
+          tl = projectPoint(mid, pa - TAU + t * PI, r - 1)
+          tr = projectPoint(mid, pa + TAU + t * -PI, r - 1)
+
+          leftPts.push(tl)
+          rightPts.push(tr)
+        }
+      } else {
+        // A regular point.
+
+        // Add projected points left and right.
+        pl = projectPoint([x, y], angle - TAU, r)
+        pr = projectPoint([x, y], angle + TAU, r)
+
+        // Add projected point if far enough away from last left point
+        if (getDistance(pl, tl) > minDist) {
+          leftPts.push(getPointBetween(tl, pl, 0.5))
+          tl = pl
+        }
+
+        // Add point if far enough away from last right point
+        if (getDistance(pr, tr) > minDist) {
+          rightPts.push(getPointBetween(tr, pr, 0.5))
+          tr = pr
+        }
+      }
+
+      pp = pressure
     }
-
-    // Handle line start
-    if (!started && length > size / 2) {
-      const [sx, sy] = points[0]
-
-      for (let t = 0, step = 0.25; t <= 1; t += step) {
-        m0 = projectPoint(sx, sy, angle + TAU + t * PI, size - 1)
-        leftPts.push(m0)
-
-        m1 = projectPoint(sx, sy, angle - TAU + t * -PI, size - 1)
-        rightPts.push(m1)
-      }
-      started = true
-      continue
-    }
-
-    // 3. Shape
-    p0 = projectPoint(x, y, angle - TAU, size) // left
-    p1 = projectPoint(x, y, angle + TAU, size) // right
-
-    const delta = angleDelta(pa, angle)
-
-    // Handle sharp corners differently
-    if (i === points.length - 1 || (abs(delta) > PI * 0.75 && length > size)) {
-      const [mx, my] = getPointBetween(px, py, x, y, 0.5)
-
-      for (let t = 0, step = 0.25; t <= 1; t += step) {
-        m0 = projectPoint(mx, my, pa - TAU + t * PI, size - 1)
-        leftPts.push(m0)
-
-        m1 = projectPoint(mx, my, pa + TAU + t * -PI, size - 1)
-        rightPts.push(m1)
-      }
-      t0 = m0
-      t1 = m1
-    } else {
-      // Project sideways
-      d0 = getDistance(p0[0], p0[1], t0[0], t0[1])
-      if (d0 > smooth) {
-        leftPts.push(m0)
-        m0 = getPointBetween(t0[0], t0[1], p0[0], p0[1], 0.5)
-        t0 = p0
-      }
-
-      d1 = getDistance(p1[0], p1[1], t1[0], t1[1])
-      if (d1 > smooth) {
-        rightPts.push(m1)
-        m1 = getPointBetween(t1[0], t1[1], p1[0], p1[1], 0.5)
-        t1 = p1
-      }
-    }
-
-    pp = ip
   }
 
   return leftPts.concat(rightPts.reverse())
 }
 
 /**
- * ## clipPath
- * @description Returns a clipped polygon of the provided points.
- * @param points An array of points (as number[]), the output of getStrokeOutlinePoints.
- */
-export function clipPath(points: number[][]) {
-  return polygonClipping.union([points] as any)
-}
-
-/**
- * ## getPath
- * @description Returns a pressure sensitive stroke SVG data
+ * ## getStroke
+ * @description Returns a stroke as an array of points.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
  * @param options An (optional) object with options.
+ * @param options.size	The base size (diameter) of the stroke.
+ * @param options.thinning The effect of pressure on the stroke's size.
+ * @param options.smoothing	How much to soften the stroke's edges.
+ * @param options.streamline How much to streamline the stroke.
+ * @param options.simulatePressure Whether to simulate pressure based on velocity.
  */
-export default function getPath<
+export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): string {
-  if (points.length === 0) {
-    return ''
-  }
-
-  const { clip = true, maxSize = 8 } = options
-
-  let ps = getStrokePoints(points, options),
-    totalLength = ps[ps.length - 1][5],
-    pts =
-      totalLength < maxSize
-        ? getShortStrokeOutlinePoints(ps, options)
-        : getStrokeOutlinePoints(ps, options),
-    d: string[] = []
-
-  // If the length is too short, just draw a dot.
-
-  // If we're clipping the path, then find the polygon and add its faces.
-  if (clip) {
-    const poly = clipPath(pts)
-
-    for (let face of poly) {
-      for (let verts of face) {
-        let v0 = verts[0]
-        let v1 = verts[1]
-        verts.push(v0)
-
-        d.push(`M ${v0[0]} ${v0[1]}`)
-        for (let i = 1; i < verts.length; i++) {
-          const [mpx, mpy] = getPointBetween(v0[0], v0[1], v1[0], v1[1], 0.5)
-          d.push(` Q ${v0[0]},${v0[1]} ${mpx},${mpy}`)
-          v0 = v1
-          v1 = verts[i + 1]
-        }
-      }
-    }
-  } else {
-    // If we're not clipping the path, just trace it.
-    let v0 = pts[0]
-    let v1 = pts[1]
-    pts.push(v0)
-    d.push(`M ${v0[0]} ${v0[1]}`)
-    for (let i = 1; i < pts.length; i++) {
-      const [mpx, mpy] = getPointBetween(v0[0], v0[1], v1[0], v1[1], 0.5)
-      d.push(`Q ${v0[0]},${v0[1]} ${mpx},${mpy}`)
-      v0 = v1
-      v1 = pts[i + 1]
-    }
-  }
-
-  d.push('Z')
-
-  return d.join(' ')
+>(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
+  return getStrokeOutlinePoints(
+    getStrokePoints(points, options.streamline),
+    options
+  )
 }
+
+export { StrokeOptions }
