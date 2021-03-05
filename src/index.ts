@@ -25,40 +25,22 @@ export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], streamline = 0.5): number[][] {
-  const aPoints = toPointsArray(points)
+  const pts = toPointsArray(points)
 
-  let x: number,
-    y: number,
-    angle: number,
-    totalLength = 0,
-    distance = 0.01,
-    len = aPoints.length,
-    prev = [...aPoints[0], 0, 0, 0],
-    pts = [prev]
+  if (pts.length === 0) return []
 
-  if (len === 0) {
-    return []
-  }
+  pts[0] = [pts[0][0], pts[0][1], pts[0][2] || 0, 0, 0, 0]
 
-  for (let i = 1; i < len; i++) {
-    const curr = aPoints[i]
-
-    // Point
-    x = lerp(prev[0], curr[0], 1 - streamline)
-    y = lerp(prev[0], curr[1], 1 - streamline)
-
-    // Distance
-    distance = getDistance([x, y], prev)
-
-    // Angle
-    angle = getAngle([x, y], prev)
-
-    // Increment total length
-    totalLength += distance
-
-    prev = [x, y, curr[2], angle, distance, totalLength]
-
-    pts.push(prev)
+  for (
+    let i = 1, curr = pts[i], prev = pts[0];
+    i < pts.length;
+    i++, curr = pts[i], prev = pts[i - 1]
+  ) {
+    curr[0] = lerp(prev[0], curr[0], 1 - streamline)
+    curr[1] = lerp(prev[1], curr[1], 1 - streamline)
+    curr[3] = getAngle(curr, prev)
+    curr[4] = getDistance(curr, prev)
+    curr[5] = prev[5] + curr[4]
   }
 
   return pts
