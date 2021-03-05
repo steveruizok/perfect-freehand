@@ -41,12 +41,11 @@ export function getStrokePoints<
   }
 
   for (let i = 1; i < len; i++) {
-    const [ix, iy, ip] = aPoints[i]
-    const [px, py] = prev
+    const curr = aPoints[i]
 
     // Point
-    x = lerp(px, ix, 1 - streamline)
-    y = lerp(py, iy, 1 - streamline)
+    x = lerp(prev[0], curr[0], 1 - streamline)
+    y = lerp(prev[0], curr[1], 1 - streamline)
 
     // Distance
     distance = getDistance([x, y], prev)
@@ -57,7 +56,7 @@ export function getStrokePoints<
     // Increment total length
     totalLength += distance
 
-    prev = [x, y, ip, angle, distance, totalLength]
+    prev = [x, y, curr[2], angle, distance, totalLength]
 
     pts.push(prev)
   }
@@ -183,7 +182,7 @@ export function getStrokeOutlinePoints(
 
       // Add points for an end cap.
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tr = projectPoint([x, y], angle + TAU + t * PI, r * 0.9)
+        tr = projectPoint([x, y], angle + TAU + t * PI, r)
         rightPts.push(tr)
       }
     } else {
@@ -198,8 +197,8 @@ export function getStrokeOutlinePoints(
         const mid = getPointBetween(prev, [x, y])
 
         for (let t = 0, step = 0.25; t <= 1; t += step) {
-          tl = projectPoint(mid, pa - TAU + t * -PI, r * 0.9)
-          tr = projectPoint(mid, pa + TAU + t * PI, r * 0.9)
+          tl = projectPoint(mid, pa - TAU + t * -PI, r)
+          tr = projectPoint(mid, pa + TAU + t * PI, r)
 
           leftPts.push(tl)
           rightPts.push(tr)
