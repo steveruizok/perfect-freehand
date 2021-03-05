@@ -1,6 +1,6 @@
 # 0.3.2
 
-- Organizational changes.
+- Superficial changes.
 
 # 0.3.1
 
