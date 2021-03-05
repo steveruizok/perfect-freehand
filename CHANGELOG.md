@@ -1,3 +1,11 @@
+# 0.3.2
+
+- Organizational changes.
+
+# 0.3.1
+
+- Improves sharp corners that aren't sharp enough for caps, but are still sharp enough to confuse the distance-checking part of the algorithm.
+
 # 0.3.0
 
 This version has breaking changes.

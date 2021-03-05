@@ -12,7 +12,8 @@ import { StrokeOptions } from './types'
 
 const { abs, min, PI } = Math,
   TAU = PI / 2,
-  SHARP = PI * 0.7
+  SHARP = PI * 0.8,
+  DULL = SHARP / 2
 
 /**
  * ## getStrokePoints
@@ -40,18 +41,18 @@ export function getStrokePoints<
   }
 
   for (let i = 1; i < len; i++) {
-    let [ix, iy, ip] = aPoints[i]
-    let [px, py] = prev
+    const [ix, iy, ip] = aPoints[i]
+    const [px, py] = prev
 
     // Point
-    x = px + (ix - px) * (1 - streamline)
-    y = py + (iy - py) * (1 - streamline)
+    x = lerp(px, ix, 1 - streamline)
+    y = lerp(py, iy, 1 - streamline)
 
     // Distance
     distance = getDistance([x, y], prev)
 
     // Angle
-    angle = getAngle(prev, [x, y])
+    angle = getAngle([x, y], prev)
 
     // Increment total length
     totalLength += distance
@@ -105,18 +106,18 @@ export function getStrokeOutlinePoints(
   }
 
   // If the point is only one point long, draw two caps at either end.
-  if (len === 1 || totalLength < size / 2) {
+  if (len === 1 || totalLength <= size / 4) {
     let first = points[0],
       last = points[len - 1],
       angle = getAngle(first, last)
 
     if (thinning) {
-      const pressure = last[3] ? clamp(last[3], 0, 1) : 0.5
+      const pressure = last[2] ? clamp(last[2], 0, 1) : 0.5
 
       r =
         (thinning > 0
-          ? lerp(size - size * thinning, size, clamp(pressure, 0, 1))
-          : lerp(size, size + size * thinning, clamp(pressure, 0, 1))) / 2
+          ? lerp(size - size * thinning, size, clamp(pressure, 0.01, 0.99))
+          : lerp(size, size + size * thinning, clamp(pressure, 0.01, 0.99))) / 2
     }
 
     for (let t = 0, step = 0.1; t <= 1; t += step) {
@@ -149,14 +150,14 @@ export function getStrokeOutlinePoints(
       // Compute the size based on the pressure and thinning.
       r =
         (thinning > 0
-          ? lerp(size - size * thinning, size, clamp(pressure, 0, 1))
-          : lerp(size, size + size * thinning, clamp(pressure, 0, 1))) / 2
+          ? lerp(size - size * thinning, size, clamp(pressure, 0.05, 0.95))
+          : lerp(size, size + size * thinning, clamp(pressure, 0.05, 0.95))) / 2
     }
 
     // 2.
     // Draw a cap once we've reached the minimum length.
     if (short) {
-      if (clen < size / 2) {
+      if (clen < size / 4) {
         continue
       }
 
@@ -167,7 +168,7 @@ export function getStrokeOutlinePoints(
       const first = points[0]
 
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tl = projectPoint(first, angle + TAU + t * PI, r - 1)
+        tl = projectPoint(first, angle + TAU - t * PI, r - 1)
         leftPts.push(tl)
       }
 
@@ -182,22 +183,23 @@ export function getStrokeOutlinePoints(
 
       // Add points for an end cap.
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tr = projectPoint([x, y], angle + TAU - t * PI, r - 1)
+        tr = projectPoint([x, y], angle + TAU + t * PI, r * 0.9)
         rightPts.push(tr)
       }
     } else {
       // Find the delta between the current and previous angle.
-      const delta = getAngleDelta(prev[3], angle)
+      const delta = getAngleDelta(prev[3], angle),
+        absDelta = abs(delta)
 
-      if (abs(delta) > SHARP && clen > r) {
+      if (absDelta > SHARP && clen > r) {
         // A sharp corner.
 
         // Project points (left and right) for a cap.
-        const mid = getPointBetween(prev, [x, y], 0.5)
+        const mid = getPointBetween(prev, [x, y])
 
         for (let t = 0, step = 0.25; t <= 1; t += step) {
-          tl = projectPoint(mid, pa - TAU + t * PI, r - 1)
-          tr = projectPoint(mid, pa + TAU + t * -PI, r - 1)
+          tl = projectPoint(mid, pa - TAU + t * -PI, r * 0.9)
+          tr = projectPoint(mid, pa + TAU + t * PI, r * 0.9)
 
           leftPts.push(tl)
           rightPts.push(tr)
@@ -210,14 +212,14 @@ export function getStrokeOutlinePoints(
         pr = projectPoint([x, y], angle + TAU, r)
 
         // Add projected point if far enough away from last left point
-        if (getDistance(pl, tl) > minDist) {
-          leftPts.push(getPointBetween(tl, pl, 0.5))
+        if (absDelta > DULL || getDistance(pl, tl) > minDist) {
+          leftPts.push(getPointBetween(tl, pl))
           tl = pl
         }
 
         // Add point if far enough away from last right point
-        if (getDistance(pr, tr) > minDist) {
-          rightPts.push(getPointBetween(tr, pr, 0.5))
+        if (absDelta > DULL || getDistance(pr, tr) > minDist) {
+          rightPts.push(getPointBetween(tr, pr))
           tr = pr
         }
       }

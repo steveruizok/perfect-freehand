@@ -24,6 +24,8 @@ const defaultSettings = {
 }
 
 function getSvgPathFromStroke(stroke: number[][]) {
+  if (stroke.length === 0) return ''
+
   const d = []
 
   let [p0, p1] = stroke
