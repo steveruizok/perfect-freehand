@@ -1,35 +1,9 @@
 import * as React from 'react'
 import NumberInput from './number-input'
 import BooleanInput from './boolean-input'
+import EnumInput from './enum-input'
 import state, { useSelector } from '../state'
 import styled from 'styled-components'
-
-const StyledControls = styled.div`
-  position: absolute;
-  top: 44px;
-  right: 0;
-  width: 100%;
-  max-width: 512px;
-  display: grid;
-  grid-template-columns: auto 1fr 48px;
-  gap: 4px 8px;
-  font-size: 13px;
-  padding: 16px;
-  background-color: var(--color-scrim);
-  backdrop-filter: blur(30px);
-`
-
-const ButtonGroup = styled.div`
-  padding-top: 16px;
-  grid-column: 1 / span 3;
-  display: grid;
-  grid-auto-flow: column;
-  gap: 16px;
-
-  button {
-    padding: 8px 12px;
-  }
-`
 
 export default function Controls() {
   const options = useSelector(state => state.data.alg)
@@ -56,6 +30,12 @@ export default function Controls() {
         max={64}
         onChange={v => state.send('CHANGED_OPTIONS', { size: v })}
       />
+      <EnumInput
+        label="Easing"
+        value={options.easing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
+      />
       <NumberInput
         label="Thinning"
         value={options.thinning}
@@ -63,7 +43,6 @@ export default function Controls() {
         max={1}
         onChange={v => state.send('CHANGED_OPTIONS', { thinning: v })}
       />
-
       <NumberInput
         value={options.smoothing}
         onChange={v => state.send('CHANGED_OPTIONS', { smoothing: v })}
@@ -74,7 +53,7 @@ export default function Controls() {
       <BooleanInput
         label="Dark Mode"
         value={settings.darkMode}
-        onChange={v => state.send('TOGGLED_DARK_MODE')}
+        onChange={() => state.send('TOGGLED_DARK_MODE')}
       />
       <BooleanInput
         label="Show Path"
@@ -88,3 +67,40 @@ export default function Controls() {
     </StyledControls>
   )
 }
+
+const StyledControls = styled.div`
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 100%;
+  max-width: 512px;
+  display: grid;
+  grid-template-columns: auto 1fr 48px;
+  gap: 4px 8px;
+  font-size: 13px;
+  padding: 16px;
+  background-color: var(--color-scrim);
+  backdrop-filter: blur(30px);
+  align-items: center;
+
+  select {
+    height: 20px;
+    grid-column: span 2;
+  }
+
+  input {
+    height: 20px;
+  }
+`
+
+const ButtonGroup = styled.div`
+  padding-top: 16px;
+  grid-column: 1 / span 3;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 16px;
+
+  button {
+    padding: 8px 12px;
+  }
+`

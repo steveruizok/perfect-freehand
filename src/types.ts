@@ -3,5 +3,6 @@ export interface StrokeOptions {
   thinning?: number
   smoothing?: number
   streamline?: number
+  easing?: (pressure: number) => number
   simulatePressure?: boolean
 }

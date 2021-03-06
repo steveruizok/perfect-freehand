@@ -4,7 +4,15 @@ import { Mark, ClipboardMessage } from './types'
 import getStroke, { StrokeOptions } from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 
-type AppOptions = StrokeOptions & { clip: boolean }
+interface AppOptions {
+  size: number
+  streamline: number
+  clip: boolean
+  easing: string
+  thinning: number
+  smoothing: number
+  simulatePressure: boolean
+}
 
 const defaultOptions: AppOptions = {
   size: 16,
@@ -13,6 +21,7 @@ const defaultOptions: AppOptions = {
   streamline: 0.5,
   simulatePressure: true,
   clip: true,
+  easing: 'linear',
 }
 
 const defaultSettings = {
@@ -71,8 +80,37 @@ function getFlatSvgPathFromStroke(stroke: number[][]) {
   return d.join(' ')
 }
 
-function getStrokePath(points: Mark['points'], options: AppOptions) {
-  const stroke = getStroke(points, options)
+function getStrokePath(
+  points: Mark['points'],
+  options: AppOptions,
+  type: string
+) {
+  let easing: StrokeOptions['easing']
+
+  switch (options.easing) {
+    case 'easeIn': {
+      easing = (t: number) => t * t
+      break
+    }
+    case 'easeOut': {
+      easing = (t: number) => t * (2 - t)
+      break
+    }
+    case 'easeInOut': {
+      easing = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t)
+      break
+    }
+    default: {
+      easing = (t: number) => t
+      break
+    }
+  }
+
+  const stroke = getStroke(points, {
+    ...options,
+    easing,
+    simulatePressure: type !== 'pen',
+  })
 
   if (options.clip) {
     return getFlatSvgPathFromStroke(stroke)
@@ -213,10 +251,7 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
-        }),
+        path: getStrokePath(mark.points, alg, mark.type),
       }))
 
       data.settings = {
@@ -243,10 +278,7 @@ const state = createState({
       data.currentMark = {
         type,
         points: [point],
-        path: getStrokePath([point], {
-          ...alg,
-          simulatePressure: alg.simulatePressure && type !== 'pen',
-        }),
+        path: getStrokePath([point], alg, type),
       }
     },
     addPointToMark(data) {
@@ -261,20 +293,18 @@ const state = createState({
         pressure: p,
       })
 
-      currentMark!.path = getStrokePath(currentMark!.points, {
-        ...alg,
-        simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-      })
+      currentMark!.path = getStrokePath(
+        currentMark!.points,
+        alg,
+        currentMark!.type
+      )
     },
     Mark(data) {
       const { currentMark, alg } = data
 
       data.marks.push({
         ...currentMark!,
-        path: getStrokePath(currentMark!.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-        }),
+        path: getStrokePath(currentMark!.points, alg, currentMark!.type),
       })
 
       data.currentMark = null
@@ -287,10 +317,7 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
-        }),
+        path: getStrokePath(mark.points, alg, mark.type),
       }))
     },
     undoMark(data) {
@@ -326,17 +353,15 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = getStrokePath(mark.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && mark.type !== 'pen',
-        })
+        mark.path = getStrokePath(mark.points, alg, mark.type)
       }
 
       if (currentMark) {
-        currentMark.path = getStrokePath(currentMark.points, {
-          ...alg,
-          simulatePressure: alg.simulatePressure && currentMark.type !== 'pen',
-        })
+        currentMark.path = getStrokePath(
+          currentMark.points,
+          alg,
+          currentMark.type
+        )
       }
     },
     // Clipboard message

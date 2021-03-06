@@ -1,6 +1,6 @@
 # Perfect Freehand
 
-Perfect freehand is a library for creating freehand paths by [@steveruizok](https://twitter.com/steveruizok).
+Perfect freehand is a library for generating freehand strokes.
 
 ![Screenshot](https://github.com/steveruizok/perfect-freehand/raw/main/screenshot.png)
 
@@ -20,7 +20,7 @@ yarn add perfect-freehand
 
 ## Usage
 
-The library exports a default function, `getStroke`, that:
+This library's default export is a function that:
 
 - accepts an array of points and an (optional) options object
 - returns a stroke as an array of points formatted as `[x, y]`
@@ -29,7 +29,7 @@ The library exports a default function, `getStroke`, that:
 import getStroke from 'perfect-freehand'
 ```
 
-You may format your input points _either_ as an array or an object as shown below. In both cases, the pressure value is optional.
+You may format your input points as array _or_ an object. In both cases, the value for pressure is optional (it will default to `.5`).
 
 ```js
 getStroke([
@@ -49,13 +49,14 @@ getStroke([
 
 The options object is optional, as are each of its properties.
 
-| Property           | Type    | Default | Description                                     |
-| ------------------ | ------- | ------- | ----------------------------------------------- |
-| `size`             | number  | 8       | The base size (diameter) of the stroke.         |
-| `thinning`         | number  | .5      | The effect of pressure on the stroke's size.    |
-| `smoothing`        | number  | .5      | How much to soften the stroke's edges.          |
-| `streamline`       | number  | .5      | How much to streamline the stroke.              |
-| `simulatePressure` | boolean | true    | Whether to simulate pressure based on velocity. |
+| Property           | Type     | Default | Description                                           |
+| ------------------ | -------- | ------- | ----------------------------------------------------- |
+| `size`             | number   | 8       | The base size (diameter) of the stroke.               |
+| `thinning`         | number   | .5      | The effect of pressure on the stroke's size.          |
+| `smoothing`        | number   | .5      | How much to soften the stroke's edges.                |
+| `streamline`       | number   | .5      | How much to streamline the stroke.                    |
+| `simulatePressure` | boolean  | true    | Whether to simulate pressure based on velocity.       |
+| `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
 
 ```js
 getStroke(myPoints, {
@@ -63,9 +64,12 @@ getStroke(myPoints, {
   thinning: 0.5,
   smoothing: 0.5,
   streamline: 0.5,
+  easing: t => t * t * t,
   simulatePressure: true,
 })
 ```
+
+> **Tip:** To create a stroke with a steady line, set the `thinning` option to `0`.
 
 > **Tip:** To create a stroke that gets thinner with pressure instead of thicker, use a negative number for the `thinning` option.
 
@@ -130,6 +134,7 @@ export default function Example() {
         thinning: 0.75,
         smoothing: 0.5,
         streamline: 0.5,
+        easing: t => t * t * t,
         simulatePressure: currentMark.type !== 'pen',
       })
     : []
@@ -158,7 +163,10 @@ For advanced usage, the library also exports smaller functions that `getStroke` 
 
 #### `getStrokePoints`
 
-Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and returns a set of streamlined points as `[x, y, pressure, angle, distance, length]`. The path's total length will be the length of the last point in the array.
+```js
+```
+
+Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of streamlined points as `[x, y, pressure, angle, distance, lengthAtPoint]`. The path's total length will be the length of the last point in the array.
 
 #### `getStrokeOutlinePoints`
 
@@ -199,3 +207,7 @@ function getFlatSvgPathFromStroke(stroke) {
   return d.join(' ')
 }
 ```
+
+## Author
+
+- [@steveruizok](https://twitter.com/steveruizok)
