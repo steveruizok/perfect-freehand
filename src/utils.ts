@@ -9,9 +9,18 @@ export function projectPoint(p0: number[], a: number, d: number) {
   return [cos(a) * d + p0[0], sin(a) * d + p0[1]]
 }
 
+function shortAngleDist(a0: number, a1: number) {
+  var max = PI2
+  var da = (a1 - a0) % max
+  return ((2 * da) % max) - da
+}
+
 export function getAngleDelta(a0: number, a1: number) {
-  const da = (a1 - a0) % PI2
-  return ((2 * da) % PI2) - da
+  return shortAngleDist(a0, a1)
+}
+
+export function lerpAngles(a0: number, a1: number, t: number) {
+  return a0 + shortAngleDist(a0, a1) * t
 }
 
 export function getPointBetween(p0: number[], p1: number[], d = 0.5) {

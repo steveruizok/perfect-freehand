@@ -6,6 +6,7 @@ import {
   getDistance,
   getPointBetween,
   projectPoint,
+  lerpAngles,
   lerp,
 } from './utils'
 import { StrokeOptions } from './types'
@@ -94,6 +95,7 @@ export function getStrokeOutlinePoints(
     pr = points[0],
     tl = pl, // Points to test distance from
     tr = pr,
+    pa = pr[3],
     pp = 0, // Previous (maybe simulated) pressure
     r = size / 2, // The current point radius
     short = true // Whether the line is drawn far enough
@@ -114,8 +116,8 @@ export function getStrokeOutlinePoints(
     }
 
     for (let t = 0, step = 0.1; t <= 1; t += step) {
-      tl = projectPoint(first, angle + PI + TAU - t * PI, r - 1)
-      tr = projectPoint(last, angle + TAU - t * PI, r - 1)
+      tl = projectPoint(first, angle + PI + TAU - t * PI, r)
+      tr = projectPoint(last, angle + TAU - t * PI, r)
       leftPts.push(tl)
       rightPts.push(tr)
     }
@@ -125,8 +127,7 @@ export function getStrokeOutlinePoints(
 
   // For a point with more than one point, create an outline shape.
   for (let i = 1; i < len; i++) {
-    const prev = points[i - 1],
-      pa = prev[3]
+    const prev = points[i - 1]
 
     let [x, y, pressure, angle, distance, clen] = points[i]
 
@@ -162,6 +163,8 @@ export function getStrokeOutlinePoints(
       tr = projectPoint(points[0], angle + TAU, r)
       rightPts.push(tr)
     }
+
+    angle = lerpAngles(pa, angle, 0.75)
 
     // 3.
     // Add points for the current point.
@@ -206,6 +209,7 @@ export function getStrokeOutlinePoints(
       }
 
       pp = pressure
+      pa = angle
     }
   }
 
