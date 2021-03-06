@@ -1,35 +1,9 @@
 import * as React from 'react'
 import NumberInput from './number-input'
 import BooleanInput from './boolean-input'
+import EnumInput from './enum-input'
 import state, { useSelector } from '../state'
 import styled from 'styled-components'
-
-const StyledControls = styled.div`
-  position: absolute;
-  top: 44px;
-  right: 0;
-  width: 100%;
-  max-width: 512px;
-  display: grid;
-  grid-template-columns: auto 1fr 48px;
-  gap: 4px 8px;
-  font-size: 13px;
-  padding: 16px;
-  background-color: var(--color-scrim);
-  backdrop-filter: blur(30px);
-`
-
-const ButtonGroup = styled.div`
-  padding-top: 16px;
-  grid-column: 1 / span 3;
-  display: grid;
-  grid-auto-flow: column;
-  gap: 16px;
-
-  button {
-    padding: 8px 12px;
-  }
-`
 
 export default function Controls() {
   const options = useSelector(state => state.data.alg)
@@ -42,13 +16,12 @@ export default function Controls() {
         value={options.clip}
         onChange={v => state.send('CHANGED_OPTIONS', { clip: v })}
       />
-      <NumberInput
-        value={options.streamline}
-        onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
-        label="Streamline"
-        min={0}
-        max={1}
+      <BooleanInput
+        label="Show Path"
+        value={settings.showTrace}
+        onChange={v => state.send('CHANGED_SETTINGS', { showTrace: v })}
       />
+      <hr />
       <NumberInput
         label="Size"
         value={options.size}
@@ -63,7 +36,12 @@ export default function Controls() {
         max={1}
         onChange={v => state.send('CHANGED_OPTIONS', { thinning: v })}
       />
-
+      <EnumInput
+        label="Easing"
+        value={options.easing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
+      />
       <NumberInput
         value={options.smoothing}
         onChange={v => state.send('CHANGED_OPTIONS', { smoothing: v })}
@@ -71,15 +49,12 @@ export default function Controls() {
         min={0}
         max={2}
       />
-      <BooleanInput
-        label="Dark Mode"
-        value={settings.darkMode}
-        onChange={v => state.send('TOGGLED_DARK_MODE')}
-      />
-      <BooleanInput
-        label="Show Path"
-        value={settings.showTrace}
-        onChange={v => state.send('CHANGED_SETTINGS', { showTrace: v })}
+      <NumberInput
+        value={options.streamline}
+        onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
+        label="Streamline"
+        min={0}
+        max={1}
       />
       <ButtonGroup>
         <button onClick={() => state.send('RESET_OPTIONS')}>Reset</button>
@@ -88,3 +63,45 @@ export default function Controls() {
     </StyledControls>
   )
 }
+
+const StyledControls = styled.div`
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 100%;
+  max-width: 512px;
+  display: grid;
+  grid-template-columns: auto 1fr 48px;
+  gap: 4px 8px;
+  font-size: 13px;
+  padding: 16px;
+  background-color: var(--color-scrim);
+  backdrop-filter: blur(30px);
+  align-items: center;
+
+  select {
+    height: 20px;
+    grid-column: span 2;
+  }
+
+  input {
+    height: 20px;
+  }
+
+  hr {
+    grid-column: span 3;
+    width: 100%;
+  }
+`
+
+const ButtonGroup = styled.div`
+  padding-top: 16px;
+  grid-column: 1 / span 3;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 16px;
+
+  button {
+    padding: 8px 12px;
+  }
+`

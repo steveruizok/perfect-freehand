@@ -6,14 +6,30 @@ import {
   getDistance,
   getPointBetween,
   projectPoint,
+  lerpAngles,
   lerp,
 } from './utils'
 import { StrokeOptions } from './types'
 
 const { abs, min, PI } = Math,
   TAU = PI / 2,
-  SHARP = PI * 0.8,
+  SHARP = TAU,
   DULL = SHARP / 2
+
+function getStrokeRadius(
+  size: number,
+  thinning: number,
+  easing: (t: number) => number,
+  pressure = 0.5
+) {
+  if (thinning === undefined) return size / 2
+  pressure = clamp(easing(pressure), 0, 1)
+  return (
+    (thinning < 0
+      ? lerp(size, size + size * clamp(thinning, -0.95, -0.05), pressure)
+      : lerp(size - size * clamp(thinning, 0.05, 0.95), size, pressure)) / 2
+  )
+}
 
 /**
  * ## getStrokePoints
@@ -25,41 +41,22 @@ export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], streamline = 0.5): number[][] {
-  const aPoints = toPointsArray(points)
+  const pts = toPointsArray(points)
 
-  let x: number,
-    y: number,
-    angle: number,
-    totalLength = 0,
-    distance = 0.01,
-    len = aPoints.length,
-    prev = [...aPoints[0], 0, 0, 0],
-    pts = [prev]
+  if (pts.length === 0) return []
 
-  if (len === 0) {
-    return []
-  }
+  pts[0] = [pts[0][0], pts[0][1], pts[0][2] || 0.5, 0, 0, 0]
 
-  for (let i = 1; i < len; i++) {
-    const [ix, iy, ip] = aPoints[i]
-    const [px, py] = prev
-
-    // Point
-    x = lerp(px, ix, 1 - streamline)
-    y = lerp(py, iy, 1 - streamline)
-
-    // Distance
-    distance = getDistance([x, y], prev)
-
-    // Angle
-    angle = getAngle([x, y], prev)
-
-    // Increment total length
-    totalLength += distance
-
-    prev = [x, y, ip, angle, distance, totalLength]
-
-    pts.push(prev)
+  for (
+    let i = 1, curr = pts[i], prev = pts[0];
+    i < pts.length;
+    i++, curr = pts[i], prev = pts[i - 1]
+  ) {
+    curr[0] = lerp(prev[0], curr[0], 1 - streamline)
+    curr[1] = lerp(prev[1], curr[1], 1 - streamline)
+    curr[3] = getAngle(curr, prev)
+    curr[4] = getDistance(curr, prev)
+    curr[5] = prev[5] + curr[4]
   }
 
   return pts
@@ -73,6 +70,7 @@ export function getStrokePoints<
  * @param options.size	The base size (diameter) of the stroke.
  * @param options.thinning The effect of pressure on the stroke's size.
  * @param options.smoothing	How much to soften the stroke's edges.
+ * @param options.easing	An easing function to apply to each point's pressure.
  * @param options.simulatePressure Whether to simulate pressure based on velocity.
  */
 export function getStrokeOutlinePoints(
@@ -84,6 +82,7 @@ export function getStrokeOutlinePoints(
     thinning = 0.5,
     smoothing = 0.5,
     simulatePressure = true,
+    easing = t => t,
   } = options
 
   const len = points.length,
@@ -96,6 +95,7 @@ export function getStrokeOutlinePoints(
     pr = points[0],
     tl = pl, // Points to test distance from
     tr = pr,
+    pa = pr[3],
     pp = 0, // Previous (maybe simulated) pressure
     r = size / 2, // The current point radius
     short = true // Whether the line is drawn far enough
@@ -106,23 +106,18 @@ export function getStrokeOutlinePoints(
   }
 
   // If the point is only one point long, draw two caps at either end.
-  if (len === 1 || totalLength <= size / 4) {
+  if (len === 1 || totalLength <= 4) {
     let first = points[0],
       last = points[len - 1],
       angle = getAngle(first, last)
 
     if (thinning) {
-      const pressure = last[2] ? clamp(last[2], 0, 1) : 0.5
-
-      r =
-        (thinning > 0
-          ? lerp(size - size * thinning, size, clamp(pressure, 0.01, 0.99))
-          : lerp(size, size + size * thinning, clamp(pressure, 0.01, 0.99))) / 2
+      r = getStrokeRadius(size, thinning, easing, last[2])
     }
 
     for (let t = 0, step = 0.1; t <= 1; t += step) {
-      tl = projectPoint(first, angle + PI + TAU - t * PI, r - 1)
-      tr = projectPoint(last, angle + TAU - t * PI, r - 1)
+      tl = projectPoint(first, angle + PI + TAU - t * PI, r)
+      tr = projectPoint(last, angle + TAU - t * PI, r)
       leftPts.push(tl)
       rightPts.push(tr)
     }
@@ -132,8 +127,7 @@ export function getStrokeOutlinePoints(
 
   // For a point with more than one point, create an outline shape.
   for (let i = 1; i < len; i++) {
-    const prev = points[i - 1],
-      pa = prev[3]
+    const prev = points[i - 1]
 
     let [x, y, pressure, angle, distance, clen] = points[i]
 
@@ -147,44 +141,38 @@ export function getStrokeOutlinePoints(
         pressure = min(1, pp + (rp - pp) * (sp / 2))
       }
 
-      // Compute the size based on the pressure and thinning.
-      r =
-        (thinning > 0
-          ? lerp(size - size * thinning, size, clamp(pressure, 0.05, 0.95))
-          : lerp(size, size + size * thinning, clamp(pressure, 0.05, 0.95))) / 2
+      // Compute the stroke radius based on the pressure, easing and thinning.
+      r = getStrokeRadius(size, thinning, easing, pressure)
     }
 
     // 2.
     // Draw a cap once we've reached the minimum length.
     if (short) {
-      if (clen < size / 4) {
-        continue
-      }
+      if (clen < size / 4) continue
 
       // The first point after we've reached the minimum length.
+      // Draw a cap at the first point angled toward the current point.
+
       short = false
 
-      // Draw a cap at the first point angled toward the current point.
-      const first = points[0]
-
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tl = projectPoint(first, angle + TAU - t * PI, r - 1)
+        tl = projectPoint(points[0], angle + TAU - t * PI, r)
         leftPts.push(tl)
       }
 
-      tr = projectPoint(first, angle + TAU, r - 1)
+      tr = projectPoint(points[0], angle + TAU, r)
       rightPts.push(tr)
     }
+
+    angle = lerpAngles(pa, angle, 0.75)
 
     // 3.
     // Add points for the current point.
     if (i === len - 1) {
       // The last point in the line.
-
       // Add points for an end cap.
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tr = projectPoint([x, y], angle + TAU + t * PI, r * 0.9)
-        rightPts.push(tr)
+        rightPts.push(projectPoint([x, y], angle + TAU + t * PI, r))
       }
     } else {
       // Find the delta between the current and previous angle.
@@ -193,31 +181,27 @@ export function getStrokeOutlinePoints(
 
       if (absDelta > SHARP && clen > r) {
         // A sharp corner.
-
         // Project points (left and right) for a cap.
         const mid = getPointBetween(prev, [x, y])
 
         for (let t = 0, step = 0.25; t <= 1; t += step) {
-          tl = projectPoint(mid, pa - TAU + t * -PI, r * 0.9)
-          tr = projectPoint(mid, pa + TAU + t * PI, r * 0.9)
+          tl = projectPoint(mid, pa - TAU + t * -PI, r)
+          tr = projectPoint(mid, pa + TAU + t * PI, r)
 
           leftPts.push(tl)
           rightPts.push(tr)
         }
       } else {
         // A regular point.
-
-        // Add projected points left and right.
+        // Add projected points left and right, if far enough away.
         pl = projectPoint([x, y], angle - TAU, r)
         pr = projectPoint([x, y], angle + TAU, r)
 
-        // Add projected point if far enough away from last left point
         if (absDelta > DULL || getDistance(pl, tl) > minDist) {
           leftPts.push(getPointBetween(tl, pl))
           tl = pl
         }
 
-        // Add point if far enough away from last right point
         if (absDelta > DULL || getDistance(pr, tr) > minDist) {
           rightPts.push(getPointBetween(tr, pr))
           tr = pr
@@ -225,6 +209,7 @@ export function getStrokeOutlinePoints(
       }
 
       pp = pressure
+      pa = angle
     }
   }
 

@@ -1,35 +1,26 @@
-const { hypot, cos, max, min, sin, atan2, PI } = Math
+const { hypot, cos, max, min, sin, atan2, PI } = Math,
+  PI2 = PI * 2
 
-/**
- * Linear interpolation betwen two numbers.
- * @param y1
- * @param y2
- * @param mu
- */
 export function lerp(y1: number, y2: number, mu: number) {
   return y1 * (1 - mu) + y2 * mu
 }
 
-/**
- * Project a point in a direction, by an angle.
- * @param x0
- * @param y0
- * @param a
- * @param d
- * @returns
- */
 export function projectPoint(p0: number[], a: number, d: number) {
   return [cos(a) * d + p0[0], sin(a) * d + p0[1]]
 }
 
 function shortAngleDist(a0: number, a1: number) {
-  var max = PI * 2
+  var max = PI2
   var da = (a1 - a0) % max
   return ((2 * da) % max) - da
 }
 
 export function getAngleDelta(a0: number, a1: number) {
   return shortAngleDist(a0, a1)
+}
+
+export function lerpAngles(a0: number, a1: number, t: number) {
+  return a0 + shortAngleDist(a0, a1) * t
 }
 
 export function getPointBetween(p0: number[], p1: number[], d = 0.5) {

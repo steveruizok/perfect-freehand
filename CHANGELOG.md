@@ -1,3 +1,7 @@
+# 0.3.4
+
+- Adds the `easing` property. This property accepts an [easing function](https://gist.github.com/gre/1650294) that will apply to all pressure measurements (real or simulated). Defaults to a linear easing (`t => t`).
+
 # 0.3.2
 
 - Superficial changes.
