@@ -12,7 +12,7 @@ import { StrokeOptions } from './types'
 
 const { abs, min, PI } = Math,
   TAU = PI / 2,
-  SHARP = PI * 0.8,
+  SHARP = TAU,
   DULL = SHARP / 2
 
 function getStrokeRadius(
@@ -25,8 +25,8 @@ function getStrokeRadius(
   pressure = clamp(easing(pressure), 0, 1)
   return (
     (thinning < 0
-      ? lerp(size, size + size * clamp(thinning, -0.99, 0.01), pressure)
-      : lerp(size - size * clamp(thinning, 0.01, 0.99), size, pressure)) / 2
+      ? lerp(size, size + size * clamp(thinning, -0.95, -0.05), pressure)
+      : lerp(size - size * clamp(thinning, 0.05, 0.95), size, pressure)) / 2
   )
 }
 
@@ -44,7 +44,7 @@ export function getStrokePoints<
 
   if (pts.length === 0) return []
 
-  pts[0] = [pts[0][0], pts[0][1], pts[0][2] || 0, 0, 0, 0]
+  pts[0] = [pts[0][0], pts[0][1], pts[0][2] || 0.5, 0, 0, 0]
 
   for (
     let i = 1, curr = pts[i], prev = pts[0];
@@ -104,7 +104,7 @@ export function getStrokeOutlinePoints(
   }
 
   // If the point is only one point long, draw two caps at either end.
-  if (len === 1 || totalLength <= size / 4) {
+  if (len === 1 || totalLength <= 4) {
     let first = points[0],
       last = points[len - 1],
       angle = getAngle(first, last)
@@ -154,14 +154,12 @@ export function getStrokeOutlinePoints(
 
       short = false
 
-      const first = points[0]
-
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tl = projectPoint(first, angle + TAU - t * PI, r - 1)
+        tl = projectPoint(points[0], angle + TAU - t * PI, r)
         leftPts.push(tl)
       }
 
-      tr = projectPoint(first, angle + TAU, r - 1)
+      tr = projectPoint(points[0], angle + TAU, r)
       rightPts.push(tr)
     }
 

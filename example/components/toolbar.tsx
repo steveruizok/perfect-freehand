@@ -2,7 +2,14 @@ import * as React from 'react'
 import state, { useSelector } from '../state'
 import Alert from './alert'
 import styled from 'styled-components'
-import { Trash, RotateCcw, RotateCw, Settings, Clipboard } from 'react-feather'
+import {
+  Sun,
+  Trash,
+  RotateCcw,
+  RotateCw,
+  Settings,
+  Clipboard,
+} from 'react-feather'
 
 const ToolbarContainer = styled.div`
   position: absolute;
@@ -68,6 +75,9 @@ export default function Toolbar() {
         | <a href="https://twitter.com/steveruizok">@steveruizok</a>
       </div>
       <ButtonGroup>
+        <IconButton onClick={() => state.send('TOGGLED_DARK_MODE')}>
+          <Sun />
+        </IconButton>
         <Alert
           animationLength={150}
           visibilityDuration={1200}

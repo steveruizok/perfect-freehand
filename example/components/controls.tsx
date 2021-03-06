@@ -16,25 +16,18 @@ export default function Controls() {
         value={options.clip}
         onChange={v => state.send('CHANGED_OPTIONS', { clip: v })}
       />
-      <NumberInput
-        value={options.streamline}
-        onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
-        label="Streamline"
-        min={0}
-        max={1}
+      <BooleanInput
+        label="Show Path"
+        value={settings.showTrace}
+        onChange={v => state.send('CHANGED_SETTINGS', { showTrace: v })}
       />
+      <hr />
       <NumberInput
         label="Size"
         value={options.size}
         min={1}
         max={64}
         onChange={v => state.send('CHANGED_OPTIONS', { size: v })}
-      />
-      <EnumInput
-        label="Easing"
-        value={options.easing}
-        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
-        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
       />
       <NumberInput
         label="Thinning"
@@ -43,6 +36,12 @@ export default function Controls() {
         max={1}
         onChange={v => state.send('CHANGED_OPTIONS', { thinning: v })}
       />
+      <EnumInput
+        label="Easing"
+        value={options.easing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
+      />
       <NumberInput
         value={options.smoothing}
         onChange={v => state.send('CHANGED_OPTIONS', { smoothing: v })}
@@ -50,15 +49,12 @@ export default function Controls() {
         min={0}
         max={2}
       />
-      <BooleanInput
-        label="Dark Mode"
-        value={settings.darkMode}
-        onChange={() => state.send('TOGGLED_DARK_MODE')}
-      />
-      <BooleanInput
-        label="Show Path"
-        value={settings.showTrace}
-        onChange={v => state.send('CHANGED_SETTINGS', { showTrace: v })}
+      <NumberInput
+        value={options.streamline}
+        onChange={v => state.send('CHANGED_OPTIONS', { streamline: v })}
+        label="Streamline"
+        min={0}
+        max={1}
       />
       <ButtonGroup>
         <button onClick={() => state.send('RESET_OPTIONS')}>Reset</button>
@@ -90,6 +86,11 @@ const StyledControls = styled.div`
 
   input {
     height: 20px;
+  }
+
+  hr {
+    grid-column: span 3;
+    width: 100%;
   }
 `
 
