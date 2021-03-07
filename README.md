@@ -1,6 +1,6 @@
 # ![Screenshot](screenshot.svg 'Perfect Freehand')
 
-Create pressure-sensitive freehand strokes.
+Draw perfect pressure-sensitive freehand strokes.
 
 🔗 [Demo](https://perfect-freehand-example.vercel.app/)
 
