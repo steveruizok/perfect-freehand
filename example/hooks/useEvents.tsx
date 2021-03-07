@@ -66,6 +66,7 @@ export default function useEvents() {
     }
 
     function handlePointerDown(e: PointerEvent) {
+      e.preventDefault()
       if (pointerIds.size === 0) first = e.pointerId
       pointerIds.add(e.pointerId)
 

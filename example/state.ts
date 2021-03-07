@@ -3,6 +3,64 @@ import { getPointer } from './hooks/useEvents'
 import { Mark, ClipboardMessage } from './types'
 import getStroke, { StrokeOptions } from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
+import { copyToClipboard } from './utils'
+
+function getSvgPathFromStroke(stroke: number[][]) {
+  if (stroke.length === 0) return ''
+
+  const d = []
+
+  let [p0, p1] = stroke
+
+  d.push('M', p0[0], p0[1], 'Q')
+
+  for (let i = 1; i < stroke.length; i++) {
+    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
+    p0 = p1
+    p1 = stroke[i]
+  }
+
+  d.push('Z')
+
+  return d.join(' ')
+}
+
+function getFlatSvgPathFromStroke(stroke: number[][]) {
+  const poly = polygonClipping.union([stroke] as any)
+
+  const d = []
+
+  for (let face of poly) {
+    for (let points of face) {
+      d.push(getSvgPathFromStroke(points))
+    }
+  }
+
+  return d.join(' ')
+}
+
+const easings = {
+  linear: (t: number) => t,
+  easeIn: (t: number) => t * t,
+  easeOut: (t: number) => t * (2 - t),
+  easeInOut: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+}
+
+function getStrokePath(
+  points: Mark['points'],
+  options: AppOptions,
+  type: string
+) {
+  const stroke = getStroke(points, {
+    ...options,
+    easing: easings[options.easing],
+    simulatePressure: type !== 'pen',
+  })
+
+  return options.clip
+    ? getFlatSvgPathFromStroke(stroke)
+    : getSvgPathFromStroke(stroke)
+}
 
 interface AppOptions {
   size: number
@@ -32,93 +90,6 @@ const defaultSettings = {
   recomputePaths: true,
 }
 
-function getSvgPathFromStroke(stroke: number[][]) {
-  if (stroke.length === 0) return ''
-
-  const d = []
-
-  let [p0, p1] = stroke
-
-  d.push(`M ${p0[0]} ${p0[1]} Q`)
-
-  for (let i = 1; i < stroke.length; i++) {
-    const mpx = p0[0] + (p1[0] - p0[0]) / 2
-    const mpy = p0[1] + (p1[1] - p0[1]) / 2
-    d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
-    p0 = p1
-    p1 = stroke[i + 1]
-  }
-
-  d.push('Z')
-
-  return d.join(' ')
-}
-
-function getFlatSvgPathFromStroke(stroke: number[][]) {
-  const poly = polygonClipping.union([stroke] as any)
-
-  const d = []
-
-  for (let face of poly) {
-    for (let pts of face) {
-      let [p0, p1] = pts
-
-      d.push(`M ${p0[0]} ${p0[1]} Q`)
-
-      for (let i = 1; i < pts.length; i++) {
-        const mpx = p0[0] + (p1[0] - p0[0]) / 2
-        const mpy = p0[1] + (p1[1] - p0[1]) / 2
-        d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
-        p0 = p1
-        p1 = pts[i + 1]
-      }
-
-      d.push('Z')
-    }
-  }
-
-  return d.join(' ')
-}
-
-function getStrokePath(
-  points: Mark['points'],
-  options: AppOptions,
-  type: string
-) {
-  let easing: StrokeOptions['easing']
-
-  switch (options.easing) {
-    case 'easeIn': {
-      easing = (t: number) => t * t
-      break
-    }
-    case 'easeOut': {
-      easing = (t: number) => t * (2 - t)
-      break
-    }
-    case 'easeInOut': {
-      easing = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t)
-      break
-    }
-    default: {
-      easing = (t: number) => t
-      break
-    }
-  }
-
-  const stroke = getStroke(points, {
-    ...options,
-    easing,
-    simulatePressure: type !== 'pen',
-  })
-
-  if (options.clip) {
-    return getFlatSvgPathFromStroke(stroke)
-  }
-
-  return getSvgPathFromStroke(stroke)
-}
-
 const state = createState({
   data: {
     settings: { ...defaultSettings },
@@ -140,15 +111,9 @@ const state = createState({
             CHANGED_SETTINGS: ['changeSettings'],
             TOGGLED_CONTROLS: 'toggleControls',
             LOADED: ['setup', 'setDarkMode'],
+            CLEARED_CANVAS: ['clearMarks'],
             UNLOADED: 'cleanup',
             RESIZED: ['resize'],
-            PRESSED_KEY_Z: [
-              { if: ['metaPressed', 'shiftPressed'], do: 'redoMark' },
-              { if: 'metaPressed', unless: 'shiftPressed', do: 'undoMark' },
-            ],
-            PRESSED_KEY_D: 'toggledTrace',
-            PRESSED_KEY_E: ['clearMarks'],
-            CLEARED_CANVAS: ['clearMarks'],
             UNDO: ['undoMark'],
             REDO: ['redoMark'],
             TOGGLED_DARK_MODE: ['toggleDarkMode', 'setDarkMode'],
@@ -161,6 +126,12 @@ const state = createState({
                 else: 'alertCouldNotCopyToClipboard',
               },
             ],
+            PRESSED_KEY_D: 'toggledTrace',
+            PRESSED_KEY_E: ['clearMarks'],
+            PRESSED_KEY_Z: [
+              { if: ['metaPressed', 'shiftPressed'], do: 'redoMark' },
+              { if: 'metaPressed', unless: 'shiftPressed', do: 'undoMark' },
+            ],
           },
         },
         copying: {
@@ -171,7 +142,10 @@ const state = createState({
               to: 'idle',
             },
             onReject: {
-              do: 'alertCouldNotCopyToClipboard',
+              do: [
+                () => window.alert('no api'),
+                'alertCouldNotCopyToClipboard',
+              ],
               to: 'idle',
             },
           },
@@ -182,23 +156,14 @@ const state = createState({
       initial: 'up',
       states: {
         up: {
-          onEnter: [],
           on: {
-            DOWNED_POINTER: {
-              to: 'down',
-              do: ['beginMark'],
-            },
+            DOWNED_POINTER: ['beginMark', { to: 'down' }],
           },
         },
         down: {
           on: {
-            LIFTED_POINTER: {
-              do: ['Mark'],
-              to: 'up',
-            },
-            MOVED_POINTER: {
-              do: ['addPointToMark'],
-            },
+            LIFTED_POINTER: { do: 'completeMark', to: 'up' },
+            MOVED_POINTER: 'addPointToMark',
           },
         },
       },
@@ -211,6 +176,9 @@ const state = createState({
     },
   },
   conditions: {
+    hasCurrentMark(data) {
+      return !!data.currentMark
+    },
     hasResult(data, paylad, result) {
       return !!result
     },
@@ -299,12 +267,14 @@ const state = createState({
         currentMark!.type
       )
     },
-    Mark(data) {
+    completeMark(data) {
       const { currentMark, alg } = data
 
+      if (!currentMark) return
+
       data.marks.push({
-        ...currentMark!,
-        path: getStrokePath(currentMark!.points, alg, currentMark!.type),
+        ...currentMark,
+        path: getStrokePath(currentMark.points, alg, currentMark!.type),
       })
 
       data.currentMark = null
@@ -415,7 +385,11 @@ const state = createState({
       element.setAttribute('height', tH)
 
       // Copy to clipboard!
-      return navigator.clipboard.writeText(svgString)
+      try {
+        navigator.clipboard.writeText(svgString)
+      } catch (e) {
+        copyToClipboard(svgString)
+      }
     },
   },
 })
@@ -423,3 +397,5 @@ const state = createState({
 export const useSelector = createSelectorHook(state)
 
 export default state
+
+// state.onUpdate(d => console.log(d.log[0]))

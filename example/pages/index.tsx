@@ -5,39 +5,28 @@ import { useSelector } from '../state'
 import useEvents from '../hooks/useEvents'
 import useLocalData from '../hooks/useLocalData'
 import useDarkMode from '../hooks/useDarkMode'
+import useSvgResizer from 'hooks/useSvgResizer'
 const Toolbar = dynamic(() => import('../components/toolbar'), { ssr: false })
 const Controls = dynamic(() => import('../components/controls'), { ssr: false })
+
+function handleTouchStart(e: React.TouchEvent) {
+  e.preventDefault()
+}
+
+function handleTouchEnd(e: React.TouchEvent) {
+  e.preventDefault()
+}
 
 export default function Home() {
   useEvents()
   useDarkMode()
   useLocalData()
-
+  const ref = useSvgResizer()
   const marks = useSelector(state => state.data.marks)
   const currentMark = useSelector(state => state.data.currentMark)
-  const darkMode = useSelector(state => state.data.settings.darkMode)
   const showControls = useSelector(state => state.data.settings.showControls)
   const showTrace = useSelector(state => state.data.settings.showTrace)
-  const ref = React.useRef<SVGSVGElement>(null)
-
-  React.useEffect(() => {
-    function resize() {
-      const svg = ref.current!
-      svg.setAttribute('width', String(window.innerWidth))
-      svg.setAttribute('height', String(window.innerHeight))
-      svg.setAttribute(
-        'viewBox',
-        `0 0 ${String(window.innerWidth)} ${String(window.innerHeight)}`
-      )
-    }
-    resize()
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', resize)
-      return () => {
-        window.removeEventListener('resize', resize)
-      }
-    }
-  }, [])
+  const darkMode = useSelector(state => state.data.settings.darkMode)
 
   return (
     <div>
@@ -46,7 +35,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <svg ref={ref} viewBox={'0 0 800 600'} id="drawable-svg">
+        <svg
+          ref={ref}
+          viewBox={'0 0 800 600'}
+          id="drawable-svg"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           {marks.map((mark, i) => (
             <path
               key={i}

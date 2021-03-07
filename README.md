@@ -1,10 +1,15 @@
-# Perfect Freehand
+# ![Screenshot](screenshot.svg 'Perfect Freehand')
 
-Perfect freehand is a library for generating freehand strokes.
-
-![Screenshot](https://github.com/steveruizok/perfect-freehand/raw/main/screenshot.png)
+Create pressure-sensitive freehand strokes.
 
 🔗 [Demo](https://perfect-freehand-example.vercel.app/)
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Support](#support)
+- [Contributing](#contributing)
 
 ## Installation
 
@@ -20,7 +25,7 @@ yarn add perfect-freehand
 
 ## Usage
 
-This library's default export is a function that:
+This package's default export is a function that:
 
 - accepts an array of points and an (optional) options object
 - returns a stroke as an array of points formatted as `[x, y]`
@@ -77,23 +82,23 @@ getStroke(myPoints, {
 
 While `getStroke` returns an array of points representing a stroke, it's up to you to decide how you will render the stroke. The library does not export any rendering solutions.
 
-For example, here is a function that takes in a stroke and returns SVG path data. You can use the string returned by this function in two ways. For SVG, you can pass the data into `path` element's [`d` property](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d). For HTML canvas, you can pass the string into the [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths) and then stroke or fill the path.
+For example, the function below will turn a stroke into SVG path data for use with either [SVG paths](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d) or HTML Canvas (using the [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths)).
 
 ```js
 // Create SVG path data using the points from perfect-freehand.
-function getSvgPathFromStroke(stroke) {
+function getSvgPathFromStroke(points) {
+  if (points.length === 0) return ''
+
   const d = []
 
-  let [p0, p1] = stroke
+  let [p0, p1] = points
 
-  d.push(`M ${p0[0]} ${p0[1]} Q`)
+  d.push('M', p0[0], p0[1], 'Q')
 
-  for (let i = 1; i < stroke.length; i++) {
-    const mpx = p0[0] + (p1[0] - p0[0]) / 2
-    const mpy = p0[1] + (p1[1] - p0[1]) / 2
-    d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
+  for (let i = 1; i < points.length; i++) {
+    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
     p0 = p1
-    p1 = stroke[i + 1]
+    p1 = points[i]
   }
 
   d.push('Z')
@@ -101,6 +106,28 @@ function getSvgPathFromStroke(stroke) {
   return d.join(' ')
 }
 ```
+
+To render a stroke as a flat polygon, add the [`polygon-clipping`](https://github.com/mfogel/polygon-clipping) package and use the following function together with the `getSvgPathFromStroke`.
+
+```js
+import polygonClipping from 'polygon-clipping'
+
+function getFlatSvgPathFromStroke(stroke) {
+  const poly = polygonClipping.union([stroke])
+
+  const d = []
+
+  for (let face of poly) {
+    for (let points of face) {
+      d.push(getSvgPathFromStroke(points))
+    }
+  }
+
+  return d.join(' ')
+}
+```
+
+> **Tip:** For implementations in Typescript, see the example project included in this repository.
 
 # Example
 
@@ -128,17 +155,6 @@ export default function Example() {
     }
   }
 
-  const stroke = currentMark
-    ? getStroke(currentMark.points, {
-        size: 16,
-        thinning: 0.75,
-        smoothing: 0.5,
-        streamline: 0.5,
-        easing: t => t * t * t,
-        simulatePressure: currentMark.type !== 'pen',
-      })
-    : []
-
   return (
     <svg
       width={800}
@@ -147,7 +163,20 @@ export default function Example() {
       onPointerMove={handlePointerMove}
       style={{ touchAction: 'none' }}
     >
-      {currentMark && <path d={getSvgPathFromStroke(stroke)} />}
+      {currentMark && (
+        <path
+          d={getSvgPathFromStroke(
+            getStroke(currentMark.points, {
+              size: 16,
+              thinning: 0.75,
+              smoothing: 0.5,
+              streamline: 0.5,
+              easing: t => t * t * t,
+              simulatePressure: currentMark.type !== 'pen',
+            })
+          )}
+        />
+      )}
     </svg>
   )
 }
@@ -155,58 +184,41 @@ export default function Example() {
 
 [![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
 
-# Advanced Usage
+## Other Exports
 
-## Functions
+### `StrokeOptions`
+
+A TypeScript type for the options object.
+
+```ts
+import { StrokeOptions } from 'perfect-freehand'
+```
 
 For advanced usage, the library also exports smaller functions that `getStroke` uses to generate its SVG data. While you can use `getStroke`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
 
-#### `getStrokePoints`
+### `getStrokePoints`
 
 ```js
+const strokePoints = getStrokePoints(rawInputPoints)
 ```
 
 Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of streamlined points as `[x, y, pressure, angle, distance, lengthAtPoint]`. The path's total length will be the length of the last point in the array.
 
-#### `getStrokeOutlinePoints`
+### `getStrokeOutlinePoints`
 
 Accepts an array of points (formatted as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
-## Rendering a Flattened Stroke
-
-To render a stroke as a flat polygon, add the `polygon-clipping` package and use (or refer to) the following function.
-
 ```js
-import getStroke from 'perfect-freehand'
-import polygonClipping from 'polygon-clipping'
-
-function getFlatSvgPathFromStroke(stroke) {
-
-  const poly = polygonClipping.union([stroke] as any)
-
-  const d = []
-
-  for (let face of poly) {
-    for (let pts of face) {
-      let [p0, p1] = pts
-
-      d.push(`M ${p0[0]} ${p0[1]} Q`)
-
-      for (let i = 1; i < pts.length; i++) {
-        const mpx = p0[0] + (p1[0] - p0[0]) / 2
-        const mpy = p0[1] + (p1[1] - p0[1]) / 2
-        d.push(`${p0[0]},${p0[1]} ${mpx},${mpy}`)
-        p0 = p1
-        p1 = pts[i + 1]
-      }
-
-      d.push('Z')
-    }
-  }
-
-  return d.join(' ')
-}
+const outlinePoints = getOutlinePoints(strokePoints)
 ```
+
+## Support
+
+Please [open an issue](https://github.com/steveruizok/perfect-freehand/issues/new) for support.
+
+## Discussion
+
+Have an idea or casual question? Visit the [discussion page](https://github.com/steveruizok/perfect-freehand/discussions).
 
 ## Author
 
