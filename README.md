@@ -9,7 +9,8 @@ Create pressure-sensitive freehand strokes.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Support](#support)
-- [Contributing](#contributing)
+- [Discussion](#discussion)
+- [Author](#Author)
 
 ## Installation
 
@@ -129,7 +130,7 @@ function getFlatSvgPathFromStroke(stroke) {
 
 > **Tip:** For implementations in Typescript, see the example project included in this repository.
 
-# Example
+### Example
 
 ```jsx
 import * as React from 'react'
@@ -184,9 +185,9 @@ export default function Example() {
 
 [![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
 
-## Other Exports
+### Advanced Usage
 
-### `StrokeOptions`
+#### `StrokeOptions`
 
 A TypeScript type for the options object.
 
@@ -196,7 +197,7 @@ import { StrokeOptions } from 'perfect-freehand'
 
 For advanced usage, the library also exports smaller functions that `getStroke` uses to generate its SVG data. While you can use `getStroke`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
 
-### `getStrokePoints`
+#### `getStrokePoints`
 
 ```js
 const strokePoints = getStrokePoints(rawInputPoints)
@@ -204,7 +205,7 @@ const strokePoints = getStrokePoints(rawInputPoints)
 
 Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of streamlined points as `[x, y, pressure, angle, distance, lengthAtPoint]`. The path's total length will be the length of the last point in the array.
 
-### `getStrokeOutlinePoints`
+#### `getStrokeOutlinePoints`
 
 Accepts an array of points (formatted as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
