@@ -36,16 +36,10 @@ export default function Controls() {
         max={1}
         onChange={v => state.send('CHANGED_OPTIONS', { thinning: v })}
       />
-      <EnumInput
-        label="Easing"
-        value={options.easing}
-        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
-        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
-      />
       <NumberInput
         value={options.smoothing}
         onChange={v => state.send('CHANGED_OPTIONS', { smoothing: v })}
-        label="Smooth"
+        label="Smoothing"
         min={0}
         max={2}
       />
@@ -55,6 +49,12 @@ export default function Controls() {
         label="Streamline"
         min={0}
         max={1}
+      />
+      <EnumInput
+        label="Easing"
+        value={options.easing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
       />
       <ButtonGroup>
         <button onClick={() => state.send('RESET_OPTIONS')}>Reset</button>

@@ -141,6 +141,7 @@ export default function Example() {
   const [currentMark, setCurrentMark] = React.useState()
 
   function handlePointerDown(e) {
+    e.preventDefault()
     setCurrentMark({
       type: e.pointerType,
       points: [[e.pageX, e.pageY, e.pressure]],
@@ -148,6 +149,7 @@ export default function Example() {
   }
 
   function handlePointerMove(e) {
+    e.preventDefault()
     if (e.buttons === 1) {
       setCurrentMark({
         ...currentMark,
@@ -158,8 +160,6 @@ export default function Example() {
 
   return (
     <svg
-      width={800}
-      height={600}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       style={{ touchAction: 'none' }}
@@ -168,11 +168,10 @@ export default function Example() {
         <path
           d={getSvgPathFromStroke(
             getStroke(currentMark.points, {
-              size: 16,
+              size: 24,
               thinning: 0.75,
               smoothing: 0.5,
               streamline: 0.5,
-              easing: t => t * t * t,
               simulatePressure: currentMark.type !== 'pen',
             })
           )}
