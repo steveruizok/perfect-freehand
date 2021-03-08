@@ -120,6 +120,7 @@ function getFlatSvgPathFromStroke(stroke) {
 
   for (let face of poly) {
     for (let points of face) {
+      points.push(points[0])
       d.push(getSvgPathFromStroke(points))
     }
   }
