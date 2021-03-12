@@ -29,7 +29,7 @@ export default function Home() {
   const darkMode = useSelector(state => state.data.settings.darkMode)
 
   return (
-    <div>
+    <div className="app">
       <Head>
         <title>Perfect Freehand Example</title>
         <link rel="icon" href="/favicon.ico" />

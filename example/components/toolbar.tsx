@@ -25,6 +25,7 @@ const ToolbarContainer = styled.div`
   backdrop-filter: blur(30px);
   user-select: none;
   overflow: visible;
+  font-size: 14px;
 `
 
 const ButtonGroup = styled.div`
@@ -62,10 +63,10 @@ export default function Toolbar() {
     <ToolbarContainer onPointerDown={e => e.stopPropagation()}>
       <ButtonGroup>
         <IconButton onClick={() => state.send('UNDO')}>
-          <RotateCcw />
+          <RotateCcw size={20} />
         </IconButton>
         <IconButton onClick={() => state.send('REDO')}>
-          <RotateCw />
+          <RotateCw size={20} />
         </IconButton>
       </ButtonGroup>
       <div>
@@ -79,7 +80,7 @@ export default function Toolbar() {
       </div>
       <ButtonGroup>
         <IconButton onClick={() => state.send('TOGGLED_DARK_MODE')}>
-          <Sun />
+          <Sun size={20} />
         </IconButton>
         <Alert
           animationLength={150}
@@ -88,14 +89,14 @@ export default function Toolbar() {
           onFinish={() => state.send('CLEARED_CLIPBOARD_MESSAGE', null)}
         >
           <IconButton onClick={async () => state.send('COPIED_TO_CLIPBOARD')}>
-            <Clipboard />
+            <Clipboard size={20} />
           </IconButton>
         </Alert>
         <IconButton onClick={() => state.send('TOGGLED_CONTROLS')}>
-          <Settings />
+          <Settings size={20} />
         </IconButton>
         <IconButton onClick={() => state.send('CLEARED_CANVAS')}>
-          <Trash />
+          <Trash size={20} />
         </IconButton>
       </ButtonGroup>
     </ToolbarContainer>
