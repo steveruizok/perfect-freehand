@@ -106,7 +106,7 @@ export function getStrokeOutlinePoints(
   }
 
   // If the point is only one point long, draw two caps at either end.
-  if (len === 1 || totalLength <= 4) {
+  if (len === 1 || totalLength <= size / 4) {
     let first = points[0],
       last = points[len - 1],
       angle = getAngle(first, last)

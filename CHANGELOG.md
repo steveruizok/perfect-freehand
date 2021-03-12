@@ -1,16 +1,20 @@
-# 0.3.4
+## 0.3.4
+
+- Fixes bug in short strokes.
+
+## 0.3.3
 
 - Adds the `easing` property. This property accepts an [easing function](https://gist.github.com/gre/1650294) that will apply to all pressure measurements (real or simulated). Defaults to a linear easing (`t => t`).
 
-# 0.3.2
+## 0.3.2
 
 - Superficial changes.
 
-# 0.3.1
+## 0.3.1
 
 - Improves sharp corners that aren't sharp enough for caps, but are still sharp enough to confuse the distance-checking part of the algorithm.
 
-# 0.3.0
+## 0.3.0
 
 This version has breaking changes.
 
@@ -31,28 +35,28 @@ This version has breaking changes.
 - Setting `thinning` to zero has the same effect as had setting the now removed `pressure` option to `false`.
 - Improves code organization and comments.
 
-# 0.2.5
+## 0.2.5
 
 - Improves caps for start and end.
 - Improves handling of short moves.
 
-# 0.2.4
+## 0.2.4
 
 - Improves sharp corners.
 
-# 0.2.3
+## 0.2.3
 
 - Brings back `simulatePressure` until I have a better way of guessing.
 
-# 0.2.2
+## 0.2.2
 
 - Slight fix to line starts.
 
-# 0.2.1
+## 0.2.1
 
 - Fixes actual pressure sensitivity.
 
-# 0.2.0
+## 0.2.0
 
 - Breaks up algorithm into smaller functions. Because `getPath` returns an SVG path data, you can use `getPath` only with the Path2D element (for HTML Canvas) or SVG paths. These new functions will allow you to create paths in other rendering technologies.
 
@@ -65,18 +69,18 @@ This version has breaking changes.
 - Adds the `clip` option to flatten the path into a single polygon.
 - Removes `type` option. We'll try to use pressure if available. To turn off pressure, set `pressure` to false.
 
-# 0.1.3
+## 0.1.3
 
 - Removes hidden options, uses `maxSize` for velocity calculations.
 
-# 0.1.2
+## 0.1.2
 
 - Fixes bug in pressure.
 
-# 0.1.2
+## 0.1.2
 
 - Fixes bug with empty input array.
 
-# 0.1.0
+## 0.1.0
 
 - Hey world.
