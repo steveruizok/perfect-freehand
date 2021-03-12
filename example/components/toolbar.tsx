@@ -69,10 +69,13 @@ export default function Toolbar() {
         </IconButton>
       </ButtonGroup>
       <div>
-        <a href="https://github.com/steveruizok/perfect-freehand">
+        <a
+          href="https://github.com/steveruizok/perfect-freehand"
+          target="_blank"
+          rel="nofollow noopener"
+        >
           perfect-freehand
-        </a>{' '}
-        | <a href="https://twitter.com/steveruizok">@steveruizok</a>
+        </a>
       </div>
       <ButtonGroup>
         <IconButton onClick={() => state.send('TOGGLED_DARK_MODE')}>
