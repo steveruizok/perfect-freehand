@@ -6,7 +6,6 @@ import {
   getDistance,
   getPointBetween,
   projectPoint,
-  lerpAngles,
   lerp,
 } from './utils'
 import { StrokeOptions } from './types'
@@ -101,9 +100,7 @@ export function getStrokeOutlinePoints(
     short = true // Whether the line is drawn far enough
 
   // We can't do anything with an empty array.
-  if (len === 0) {
-    return []
-  }
+  if (len === 0) return []
 
   // If the point is only one point long, draw two caps at either end.
   if (len === 1 || totalLength <= size / 4) {
@@ -126,13 +123,14 @@ export function getStrokeOutlinePoints(
   }
 
   // For a point with more than one point, create an outline shape.
-  for (let i = 1; i < len; i++) {
-    const prev = points[i - 1]
+  for (let i = 1; i < len - 1; i++) {
+    const next = points[i + 1]
 
     let [x, y, pressure, angle, distance, clen] = points[i]
 
     // 1.
     // Calculate the size of the current point.
+
     if (thinning) {
       if (simulatePressure) {
         // Simulate pressure by accellerating the reported pressure.
@@ -147,6 +145,7 @@ export function getStrokeOutlinePoints(
 
     // 2.
     // Draw a cap once we've reached the minimum length.
+
     if (short) {
       if (clen < size / 4) continue
 
@@ -164,53 +163,51 @@ export function getStrokeOutlinePoints(
       rightPts.push(tr)
     }
 
-    angle = lerpAngles(pa, angle, 0.75)
-
     // 3.
-    // Add points for the current point.
-    if (i === len - 1) {
-      // The last point in the line.
-      // Add points for an end cap.
-      for (let t = 0, step = 0.1; t <= 1; t += step) {
-        rightPts.push(projectPoint([x, y], angle + TAU + t * PI, r))
-      }
-    } else {
-      // Find the delta between the current and previous angle.
-      const delta = getAngleDelta(prev[3], angle),
-        absDelta = abs(delta)
+    // Handle sharp corners
 
-      if (absDelta > SHARP && clen > r) {
-        // A sharp corner.
-        // Project points (left and right) for a cap.
-        const mid = getPointBetween(prev, [x, y])
+    // Find the delta between the current and next angle.
+    const absDelta = abs(getAngleDelta(next[3], angle))
 
-        for (let t = 0, step = 0.25; t <= 1; t += step) {
-          tl = projectPoint(mid, pa - TAU + t * -PI, r)
-          tr = projectPoint(mid, pa + TAU + t * PI, r)
+    if (absDelta > SHARP) {
+      // A sharp corner.
+      // Project points (left and right) for a cap.
 
-          leftPts.push(tl)
-          rightPts.push(tr)
-        }
-      } else {
-        // A regular point.
-        // Add projected points left and right, if far enough away.
-        pl = projectPoint([x, y], angle - TAU, r)
-        pr = projectPoint([x, y], angle + TAU, r)
+      for (let t = 0, step = 0.25; t <= 1; t += step) {
+        tl = projectPoint([x, y], pa - TAU + t * -PI, r)
+        tr = projectPoint([x, y], pa + TAU + t * PI, r)
 
-        if (absDelta > DULL || getDistance(pl, tl) > minDist) {
-          leftPts.push(getPointBetween(tl, pl))
-          tl = pl
-        }
-
-        if (absDelta > DULL || getDistance(pr, tr) > minDist) {
-          rightPts.push(getPointBetween(tr, pr))
-          tr = pr
-        }
+        leftPts.push(tl)
+        rightPts.push(tr)
       }
 
-      pp = pressure
-      pa = angle
+      continue
     }
+
+    // 4. Add regular point.
+
+    pl = projectPoint([x, y], angle - TAU, r)
+    pr = projectPoint([x, y], angle + TAU, r)
+
+    if (absDelta > DULL || getDistance(pl, tl) > minDist) {
+      leftPts.push(getPointBetween(tl, pl))
+      tl = pl
+    }
+
+    if (absDelta > DULL || getDistance(pr, tr) > minDist) {
+      rightPts.push(getPointBetween(tr, pr))
+      tr = pr
+    }
+
+    pp = pressure
+    pa = angle
+  }
+
+  // Add the end cap. This is tricky because some lines end with sharp angles.
+  const last = points[points.length - 1]
+
+  for (let t = 0, step = 0.1; t <= 1; t += step) {
+    rightPts.push(projectPoint(last, last[3] + TAU + t * PI, r))
   }
 
   return leftPts.concat(rightPts.reverse())

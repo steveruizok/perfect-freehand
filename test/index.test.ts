@@ -9,7 +9,7 @@ describe('It works with number pairs.', () => {
       [25, 5],
       [30, 5],
     ])
-    expect(Array.isArray(stroke)).toBeTruthy
+    expect(Array.isArray(stroke)).toBeTruthy()
   })
 })
 
@@ -22,7 +22,7 @@ describe('It works with point pairs.', () => {
       { x: 25, y: 5 },
       { x: 30, y: 5 },
     ])
-    expect(Array.isArray(stroke)).toBeTruthy
+    expect(Array.isArray(stroke)).toBeTruthy()
   })
 })
 
@@ -42,6 +42,17 @@ describe('It produces the same result with either input.', () => {
       { x: 25, y: 5 },
       { x: 30, y: 5 },
     ])
-    expect(JSON.stringify(strokeA) === JSON.stringify(strokeB)).toBeTruthy
+    expect(JSON.stringify(strokeA) === JSON.stringify(strokeB)).toBeTruthy()
+  })
+})
+
+describe('It caps points.', () => {
+  it('works', () => {
+    const stroke = getPath([
+      [10, 200],
+      [10, 0],
+    ])
+
+    expect(stroke.length > 4).toBeTruthy()
   })
 })

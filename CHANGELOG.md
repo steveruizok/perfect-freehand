@@ -1,3 +1,7 @@
+## 0.3.5
+
+- Improves caps.
+
 ## 0.3.4
 
 - Fixes bug in short strokes.
