@@ -78,7 +78,7 @@ const defaultOptions: AppOptions = {
   smoothing: 0.5,
   streamline: 0.5,
   simulatePressure: true,
-  clip: true,
+  clip: false,
   easing: 'linear',
 }
 
