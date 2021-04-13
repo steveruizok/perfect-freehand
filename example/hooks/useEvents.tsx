@@ -67,6 +67,7 @@ export default function useEvents() {
 
     function handlePointerDown(e: PointerEvent) {
       e.preventDefault()
+      document.body.setPointerCapture(e.pointerId)
       if (pointerIds.size === 0) first = e.pointerId
       pointerIds.add(e.pointerId)
 
@@ -88,6 +89,7 @@ export default function useEvents() {
     }
 
     function handlePointerUp(e: PointerEvent) {
+      document.body.releasePointerCapture(e.pointerId)
       updatePointer(e)
       pointerIds.delete(e.pointerId)
       pointer.p = e.pointerType === 'pen' ? e.pressure : 0
