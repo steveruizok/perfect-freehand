@@ -1,19 +1,8 @@
-import {
-  toPointsArray,
-  clamp,
-  getAngle,
-  getAngleDelta,
-  getDistance,
-  getPointBetween,
-  projectPoint,
-  lerp,
-} from './utils'
-import { StrokeOptions } from './types'
+import { toPointsArray, clamp, lerp } from './utils'
+import { StrokeOptions, StrokePoint } from './types'
+import * as vec from './vec'
 
-const { abs, min, PI } = Math,
-  TAU = PI / 2,
-  SHARP = TAU,
-  DULL = SHARP / 2
+const { min, PI } = Math
 
 function getStrokeRadius(
   size: number,
@@ -39,26 +28,44 @@ function getStrokeRadius(
 export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], streamline = 0.5): number[][] {
+>(points: (T | K)[], streamline = 0.5): StrokePoint[] {
   const pts = toPointsArray(points)
 
   if (pts.length === 0) return []
 
-  pts[0] = [pts[0][0], pts[0][1], pts[0][2] || 0.5, 0, 0, 0]
+  if (pts.length === 1) pts.push(vec.add(pts[0], [1, 0]))
+
+  const strokePoints: StrokePoint[] = [
+    {
+      point: [pts[0][0], pts[0][1]],
+      pressure: pts[0][2],
+      vector: [0, 0],
+      distance: 0,
+      runningLength: 0,
+    },
+  ]
 
   for (
-    let i = 1, curr = pts[i], prev = pts[0];
+    let i = 1, curr = pts[i], prev = strokePoints[0];
     i < pts.length;
-    i++, curr = pts[i], prev = pts[i - 1]
+    i++, curr = pts[i], prev = strokePoints[i - 1]
   ) {
-    curr[0] = lerp(prev[0], curr[0], 1 - streamline)
-    curr[1] = lerp(prev[1], curr[1], 1 - streamline)
-    curr[3] = getAngle(curr, prev)
-    curr[4] = getDistance(curr, prev)
-    curr[5] = prev[5] + curr[4]
+    const point = vec.lrp(prev.point, [curr[0], curr[1]], 1 - streamline),
+      pressure = curr[2],
+      vector = vec.uni(vec.vec(point, prev.point)),
+      distance = vec.dist(point, prev.point),
+      runningLength = prev.runningLength + distance
+
+    strokePoints.push({
+      point,
+      pressure,
+      vector,
+      distance,
+      runningLength,
+    })
   }
 
-  return pts
+  return strokePoints
 }
 
 /**
@@ -73,7 +80,7 @@ export function getStrokePoints<
  * @param options.simulatePressure Whether to simulate pressure based on velocity.
  */
 export function getStrokeOutlinePoints(
-  points: number[][],
+  points: StrokePoint[],
   options: StrokeOptions = {} as StrokeOptions
 ): number[][] {
   const {
@@ -85,16 +92,16 @@ export function getStrokeOutlinePoints(
   } = options
 
   const len = points.length,
-    totalLength = points[len - 1][5], // The total length of the line
+    totalLength = points[len - 1].runningLength, // The total length of the line
     minDist = size * smoothing, // The minimum distance for measurements
     leftPts: number[][] = [], // Our collected left and right points
     rightPts: number[][] = []
 
-  let pl = points[0], // Previous left and right points
-    pr = points[0],
+  let pl = points[0].point, // Previous left and right points
+    pr = points[0].point,
     tl = pl, // Points to test distance from
     tr = pr,
-    pa = pr[3],
+    pa = points[0].vector,
     pp = 0, // Previous (maybe simulated) pressure
     r = size / 2, // The current point radius
     short = true // Whether the line is drawn far enough
@@ -102,19 +109,25 @@ export function getStrokeOutlinePoints(
   // We can't do anything with an empty array.
   if (len === 0) return []
 
-  // If the point is only one point long, draw two caps at either end.
-  if (len === 1 || totalLength <= size / 4) {
-    let first = points[0],
-      last = points[len - 1],
-      angle = getAngle(first, last)
+  // If the point is only one point long, or is very short, draw two caps at either end.
+  if (totalLength <= size / 4) {
+    const first = points[0],
+      last = points[len - 1]
 
     if (thinning) {
-      r = getStrokeRadius(size, thinning, easing, last[2])
+      r = getStrokeRadius(size, thinning, easing, last.pressure)
     }
 
+    const pushedA = vec.add(first.point, vec.mul(vec.per(last.vector), r))
+
+    const pushedB = vec.add(
+      [last.point[0], last.point[1]],
+      vec.mul(vec.neg(vec.per(last.vector)), r)
+    )
+
     for (let t = 0, step = 0.1; t <= 1; t += step) {
-      tl = projectPoint(first, angle + PI + TAU - t * PI, r)
-      tr = projectPoint(last, angle + TAU - t * PI, r)
+      tl = vec.rotAround(pushedA, first.point, PI * t)
+      tr = vec.rotAround(pushedB, last.point, PI * t)
       leftPts.push(tl)
       rightPts.push(tr)
     }
@@ -126,7 +139,7 @@ export function getStrokeOutlinePoints(
   for (let i = 1; i < len - 1; i++) {
     const next = points[i + 1]
 
-    let [x, y, pressure, angle, distance, clen] = points[i]
+    let { point, pressure, vector, distance, runningLength } = points[i]
 
     // 1.
     // Calculate the size of the current point.
@@ -147,19 +160,21 @@ export function getStrokeOutlinePoints(
     // Draw a cap once we've reached the minimum length.
 
     if (short) {
-      if (clen < size / 4) continue
+      if (runningLength < size / 4) continue
 
       // The first point after we've reached the minimum length.
       // Draw a cap at the first point angled toward the current point.
 
       short = false
 
+      const pushed = vec.sub(points[0].point, vec.mul(vec.per(vector), r))
+
       for (let t = 0, step = 0.1; t <= 1; t += step) {
-        tl = projectPoint(points[0], angle + TAU - t * PI, r)
+        tl = vec.rotAround(pushed, points[0].point, PI * -t)
         leftPts.push(tl)
       }
 
-      tr = projectPoint(points[0], angle + TAU, r)
+      tr = vec.rotAround(pushed, points[0].point, PI * 2)
       rightPts.push(tr)
     }
 
@@ -167,15 +182,19 @@ export function getStrokeOutlinePoints(
     // Handle sharp corners
 
     // Find the delta between the current and next angle.
-    const absDelta = abs(getAngleDelta(next[3], angle))
+    const dpr = vec.dpr(vector, next.vector)
 
-    if (absDelta > SHARP) {
+    if (dpr < 0) {
       // A sharp corner.
       // Project points (left and right) for a cap.
 
-      for (let t = 0, step = 0.25; t <= 1; t += step) {
-        tl = projectPoint([x, y], pa - TAU + t * -PI, r)
-        tr = projectPoint([x, y], pa + TAU + t * PI, r)
+      const v = vec.per(pa)
+      const pushedA = vec.add(point, vec.mul(v, r))
+      const pushedB = vec.sub(point, vec.mul(v, r))
+
+      for (let t = 0; t <= 1; t += 0.25) {
+        tl = vec.rotAround(pushedA, point, PI * -t)
+        tr = vec.rotAround(pushedB, point, PI * t)
 
         leftPts.push(tl)
         rightPts.push(tr)
@@ -186,31 +205,35 @@ export function getStrokeOutlinePoints(
 
     // 4. Add regular point.
 
-    pl = projectPoint([x, y], angle - TAU, r)
-    pr = projectPoint([x, y], angle + TAU, r)
+    pl = vec.add(point, vec.mul(vec.per(vector), r))
+    pr = vec.add(point, vec.mul(vec.neg(vec.per(vector)), r))
 
-    if (absDelta > DULL || getDistance(pl, tl) > minDist) {
-      leftPts.push(getPointBetween(tl, pl))
+    if (dpr < 0.25 || vec.dist(pl, tl) > minDist) {
+      leftPts.push(vec.med(tl, pl))
       tl = pl
     }
 
-    if (absDelta > DULL || getDistance(pr, tr) > minDist) {
-      rightPts.push(getPointBetween(tr, pr))
+    if (dpr < 0.25 || vec.dist(pr, tr) > minDist) {
+      rightPts.push(vec.med(tr, pr))
       tr = pr
     }
 
     pp = pressure
-    pa = angle
+    pa = vector
   }
 
   // Add the end cap. This is tricky because some lines end with sharp angles.
   const last = points[points.length - 1]
 
+  const pushed = vec.add(last.point, vec.mul(vec.neg(vec.per(last.vector)), r))
+
   for (let t = 0, step = 0.1; t <= 1; t += step) {
-    rightPts.push(projectPoint(last, last[3] + TAU + t * PI, r))
+    rightPts.push(vec.rotAround(pushed, last.point, PI * t))
   }
 
-  return leftPts.concat(rightPts.reverse())
+  const results = leftPts.concat(rightPts.reverse())
+
+  return results
 }
 
 /**
@@ -228,10 +251,12 @@ export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
-  return getStrokeOutlinePoints(
+  const results = getStrokeOutlinePoints(
     getStrokePoints(points, options.streamline),
     options
   )
+
+  return results
 }
 
 export { StrokeOptions }

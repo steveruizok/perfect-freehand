@@ -6,3 +6,11 @@ export interface StrokeOptions {
   easing?: (pressure: number) => number
   simulatePressure?: boolean
 }
+
+export interface StrokePoint {
+  point: number[]
+  pressure: number
+  vector: number[]
+  distance: number
+  runningLength: number
+}
