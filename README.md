@@ -63,6 +63,18 @@ The options object is optional, as are each of its properties.
 | `streamline`       | number   | .5      | How much to streamline the stroke.                    |
 | `simulatePressure` | boolean  | true    | Whether to simulate pressure based on velocity.       |
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
+| `start`            | function | t => t  | Tapering options for the start of the line.           |
+| `end`              | { }      |         | Tapering options for the end of the line.             |
+| `last`             | boolean  | false   | Whether the stroke is complete.                       |
+
+The `start` and `end` options accept an object:
+
+| Property | Type     | Default | Description                                 |
+| -------- | -------- | ------- | ------------------------------------------- |
+| `taper`  | boolean  | 0       | The distance to taper.                      |
+| `easing` | function | t =>    | An easing function for the tapering effect. |
+
+When `taper` is zero for either start or end, the library will add a rounded cap at that end of the line.
 
 ```js
 getStroke(myPoints, {
@@ -72,6 +84,15 @@ getStroke(myPoints, {
   streamline: 0.5,
   easing: t => t * t * t,
   simulatePressure: true,
+  last: true,
+  start: {
+    taper: 20,
+    easing: t => t * t * t,
+  },
+  end: {
+    taper: 20,
+    easing: t => t * t * t,
+  },
 })
 ```
 
@@ -88,18 +109,21 @@ For example, the function below will turn a stroke into SVG path data for use wi
 ```js
 // Create SVG path data using the points from perfect-freehand.
 function getSvgPathFromStroke(points) {
-  if (points.length === 0) return ''
-
   const d = []
 
-  let [p0, p1] = points
+  if (stroke.length < 3) {
+    return ''
+  }
+
+  let p0 = stroke[stroke.length - 3]
+  let p1 = stroke[stroke.length - 2]
 
   d.push('M', p0[0], p0[1], 'Q')
 
-  for (let i = 1; i < points.length; i++) {
+  for (let i = 0; i < stroke.length; i++) {
     d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
     p0 = p1
-    p1 = points[i]
+    p1 = stroke[i]
   }
 
   d.push('Z')
