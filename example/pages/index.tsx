@@ -46,7 +46,7 @@ export default function Home() {
             <path
               key={i}
               d={mark.path}
-              strokeWidth={2}
+              strokeWidth={0}
               stroke={darkMode ? '#fff' : '#000'}
               fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
             />
@@ -54,7 +54,7 @@ export default function Home() {
           {currentMark && (
             <path
               d={currentMark.path}
-              strokeWidth={2}
+              strokeWidth={0}
               stroke={darkMode ? '#fff' : '#000'}
               fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
             />
