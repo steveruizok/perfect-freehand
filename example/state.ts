@@ -4,17 +4,22 @@ import { Mark, ClipboardMessage } from './types'
 import getStroke, { StrokeOptions } from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
+import * as svg from 'svg'
+import * as vec from 'vec'
 
 function getSvgPathFromStroke(stroke: number[][]) {
-  if (stroke.length === 0) return ''
-
   const d = []
 
-  let [p0, p1] = stroke
+  if (stroke.length < 3) {
+    return ''
+  }
+
+  let p0 = stroke[stroke.length - 3]
+  let p1 = stroke[stroke.length - 2]
 
   d.push('M', p0[0], p0[1], 'Q')
 
-  for (let i = 1; i < stroke.length; i++) {
+  for (let i = 0; i < stroke.length; i++) {
     d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
     p0 = p1
     p1 = stroke[i]
@@ -49,12 +54,21 @@ const easings = {
 function getStrokePath(
   points: Mark['points'],
   options: AppOptions,
-  type: string
+  last: boolean
 ) {
   const stroke = getStroke(points, {
     ...options,
     easing: easings[options.easing],
-    simulatePressure: type !== 'pen',
+    simulatePressure: points[0].pressure === 0,
+    start: {
+      taper: options.taperStart,
+      easing: easings[options.taperStartEasing],
+    },
+    end: {
+      taper: options.taperEnd,
+      easing: easings[options.taperEndEasing],
+    },
+    last,
   })
 
   return options.clip
@@ -70,6 +84,10 @@ interface AppOptions {
   thinning: number
   smoothing: number
   simulatePressure: boolean
+  taperStart: number
+  taperEnd: number
+  taperStartEasing: string
+  taperEndEasing: string
 }
 
 const defaultOptions: AppOptions = {
@@ -80,6 +98,10 @@ const defaultOptions: AppOptions = {
   simulatePressure: true,
   clip: false,
   easing: 'linear',
+  taperStart: 0,
+  taperEnd: 0,
+  taperStartEasing: 'linear',
+  taperEndEasing: 'linear',
 }
 
 const defaultSettings = {
@@ -219,7 +241,7 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, alg, mark.type),
+        path: getStrokePath(mark.points, alg, true),
       }))
 
       data.settings = {
@@ -246,7 +268,7 @@ const state = createState({
       data.currentMark = {
         type,
         points: [point],
-        path: getStrokePath([point], alg, type),
+        path: getStrokePath([point], alg, false),
       }
     },
     addPointToMark(data) {
@@ -261,11 +283,7 @@ const state = createState({
         pressure: p,
       })
 
-      currentMark!.path = getStrokePath(
-        currentMark!.points,
-        alg,
-        currentMark!.type
-      )
+      currentMark!.path = getStrokePath(currentMark!.points, alg, false)
     },
     completeMark(data) {
       const { currentMark, alg } = data
@@ -274,7 +292,7 @@ const state = createState({
 
       data.marks.push({
         ...currentMark,
-        path: getStrokePath(currentMark.points, alg, currentMark!.type),
+        path: getStrokePath(currentMark.points, alg, true),
       })
 
       data.currentMark = null
@@ -287,7 +305,7 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, alg, mark.type),
+        path: getStrokePath(mark.points, alg, true),
       }))
     },
     undoMark(data) {
@@ -323,15 +341,11 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = getStrokePath(mark.points, alg, mark.type)
+        mark.path = getStrokePath(mark.points, alg, true)
       }
 
       if (currentMark) {
-        currentMark.path = getStrokePath(
-          currentMark.points,
-          alg,
-          currentMark.type
-        )
+        currentMark.path = getStrokePath(currentMark.points, alg, false)
       }
     },
     // Clipboard message

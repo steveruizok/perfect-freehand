@@ -1249,7 +1249,7 @@
     object.fromentries "^2.0.4"
     tsdx "^0.14.1"
 
-"@state-designer/react@^1.4.5":
+"@state-designer/react@^1.7.1":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@state-designer/react/-/react-1.7.1.tgz#05f00e0d790fc6f180b45fd805b60d8ff1b97391"
   integrity sha512-N0VeufBjhGm+NicC/9V1z0iM+6XeYJtlZPo3U9mZlCciClzQ5D+m7z6P9t19gOqsmckkKzb4j0zIPKJ3pC2xAw==
@@ -5673,11 +5673,6 @@ pbkdf2@^3.0.3:
     ripemd160 "^2.0.1"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
-
-perfect-freehand@^0.3.5:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/perfect-freehand/-/perfect-freehand-0.3.5.tgz#4204b4453dffc057edc9086996690c8d63ce9c99"
-  integrity sha512-FVMeDX//LCB1WFUZG3+Cd8oCxZSiH2l4Fm3vHQLnpbCfrM2JLk8PrJdGPwZ5TYdIrEZ1JfDuhL6AFJeurnuh4g==
 
 performance-now@^2.1.0:
   version "2.1.0"

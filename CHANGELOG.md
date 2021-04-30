@@ -1,3 +1,9 @@
+## 0.4.0
+
+- Adds `last` option.
+- Adds `start` and `end` option, each with `taper` and `easing`.
+- Improves cap handling.
+
 ## 0.3.5
 
 - Improves caps.

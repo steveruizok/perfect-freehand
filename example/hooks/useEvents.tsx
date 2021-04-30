@@ -38,7 +38,7 @@ export default function useEvents() {
         dx = x - pointer.x,
         dy = y - pointer.y,
         type = e.pointerType as 'pen' | 'mouse' | 'touch',
-        p = type === 'pen' ? e.pressure : 0.5
+        p = e.pressure
 
       if (dx === 0 && dy === 0) return false
 

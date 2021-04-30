@@ -56,6 +56,32 @@ export default function Controls() {
         options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
         onChange={v => state.send('CHANGED_OPTIONS', { easing: v })}
       />
+      <NumberInput
+        value={options.taperStart}
+        onChange={v => state.send('CHANGED_OPTIONS', { taperStart: v })}
+        label="Taper Start"
+        min={0}
+        max={100}
+      />
+      <EnumInput
+        label="Taper Start Easing"
+        value={options.taperStartEasing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { taperStartEasing: v })}
+      />
+      <NumberInput
+        value={options.taperEnd}
+        onChange={v => state.send('CHANGED_OPTIONS', { taperEnd: v })}
+        label="Taper End"
+        min={0}
+        max={100}
+      />
+      <EnumInput
+        label="Taper End Easing"
+        value={options.taperEndEasing}
+        options={['linear', 'easeIn', 'easeOut', 'easeInOut']}
+        onChange={v => state.send('CHANGED_OPTIONS', { taperEndEasing: v })}
+      />
       <ButtonGroup>
         <button onClick={() => state.send('RESET_OPTIONS')}>Reset</button>
         <button onClick={() => state.send('TOGGLED_CONTROLS')}>Close</button>
