@@ -1,7 +1,7 @@
 import { createState, createSelectorHook } from '@state-designer/react'
 import { getPointer } from './hooks/useEvents'
 import { Mark, ClipboardMessage } from './types'
-import getStroke, { StrokeOptions } from 'perfect-freehand'
+import getStroke from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
 import * as svg from 'svg'
