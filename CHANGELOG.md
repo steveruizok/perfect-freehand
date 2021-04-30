@@ -1,3 +1,11 @@
+## 0.4.2
+
+- Fixes dots.
+
+## 0.4.1
+
+- Removes default tapering.
+
 ## 0.4.0
 
 - Adds `last` option.

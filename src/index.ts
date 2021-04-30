@@ -265,7 +265,7 @@ export function getStrokeOutlinePoints(
   // Draw start cap if the end taper is set to zero
 
   if (veryShort) {
-    if (last || !isTapering) {
+    if (!isTapering || (veryShort && last)) {
       // Backup: draw an inverse cap for the end cap
       lpv = vec.uni(vec.vec(lastPoint.point, firstPoint.point))
       const start = vec.add(
@@ -301,10 +301,7 @@ export function getStrokeOutlinePoints(
 
   // Draw end cap if taper end is set to zero
 
-  if (
-    taperEnd === 0 &&
-    (!veryShort || (last && veryShort) || (!isTapering && veryShort))
-  ) {
+  if (!isTapering || (taperEnd === 0 && !veryShort) || (veryShort && last)) {
     const start = vec.add(lastPoint.point, vec.mul(vec.neg(vec.per(lpv)), r))
     for (let t = 0, step = 0.1; t <= 1; t += step) {
       const rx = PI * t
