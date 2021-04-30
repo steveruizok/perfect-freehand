@@ -121,12 +121,12 @@ export function getStrokeOutlinePoints(
   } = options
 
   const {
-    taper: taperStart = size,
+    taper: taperStart = 0,
     easing: taperStartCurve = t => t * (2 - t),
   } = start
 
   const {
-    taper: taperEnd = size,
+    taper: taperEnd = 0,
     easing: taperEndCurve = t => --t * t * t + 1,
   } = end
 
