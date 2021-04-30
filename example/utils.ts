@@ -96,3 +96,30 @@ export function copyToClipboard(string: string) {
   }
   return true
 }
+
+export function getSegmentSegmentIntersection(
+  [x0, y0]: number[],
+  [x1, y1]: number[],
+  [x2, y2]: number[],
+  [x3, y3]: number[]
+) {
+  const denom = (y3 - y2) * (x1 - x0) - (x3 - x2) * (y1 - y0)
+  const numeA = (x3 - x2) * (y0 - y2) - (y3 - y2) * (x0 - x2)
+  const numeB = (x1 - x0) * (y0 - y2) - (y1 - y0) * (x0 - x2)
+
+  if (denom === 0) {
+    if (numeA === 0 && numeB === 0) {
+      return undefined // Colinear
+    }
+    return undefined // Parallel
+  }
+
+  const uA = numeA / denom
+  const uB = numeB / denom
+
+  if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+    return [x0 + uA * (x1 - x0), y0 + uA * (y1 - y0)]
+  }
+
+  return undefined // No intersection
+}
