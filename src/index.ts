@@ -2,6 +2,10 @@ import { toPointsArray, clamp, lerp } from './utils'
 import { StrokeOptions, StrokePoint } from './types'
 import * as vec from './vec'
 
+// The idea here would be to generate a 3D curve for the points where
+// the third degree represetnts pressure. We could then pick any point t
+// along the curve and get the x, y, and pressure at that point.
+
 const { min, PI } = Math
 
 function getStrokeRadius(
