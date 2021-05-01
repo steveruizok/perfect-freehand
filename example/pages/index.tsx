@@ -42,23 +42,23 @@ export default function Home() {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {marks.map((mark, i) => (
-            <path
-              key={i}
-              d={mark.path}
-              strokeWidth={0}
-              stroke={darkMode ? '#fff' : '#000'}
-              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-            />
-          ))}
-          {currentMark && (
-            <path
-              d={currentMark.path}
-              strokeWidth={0}
-              stroke={darkMode ? '#fff' : '#000'}
-              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-            />
-          )}
+          <g strokeWidth={showTrace ? 2 : 0}>
+            {marks.map((mark, i) => (
+              <path
+                key={i}
+                d={mark.path}
+                stroke={darkMode ? '#fff' : '#000'}
+                fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+              />
+            ))}
+            {currentMark && (
+              <path
+                d={currentMark.path}
+                stroke={darkMode ? '#fff' : '#000'}
+                fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+              />
+            )}
+          </g>
         </svg>
         {showControls && <Controls />}
         <Toolbar />
