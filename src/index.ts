@@ -66,18 +66,20 @@ export class FreehandSpline {
     let lengths: number[] = []
 
     const pts = toPointsArray(points)
+    const len = pts.length
 
     // Apply streamline
-    const streamlinedPts: number[][] = [pts[0]]
+    let [p0] = pts
+    this.points = [p0]
 
-    for (let i = 1; i < pts.length; i++) {
-      streamlinedPts.push([
-        ...vec.lrp(streamlinedPts[i - 1], pts[i], 1 - streamline),
-        pts[i][2],
-      ])
+    for (let i = 1; i < len; i++) {
+      p0 = [...vec.lrp(p0, pts[i], 1 - streamline), pts[i][2]]
+      this.points.push(p0)
     }
 
-    this.points = streamlinedPts
+    // if (len > 3) {
+    //   this.points.push(this.points[len - 2])
+    // }
 
     // Calculate simulated presssures
     let pp = 0.5
@@ -136,12 +138,13 @@ export class FreehandSpline {
     const results: {
       point: number[]
       gradient: number[]
-      isSharp: boolean
     }[] = []
 
     let error = 0
+    let traveled = 0
     let point: number[]
     let gradient: number[]
+    let short = true
 
     // Get evenly spaced points along the center spline
     for (let i = 0; i < points.length - 1; i++) {
@@ -154,11 +157,20 @@ export class FreehandSpline {
       while (trav <= length) {
         point = this.getSplinePoint(i + trav / length)
         gradient = vec.uni(this.getSplinePointGradient(i + trav / length))
-        results.push({ point, gradient, isSharp: false })
-        trav += size / 2
+
+        if (short && traveled + trav > size / 2) {
+          for (let result of results) {
+            result.gradient = gradient
+          }
+          short = false
+        }
+
+        results.push({ point, gradient })
+        trav += size / 4
       }
 
       error = trav - length
+      traveled += length
     }
 
     // For the last gradient, average the previous three points
@@ -171,104 +183,151 @@ export class FreehandSpline {
 
     results.push({
       point: this.getSplinePoint(points.length - 1),
-      gradient: lastGradient!,
-      isSharp: false,
+      gradient: lastGradient,
     })
 
-    let g0 = results[0].gradient
-    let dpr: number
-
-    for (let i = 1; i < results.length; i++) {
-      const result = results[i]
-      dpr = vec.dpr(g0, result.gradient)
-      if (dpr < -0.5) {
-        result.isSharp = true
-      }
-      g0 = result.gradient
-    }
+    // results.push({ ...results[results.length - 1], isSharp: true })
 
     const leftSpline: number[][] = []
     const rightSpline: number[][] = []
 
     let l0: number[] | undefined
     let r0: number[] | undefined
+    let tl: number[] | undefined
+    let tr: number[] | undefined
+    let tlu: number[] | undefined
+    let plu: number[] | undefined
+    let tru: number[] | undefined
+    let pru: number[] | undefined
+    let dpr = 0
+    let ldpr = 1
+    let rdpr = 1
 
     const minDist = size * smoothing
 
-    for (let i = 0; i < results.length; i++) {
-      const { point, gradient, isSharp } = results[i]
+    for (let i = 0; i < results.length - 1; i++) {
+      const { point, gradient } = results[i]
 
-      if (isSharp && i > 0) {
-        const { gradient: pg, point: prev } = results[i - 1]
-        const v = vec.mul(vec.per(pg), this.getStrokeRadius(prev[2]))
-        l0 = vec.add(prev, v)
-        r0 = vec.sub(prev, v)
+      // Sharp corners
+
+      dpr = vec.dpr(gradient, results[i + 1].gradient)
+
+      if (i > 0 && dpr < 0) {
+        const { gradient: pg } = results[i - 1]
+
+        const v = vec.mul(vec.per(pg), this.getStrokeRadius(point[2]))
+        const l1 = vec.add(point, v)
+        const r1 = vec.sub(point, v)
+
+        if (l0) {
+          plu = vec.uni(vec.vec(l0, l1))
+        }
+
+        if (r0) {
+          plu = vec.uni(vec.vec(r0, r1))
+        }
 
         for (let t = 0; t <= 1; t += 0.25) {
           const r = Math.PI * t
-          leftSpline.push(vec.rotAround(l0, prev, r, r))
-          rightSpline.push(vec.rotAround(r0, prev, -r, -r))
+          tl = vec.rotAround(l1, point, r, r)
+          tr = vec.rotAround(r1, point, -r, -r)
+          leftSpline.push(tl)
+          rightSpline.push(tr)
         }
+
+        l0 = tl
+        continue
+      }
+
+      // Regular points
+      const r = vec.mul(vec.per(gradient), this.getStrokeRadius(point[2]))
+
+      let addLeft = false
+      let addRight = false
+
+      tl = vec.add(point, r)
+      tr = vec.sub(point, r)
+
+      if (!l0 || i === results.length - 1) {
+        addLeft = true
       } else {
-        const r = vec.mul(vec.per(gradient), this.getStrokeRadius(point[2]))
-
-        const l1 = vec.add(point, r)
-        if (!l0 || vec.dist(l0, l1) > minDist) {
-          l0 = l1
-          leftSpline.push(l1)
+        tlu = vec.uni(vec.vec(l0, tl))
+        if (!plu) {
+          plu = tlu
+        } else {
+          ldpr = vec.dpr(tlu, gradient)
+          if (ldpr > 0 && vec.dist(l0, tl) > minDist) {
+            addLeft = true
+          }
         }
+      }
 
-        const r1 = vec.sub(point, r)
-        if (!r0 || vec.dist(r0, r1) > minDist) {
-          r0 = r1
-          rightSpline.push(r1)
+      if (!r0 || i === results.length - 1) {
+        addRight = true
+      } else {
+        tru = vec.uni(vec.vec(r0, tr))
+        if (!pru) {
+          pru = tru
+        } else {
+          rdpr = vec.dpr(tru, gradient)
+          if (rdpr > 0 && vec.dist(r0, tr) > minDist) {
+            addRight = true
+          }
         }
+      }
+
+      if (addLeft) {
+        leftSpline.push(tl)
+        l0 = tl
+        plu = tlu
+      }
+
+      if (addRight) {
+        rightSpline.push(tr)
+        r0 = tr
+        pru = tru
       }
     }
 
-    return [rightSpline[0], ...leftSpline, ...rightSpline.reverse()]
-  }
+    // Draw start cap
+    const startCap: number[][] = []
 
-  getEvenlySpacedPoints(distance: number) {
-    const { lengths } = this
+    r0 = rightSpline[0]
+    tl = results[0].point
 
-    const results: { point: number[]; gradient: number[] }[] = []
-
-    let error = 0
-    let point: number[]
-    let gradient: number[]
-
-    for (let i = 0; i < this.points.length - 1; i++) {
-      // distance to previous point
-      const length = lengths[i]
-
-      // distance traveled
-      let trav = error
-
-      while (trav <= length) {
-        point = this.getSplinePoint(i + trav / length)
-        gradient = vec.uni(this.getSplinePointGradient(i + trav / length))
-        results.push({ point, gradient })
-        trav += distance
-      }
-
-      error = trav - length
+    for (let t = 0; t <= 1; t += 0.25) {
+      const r = Math.PI * t
+      startCap.push(vec.rotAround(r0, tl, r, r))
     }
 
-    // For the last gradient, average the previous three points
-    const lastGradient = results
-      .slice(-3)
-      .reduce(
-        (acc, cur) => (acc ? vec.med(acc, cur.gradient) : cur.gradient),
-        vec.uni(this.getSplinePointGradient(this.points.length - 1.1))
-      )
+    // Draw end cap
 
-    results.push({
-      point: this.getSplinePoint(this.points.length - 1),
-      gradient: lastGradient!,
-    })
+    const endCap: number[][] = []
 
-    return results
+    // l0 = leftSpline[leftSpline.length - 1]
+    // r0 = rightSpline[rightSpline.length - 1]
+
+    // endCap.push(points[points.length - 1])
+
+    // tl = this.getSplinePoint(points.length - 1)
+    // l0 = vec.add(
+    //   tl,
+    //   vec.mul(
+    //     vec.uni(vec.per(this.getSplinePointGradient(points.length - 1))),
+    //     this.getStrokeRadius(tl[2])
+    //   )
+    // )
+    // // const endCapDist = vec.dist(l0, r0)
+
+    // for (let t = 0; t <= 1; t += 0.25) {
+    //   const r = Math.PI * t
+    //   endCap.push(vec.rotAround(l0, tl, r, r))
+    // }
+
+    // Reverse the right spline
+    rightSpline.reverse()
+
+    return [...startCap, ...leftSpline, ...endCap, ...rightSpline]
   }
 
   getSplinePoint(index: number): number[] {
@@ -411,10 +470,7 @@ export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
-  const { streamline = 0.25 } = options
-
   const middleSpline = new FreehandSpline(points, options)
-
   return middleSpline.getOutlineShape()
 }
 
