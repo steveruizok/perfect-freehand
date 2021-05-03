@@ -25,7 +25,6 @@ export default function Home() {
   const ref = useSvgResizer()
   const marks = useSelector(state => state.data.marks)
   const currentMark = useSelector(state => state.data.currentMark)
-  const showControls = useSelector(state => state.data.settings.showControls)
   const showTrace = useSelector(state => state.data.settings.showTrace)
   const darkMode = useSelector(state => state.data.settings.darkMode)
 

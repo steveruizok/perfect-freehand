@@ -46,18 +46,16 @@ export default function Controls() {
   const options = useSelector(state => state.data.alg)
   const settings = useSelector(state => state.data.settings)
 
-  useControls(() => ({
+  const [, set] = useControls(() => ({
     clipPath: {
       label: 'Clip',
       value: options.clip,
       onChange: v => state.send('CHANGED_OPTIONS', { clip: v }),
-      transient: false,
     },
     showPath: {
       label: 'Stroke',
       value: options.clip,
       onChange: v => state.send('CHANGED_SETTINGS', { showTrace: v }),
-      transient: false,
     },
     size: {
       label: 'Size',
@@ -66,7 +64,6 @@ export default function Controls() {
       max: 64,
       step: 1,
       onChange: v => state.send('CHANGED_OPTIONS', { size: v }),
-      transient: false,
     },
     thinning: {
       label: 'Thinning',
@@ -75,7 +72,6 @@ export default function Controls() {
       max: 1,
       step: 0.01,
       onChange: v => state.send('CHANGED_OPTIONS', { thinning: v }),
-      transient: false,
     },
     smoothing: {
       label: 'Smoothing',
@@ -84,7 +80,6 @@ export default function Controls() {
       max: 2,
       step: 0.01,
       onChange: v => state.send('CHANGED_OPTIONS', { smoothing: v }),
-      transient: false,
     },
     streamline: {
       label: 'Streamline',
@@ -93,7 +88,6 @@ export default function Controls() {
       max: 1,
       step: 0.01,
       onChange: v => state.send('CHANGED_OPTIONS', { streamline: v }),
-      transient: false,
     },
     easing: bezier({
       label: 'Easing',
@@ -114,7 +108,6 @@ export default function Controls() {
         max: 200,
         step: 1,
         onChange: v => state.send('CHANGED_OPTIONS', { taperStart: v }),
-        transient: false,
       },
       taperStartEasing: bezier({
         label: 'Easing',
@@ -136,7 +129,6 @@ export default function Controls() {
         max: 200,
         step: 1,
         onChange: v => state.send('CHANGED_OPTIONS', { taperEnd: v }),
-        transient: false,
       },
       taperEndEasing: bezier({
         label: 'Easing',
@@ -150,8 +142,21 @@ export default function Controls() {
         onChange: v => state.send('CHANGED_OPTIONS', { taperEndEasing: v }),
       }),
     }),
-    reset: button(() => state.send('RESET_OPTIONS')),
-    close: button(() => state.send('TOGGLED_CONTROLS')),
+    reset: button(() => {
+      state.send('RESET_OPTIONS')
+      const {
+        data: { settings, alg },
+      } = state
+      set({
+        clipPath: options.clip,
+        showPath: settings.showTrace,
+        size: options.size,
+        thinning: options.thinning,
+        streamline: options.streamline,
+        taperStart: options.taperStart,
+        taperEnd: options.taperEnd,
+      })
+    }),
   }))
 
   return (
