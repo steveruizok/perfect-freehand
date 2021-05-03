@@ -1,23 +1,8 @@
-import { toPointsArray, clamp, lerp } from './utils'
+import { toPointsArray, getStrokeRadius } from './utils'
 import { StrokeOptions, StrokePoint } from './types'
 import * as vec from './vec'
 
 const { min, PI } = Math
-
-function getStrokeRadius(
-  size: number,
-  thinning: number,
-  easing: (t: number) => number,
-  pressure = 0.5
-) {
-  if (!thinning) return size / 2
-  pressure = clamp(easing(pressure), 0, 1)
-  return (
-    (thinning < 0
-      ? lerp(size, size + size * clamp(thinning, -0.95, -0.05), pressure)
-      : lerp(size - size * clamp(thinning, 0.05, 0.95), size, pressure)) / 2
-  )
-}
 
 /**
  * ## getStrokePoints
@@ -51,21 +36,19 @@ export function getStrokePoints<
     i < pts.length;
     i++, curr = pts[i], prev = strokePoints[i - 1]
   ) {
-    const point = vec.lrp(prev.point, [curr[0], curr[1]], 1 - streamline),
+    const point = vec.lrp(prev.point, curr, 1 - streamline),
       pressure = curr[2],
       vector = vec.uni(vec.vec(point, prev.point)),
       distance = vec.dist(point, prev.point),
       runningLength = prev.runningLength + distance
 
-    const strokePoint = {
+    strokePoints.push({
       point,
       pressure,
       vector,
       distance,
       runningLength,
-    }
-
-    strokePoints.push(strokePoint)
+    })
   }
 
   /*
@@ -123,7 +106,7 @@ export function getStrokePoints<
  */
 export function getStrokeOutlinePoints(
   points: StrokePoint[],
-  options: StrokeOptions = {} as StrokeOptions
+  options: Partial<StrokeOptions> = {} as Partial<StrokeOptions>
 ): number[][] {
   const {
     size = 8,
@@ -131,19 +114,19 @@ export function getStrokeOutlinePoints(
     smoothing = 0.5,
     simulatePressure = true,
     easing = t => t,
-    start = {},
-    end = {},
+    start = {} as Partial<StrokeOptions['start']>,
+    end = {} as Partial<StrokeOptions['end']>,
     last: isComplete = false,
   } = options
 
   const {
     taper: taperStart = 0,
-    easing: taperStartCurve = t => t * (2 - t),
+    easing: taperStartEase = t => t * (2 - t),
   } = start
 
   const {
     taper: taperEnd = 0,
-    easing: taperEndCurve = t => --t * t * t + 1,
+    easing: taperEndEase = t => --t * t * t + 1,
   } = end
 
   // The number of points in the array
@@ -159,27 +142,29 @@ export function getStrokeOutlinePoints(
   const leftPts: number[][] = []
   const rightPts: number[][] = []
 
+  // Previous pressure (start with average of first five pressures)
+  let prevPressure = points
+    .slice(0, 5)
+    .reduce((acc, cur) => (acc + cur.pressure) / 2, points[0].pressure)
+
+  // The current radius
+  let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
+
+  // Previous vector
+  let prevVector = points[0].vector
+
   // Previous left and right points
   let pl = points[0].point
   let pr = pl
 
   // Temporary left and right points
   let tl = pl
-  let tr = pl
-
-  // Previous vector
-  let pv = points[0].vector
-
-  // Previous pressure
-  let pp = 1
-
-  // The current radius
-  let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
+  let tr = pr
 
   /*
     Find the outline's left and right points
 
-   Iterating through the points and populate the leftPts and rightPts arrays,
+   Iterating through the points and populate the rightPts and leftPts arrays,
    skipping the first and last pointsm, which will get caps later on.
   */
 
@@ -198,7 +183,7 @@ export function getStrokeOutlinePoints(
       if (simulatePressure) {
         const rp = min(1, 1 - distance / size)
         const sp = min(1, distance / size)
-        pressure = min(1, pp + (rp - pp) * (sp / 2))
+        pressure = min(1, prevPressure + (rp - prevPressure) * (sp / 2))
       }
 
       radius = getStrokeRadius(size, thinning, easing, pressure)
@@ -216,12 +201,12 @@ export function getStrokeOutlinePoints(
 
     const ts =
       runningLength < taperStart
-        ? taperStartCurve(runningLength / taperStart)
+        ? taperStartEase(runningLength / taperStart)
         : 1
 
     const te =
       totalLength - runningLength < taperEnd
-        ? taperEndCurve((totalLength - runningLength) / taperEnd)
+        ? taperEndEase((totalLength - runningLength) / taperEnd)
         : 1
 
     radius *= Math.min(ts, te)
@@ -239,16 +224,16 @@ export function getStrokeOutlinePoints(
     const dpr = vec.dpr(vector, nextVector)
 
     if (dpr < 0) {
-      const offset = vec.mul(vec.per(pv), radius)
+      const offset = vec.mul(vec.per(prevVector), radius)
       const la = vec.add(point, offset)
       const ra = vec.sub(point, offset)
 
       for (let t = 0.2; t < 1; t += 0.2) {
-        tl = vec.rotAround(la, point, PI * -t)
-        tr = vec.rotAround(ra, point, PI * t)
+        tr = vec.rotAround(la, point, PI * -t)
+        tl = vec.rotAround(ra, point, PI * t)
 
-        leftPts.push(tl)
         rightPts.push(tr)
+        leftPts.push(tl)
       }
 
       pl = tl
@@ -269,54 +254,62 @@ export function getStrokeOutlinePoints(
 
     const offset = vec.mul(vec.per(vec.lrp(nextVector, vector, dpr)), radius)
 
-    tl = vec.add(point, offset)
-    tr = vec.sub(point, offset)
+    tl = vec.sub(point, offset)
+    tr = vec.add(point, offset)
 
-    const tlu = vec.uni(vec.vec(tl, pl))
-    const tru = vec.uni(vec.vec(tr, pr))
+    const tlu = vec.uni(vec.vec(tr, pr))
+    const tru = vec.uni(vec.vec(tl, pl))
 
     const alwaysAdd = i === 1 || dpr < 0.25
     const minDistance = (runningLength > size ? size : size / 2) * smoothing
 
     if (
       alwaysAdd ||
-      (vec.dist(pl, tl) > minDistance && vec.dpr(tlu, vector) > 0)
-    ) {
-      leftPts.push(tl)
-      pl = tl
-    }
-
-    if (
-      alwaysAdd ||
-      (vec.dist(pr, tr) > minDistance && vec.dpr(tru, vector) > 0)
+      (vec.dist(pr, tr) > minDistance && vec.dpr(tlu, vector) > 0)
     ) {
       rightPts.push(tr)
       pr = tr
     }
 
+    if (
+      alwaysAdd ||
+      (vec.dist(pl, tl) > minDistance && vec.dpr(tru, vector) > 0)
+    ) {
+      leftPts.push(tl)
+      pl = tl
+    }
+
     // Set variables for next iteration
 
-    pp = pressure
-    pv = vector
+    prevPressure = pressure
+    prevVector = vector
   }
 
-  const firstPoint = points[0]
-  const lastPoint = points[points.length - 1]
+  /*
+    Drawing caps
+    
+    Now that we have our points on either side of the line, we need to
+    draw caps at the start and end. Tapered lines don't have caps, but
+    may have dots for very short lines.
+  */
 
-  const isVeryShort = leftPts.length < 2 || rightPts.length < 2
-  const isTapering = taperStart + taperEnd > 0
+  const firstPoint = points[0]
+  const lastPoint = points[len - 1]
+  const isVeryShort = rightPts.length < 2 || leftPts.length < 2
 
   /* 
     Draw a dot for very short or completed strokes
     
-    If the line is too short to gather left or right points, then draw
-    a dot if either: the line is complete; or the line has no tapering.
+    If the line is too short to gather left or right points and if the line is
+    not tapered on either side, draw a dot. If the line is tapered, then only
+    draw a dot if the line is both very short and complete. If we draw a dot,
+    we can just return those points.
   */
 
-  if (isVeryShort && (!isTapering || isComplete)) {
+  if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
     let ir = 0
 
-    for (let i = 0; i < len - 1; i++) {
+    for (let i = 0; i < len; i++) {
       const { pressure, runningLength } = points[i]
       if (runningLength > size) {
         ir = getStrokeRadius(size, thinning, easing, pressure)
@@ -344,24 +337,25 @@ export function getStrokeOutlinePoints(
   /*
     Draw a start cap
 
-    Unless the line has a tapered start, draw a start cap around the first point,
-    using the distance between the second left and right point for the cap's 
-    radius, and finally remove the first left and right points. :psyduck:
+    Unless the line has a tapered start, or unless the line has a tapered end
+    and the line is very short, draw a start cap around the first point. Use
+    the distance between the second left and right point for the cap's radius.
+    Finallym remove the first left and right points. :psyduck:
   */
 
   const startCap: number[][] = []
 
-  if (taperStart === 0) {
-    tl = leftPts[1]
+  if (!taperStart && !(taperEnd && isVeryShort)) {
     tr = rightPts[1]
+    tl = leftPts[1]
 
-    const start = vec.add(
+    const start = vec.sub(
       firstPoint.point,
-      vec.mul(vec.uni(vec.vec(tl, tr)), vec.dist(tl, tr) / 2)
+      vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
     )
 
     for (let t = 0, step = 0.2; t <= 1; t += step) {
-      startCap.push(vec.rotAround(start, firstPoint.point, PI * -t))
+      startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
     }
 
     leftPts.shift()
@@ -372,34 +366,37 @@ export function getStrokeOutlinePoints(
     Draw an end cap
 
     If the line does not have a tapered end, and unless the line has a tapered
-    start and the line is very short, draw a cap around the last point. 
-
+    start and the line is very short, draw a cap around the last point. Finally, 
+    remove the last left and right points. Otherwise, add the last point. Note
+    that This cap is a full-turn-and-a-half: this prevents incorrect caps on 
+    sharp end turns.
   */
 
   const endCap: number[][] = []
 
-  if (taperEnd === 0 && !(taperStart > 0 && isVeryShort)) {
+  if (!taperEnd && !(taperStart && isVeryShort)) {
     const start = vec.sub(
       lastPoint.point,
       vec.mul(vec.per(lastPoint.vector), radius)
     )
+
     for (let t = 0, step = 0.1; t <= 1; t += step) {
       endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
     }
+
     leftPts.pop()
     rightPts.pop()
   } else {
     endCap.push(lastPoint.point)
   }
 
-  const results = [
-    ...startCap,
-    ...leftPts,
-    ...endCap.reverse(),
-    ...rightPts.reverse(),
-  ]
+  /*
+    Return the points in the correct windind order: begin on the left side, then 
+    continue around the end cap, then come back along the right side, and finally 
+    complete the start cap.
+  */
 
-  return results
+  return leftPts.concat(endCap, rightPts.reverse(), startCap)
 }
 
 /**
@@ -417,12 +414,10 @@ export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
-  const results = getStrokeOutlinePoints(
+  return getStrokeOutlinePoints(
     getStrokePoints(points, options.streamline),
     options
   )
-
-  return results
 }
 
 export { StrokeOptions }
