@@ -1,3 +1,8 @@
+## 0.4.5
+
+- Fixes typings.
+- Fixes dot product check for left vs right.
+
 ## 0.4.4
 
 - Fixes typings.

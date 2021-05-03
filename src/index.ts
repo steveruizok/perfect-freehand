@@ -117,8 +117,8 @@ export function getStrokeOutlinePoints(
     smoothing = 0.5,
     simulatePressure = true,
     easing = t => t,
-    start = {} as Partial<StrokeOptions['start']>,
-    end = {} as Partial<StrokeOptions['end']>,
+    start = {},
+    end = {},
     last: isComplete = false,
   } = options
 
@@ -268,18 +268,18 @@ export function getStrokeOutlinePoints(
 
     if (
       alwaysAdd ||
-      (vec.dist(pr, tr) > minDistance && vec.dpr(tlu, vector) > 0)
+      (vec.dist(pl, tl) > minDistance && vec.dpr(tlu, vector) > 0)
     ) {
-      rightPts.push(tr)
-      pr = tr
+      leftPts.push(vec.med(pl, tl))
+      pl = tl
     }
 
     if (
       alwaysAdd ||
-      (vec.dist(pl, tl) > minDistance && vec.dpr(tru, vector) > 0)
+      (vec.dist(pr, tr) > minDistance && vec.dpr(tru, vector) > 0)
     ) {
-      leftPts.push(tl)
-      pl = tl
+      rightPts.push(vec.med(pr, tr))
+      pr = tr
     }
 
     // Set variables for next iteration
