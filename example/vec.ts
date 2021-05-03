@@ -86,14 +86,6 @@ export function uni(A: number[]) {
 }
 
 /**
- * Get normalized / unit vector.
- * @param A
- */
-export function normalize(A: number[]) {
-  return uni(A)
-}
-
-/**
  * Dist length from A to B
  * @param A
  * @param B
@@ -109,6 +101,26 @@ export function dist(A: number[], B: number[]) {
  */
 export function med(A: number[], B: number[]) {
   return mul(add(A, B), 0.5)
+}
+
+/**
+ * Get the unit vector between two points.
+ * @param A
+ * @param B
+ * @returns
+ */
+export function uvec(A: number[], B: number[]) {
+  return uni(vec(A, B))
+}
+
+/**
+ * Get the normal unit vector between two points.
+ * @param A
+ * @param B
+ * @returns
+ */
+export function nvec(A: number[], B: number[]) {
+  return per(uvec(A, B))
 }
 
 /**

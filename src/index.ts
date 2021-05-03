@@ -30,12 +30,11 @@ export function getStrokePoints<
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], streamline = 0.5, size = 8): StrokePoint[] {
   const pts = toPointsArray(points)
+  const len = pts.length
 
-  let short = true
+  if (len === 0) return []
 
-  if (pts.length === 0) return []
-
-  if (pts.length === 1) pts.push(vec.add(pts[0], [1, 0]))
+  if (len === 1) pts.push(vec.add(pts[0], [1, 0]))
 
   const strokePoints: StrokePoint[] = [
     {
@@ -67,28 +66,43 @@ export function getStrokePoints<
     }
 
     strokePoints.push(strokePoint)
+  }
 
-    // Align vectors at the start of the line
-    if (short && (runningLength > size || i === pts.length - 1)) {
-      short = false
-      for (let pt of strokePoints) {
-        pt.vector = strokePoint.vector
+  /*
+    Align vectors at the start of the line
+    
+    Find the first stroke point past the size and then set all preceding points' 
+    vectors to match this point's vector. This aligns the start cap and reduces
+    noise at the start of the line.
+  */
+  for (let i = 0; i < len; i++) {
+    const { runningLength, vector } = strokePoints[i]
+    if (runningLength > size || i === len - 1) {
+      for (let j = 0; j < i; j++) {
+        strokePoints[j].vector = vector
       }
+      break
     }
+  }
 
-    // Align vectors at the end of the line
-    if (i === pts.length - 1) {
-      let rlen = 0
-      for (let k = i; k > 1; k--) {
-        const strokePoint = strokePoints[k]
-        if (rlen > size / 2) {
-          for (let j = k; j < pts.length; j++) {
-            strokePoints[j].vector = strokePoint.vector
-          }
-          break
-        }
-        rlen += strokePoint.distance
+  /* 
+    Align vectors at the end of the line
+
+    Starting from the last point, work back until we've traveled more than
+    half of the line's size (width). Take the current point's vector and then
+    work forward, setting all remaining points' vectors to this vector. This
+    removes the "noise" at the end of the line and allows for a better-facing
+    end cap.
+  */
+  const totalLength = strokePoints[len - 1].runningLength
+
+  for (let i = len - 1; i > 1; i--) {
+    const { runningLength, vector } = strokePoints[i]
+    if (totalLength - runningLength > size / 2) {
+      for (let j = i; j < len; j++) {
+        strokePoints[j].vector = vector
       }
+      break
     }
   }
 
@@ -119,7 +133,7 @@ export function getStrokeOutlinePoints(
     easing = t => t,
     start = {},
     end = {},
-    last = false,
+    last: isComplete = false,
   } = options
 
   const {
@@ -141,9 +155,6 @@ export function getStrokeOutlinePoints(
   // The total length of the line
   const totalLength = points[len - 1].runningLength
 
-  // The minimum distance for measurements
-  const minDist = size * smoothing
-
   // Our collected left and right points
   const leftPts: number[][] = []
   const rightPts: number[][] = []
@@ -162,33 +173,25 @@ export function getStrokeOutlinePoints(
   // Previous pressure
   let pp = 1
 
-  // Whether the line is drawn far enough to calculate an initial vector
-  let short = true
-
   // The current radius
   let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
 
   /*
-  Find the outline's left and right points
+    Find the outline's left and right points
 
-  Iterating through the points and populate the leftPts and rightPts arrays.
-  Ignore the first and last points: these will get caps later on.
+   Iterating through the points and populate the leftPts and rightPts arrays,
+   skipping the first and last pointsm, which will get caps later on.
   */
-  for (let i = 1; i < len - 1; i++) {
-    const next = points[i + 1]
 
+  for (let i = 1; i < len - 1; i++) {
     let { point, pressure, vector, distance, runningLength } = points[i]
 
-    if (short && runningLength > minDist) {
-      short = false
-    }
-
     /*
-    Calculate the radius
+      Calculate the radius
 
-    If not thinning, the current point's radius will be half the size; or
-    otherwise, the size will be based on the current (real or simulated)
-    pressure. 
+      If not thinning, the current point's radius will be half the size; or
+      otherwise, the size will be based on the current (real or simulated)
+      pressure. 
     */
 
     if (thinning) {
@@ -204,11 +207,11 @@ export function getStrokeOutlinePoints(
     }
 
     /*
-    Apply tapering
+      Apply tapering
 
-    If the current length is within the taper distance at either the
-    start or the end, calculate the taper strengths. Apply the smaller 
-    of the two taper strengths to the radius.
+      If the current length is within the taper distance at either the
+      start or the end, calculate the taper strengths. Apply the smaller 
+      of the two taper strengths to the radius.
     */
 
     const ts =
@@ -224,23 +227,25 @@ export function getStrokeOutlinePoints(
     radius *= Math.min(ts, te)
 
     /*
-    Handle sharp corners
+      Handle sharp corners
 
-    Find the difference (dot product) between the current and next vector.
-    If the next vector is at more than a right angle to the current vector,
-    draw a cap at the current point.
+      Find the difference (dot product) between the current and next vector.
+      If the next vector is at more than a right angle to the current vector,
+      draw a cap at the current point.
     */
 
-    const dpr = vec.dpr(vector, next.vector)
+    const nextVector = points[i + 1].vector
+
+    const dpr = vec.dpr(vector, nextVector)
 
     if (dpr < 0) {
       const offset = vec.mul(vec.per(pv), radius)
-      const pushedA = vec.add(point, offset)
-      const pushedB = vec.sub(point, offset)
+      const la = vec.add(point, offset)
+      const ra = vec.sub(point, offset)
 
-      for (let t = 0; t <= 1; t += 0.3333) {
-        tl = vec.rotAround(pushedA, point, PI * -t)
-        tr = vec.rotAround(pushedB, point, PI * t)
+      for (let t = 0.2; t < 1; t += 0.2) {
+        tl = vec.rotAround(la, point, PI * -t)
+        tr = vec.rotAround(ra, point, PI * t)
 
         leftPts.push(tl)
         rightPts.push(tr)
@@ -253,110 +258,136 @@ export function getStrokeOutlinePoints(
     }
 
     /* 
-    Add regular points
+      Add regular points
 
-    Project points to either side of the current point, using the
-    calculated size as a distance. If a point's distance to the 
-    previous point on that side greater than the minimum distance
-    (or if the corner is kinda sharp), add the points to the side's
-    points array.
+      Project points to either side of the current point, using the
+      calculated size as a distance. If a point's distance to the 
+      previous point on that side greater than the minimum distance
+      (or if the corner is kinda sharp), add the points to the side's
+      points array.
     */
 
-    const offset = vec.mul(vec.per(vector), radius)
+    const offset = vec.mul(vec.per(vec.lrp(nextVector, vector, dpr)), radius)
+
     tl = vec.add(point, offset)
     tr = vec.sub(point, offset)
 
-    const alwaysAdd = i === 1 || dpr < 0.25
-    const minDistance = short ? minDist / 2 : minDist
+    const tlu = vec.uni(vec.vec(tl, pl))
+    const tru = vec.uni(vec.vec(tr, pr))
 
-    if (alwaysAdd || vec.dist(pl, tl) > minDistance) {
+    const alwaysAdd = i === 1 || dpr < 0.25
+    const minDistance = (runningLength > size ? size : size / 2) * smoothing
+
+    if (
+      alwaysAdd ||
+      (vec.dist(pl, tl) > minDistance && vec.dpr(tlu, vector) > 0)
+    ) {
       leftPts.push(tl)
       pl = tl
     }
 
-    if (alwaysAdd || vec.dist(pr, tr) > minDistance) {
+    if (
+      alwaysAdd ||
+      (vec.dist(pr, tr) > minDistance && vec.dpr(tru, vector) > 0)
+    ) {
       rightPts.push(tr)
       pr = tr
     }
+
+    // Set variables for next iteration
 
     pp = pressure
     pv = vector
   }
 
+  const firstPoint = points[0]
+  const lastPoint = points[points.length - 1]
+
+  const isVeryShort = leftPts.length < 2 || rightPts.length < 2
+  const isTapering = taperStart + taperEnd > 0
+
+  /* 
+    Draw a dot for very short or completed strokes
+    
+    If the line is too short to gather left or right points, then draw
+    a dot if either: the line is complete; or the line has no tapering.
+  */
+
+  if (isVeryShort && (!isTapering || isComplete)) {
+    let ir = 0
+
+    for (let i = 0; i < len - 1; i++) {
+      const { pressure, runningLength } = points[i]
+      if (runningLength > size) {
+        ir = getStrokeRadius(size, thinning, easing, pressure)
+        break
+      }
+    }
+
+    const start = vec.sub(
+      firstPoint.point,
+      vec.mul(
+        vec.per(vec.uni(vec.vec(lastPoint.point, firstPoint.point))),
+        ir || radius
+      )
+    )
+
+    const dotPts: number[][] = []
+
+    for (let t = 0, step = 0.1; t <= 1; t += step) {
+      dotPts.push(vec.rotAround(start, firstPoint.point, PI * 2 * t))
+    }
+
+    return dotPts
+  }
+
   /*
-  Draw start and end caps.
+    Draw a start cap
+
+    Unless the line has a tapered start, draw a start cap around the first point,
+    using the distance between the second left and right point for the cap's 
+    radius, and finally remove the first left and right points. :psyduck:
   */
 
   const startCap: number[][] = []
-  const endCap: number[][] = []
 
-  const firstPoint = points[0]
-  const lastPoint = points[points.length - 1]
-  const veryShort = leftPts.length < 2 || rightPts.length < 2
-  const isTapering = taperStart + taperEnd > 0
+  if (taperStart === 0) {
+    tl = leftPts[1]
+    tr = rightPts[1]
 
-  // Draw start cap if the end taper is set to zero
-
-  if (veryShort) {
-    if (!isTapering || (veryShort && last)) {
-      // Draw a dot.
-
-      // Find the initial radius.
-      let ir = 0
-
-      for (let i = 0; i < len - 1; i++) {
-        const { pressure, runningLength } = points[i]
-        if (runningLength > size) {
-          ir = getStrokeRadius(size, thinning, easing, pressure)
-          break
-        }
-      }
-
-      // Draw an inverse cap for the end cap.
-      const start = vec.sub(
-        firstPoint.point,
-        vec.mul(
-          vec.per(vec.uni(vec.vec(lastPoint.point, firstPoint.point))),
-          ir || radius
-        )
-      )
-
-      for (let t = 0, step = 0.1; t <= 1; t += step) {
-        startCap.push(vec.rotAround(start, firstPoint.point, PI * -t))
-      }
-
-      // Get rid of the first set of points on either side.
-      leftPts.shift()
-      rightPts.shift()
-    }
-  } else if (taperStart === 0) {
-    // Draw a cap between second left / right points.
     const start = vec.add(
       firstPoint.point,
-      vec.mul(
-        vec.uni(vec.vec(leftPts[1], rightPts[1])),
-        vec.dist(leftPts[1], rightPts[1]) / 2
-      )
+      vec.mul(vec.uni(vec.vec(tl, tr)), vec.dist(tl, tr) / 2)
     )
-    for (let t = 0, step = 0.1; t <= 1; t += step) {
+
+    for (let t = 0, step = 0.2; t <= 1; t += step) {
       startCap.push(vec.rotAround(start, firstPoint.point, PI * -t))
     }
+
     leftPts.shift()
     rightPts.shift()
-  } else if (points[1]) {
-    startCap.push(points[1].point)
   }
 
-  // Draw end cap if taper end is set to zero
+  /*
+    Draw an end cap
 
-  if (!isTapering || (taperEnd === 0 && !veryShort) || (veryShort && last)) {
+    If the line does not have a tapered end, and unless the line has a tapered
+    start and the line is very short, draw a cap around the last point. 
+
+  */
+
+  const endCap: number[][] = []
+
+  if (taperEnd === 0 && !(taperStart > 0 && isVeryShort)) {
     const start = vec.sub(
       lastPoint.point,
       vec.mul(vec.per(lastPoint.vector), radius)
     )
     for (let t = 0, step = 0.1; t <= 1; t += step) {
-      endCap.push(vec.rotAround(start, lastPoint.point, PI * t))
+      endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
     }
+    leftPts.pop()
+    rightPts.pop()
   } else {
     endCap.push(lastPoint.point)
   }

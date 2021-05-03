@@ -86,14 +86,6 @@ export function uni(A: number[]) {
 }
 
 /**
- * Get normalized / unit vector.
- * @param A
- */
-export function normalize(A: number[]) {
-  return uni(A)
-}
-
-/**
  * Dist length from A to B
  * @param A
  * @param B
