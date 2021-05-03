@@ -9,6 +9,7 @@ import {
   RotateCw,
   Settings,
   Clipboard,
+  GitHub,
 } from 'react-feather'
 
 const ToolbarContainer = styled.div`
@@ -79,6 +80,14 @@ export default function Toolbar() {
         </a>
       </div>
       <ButtonGroup>
+        <IconButton
+          as="a"
+          href="https://github.com/steveruizok/perfect-freehand"
+          target="_blank"
+          rel="nofollow noopener"
+        >
+          <GitHub size={18} />
+        </IconButton>
         <Alert
           animationLength={150}
           visibilityDuration={1200}
