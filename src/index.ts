@@ -343,7 +343,7 @@ export function getStrokeOutlinePoints(
     Unless the line has a tapered start, or unless the line has a tapered end
     and the line is very short, draw a start cap around the first point. Use
     the distance between the second left and right point for the cap's radius.
-    Finallym remove the first left and right points. :psyduck:
+    Finally remove the first left and right points. :psyduck:
   */
 
   const startCap: number[][] = []
