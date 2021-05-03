@@ -11,9 +11,9 @@ import {
   Clipboard,
 } from 'react-feather'
 
-const ToolbarContainer = styled.div`
+const FooterBarContainer = styled.div`
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: 44px;
@@ -53,32 +53,24 @@ const IconButton = styled.button`
   }
 `
 
-export default function Toolbar() {
+export default function FooterBar() {
   const clipboardMessage = useSelector(state => state.data.clipboardMessage)
 
   return (
-    <ToolbarContainer onPointerDown={e => e.stopPropagation()}>
+    <FooterBarContainer onPointerDown={e => e.stopPropagation()}>
       <ButtonGroup>
         <IconButton onClick={() => state.send('UNDO')}>
-          <RotateCcw size={18} />
+          <RotateCcw size={20} />
         </IconButton>
         <IconButton onClick={() => state.send('REDO')}>
-          <RotateCw size={18} />
-        </IconButton>
-        <IconButton onClick={() => state.send('CLEARED_CANVAS')}>
-          <Trash size={18} />
+          <RotateCw size={20} />
         </IconButton>
       </ButtonGroup>
-      <div>
-        <a
-          href="https://github.com/steveruizok/perfect-freehand"
-          target="_blank"
-          rel="nofollow noopener"
-        >
-          perfect-freehand
-        </a>
-      </div>
+
       <ButtonGroup>
+        <IconButton onClick={() => state.send('TOGGLED_DARK_MODE')}>
+          <Sun size={20} />
+        </IconButton>
         <Alert
           animationLength={150}
           visibilityDuration={1200}
@@ -86,13 +78,16 @@ export default function Toolbar() {
           onFinish={() => state.send('CLEARED_CLIPBOARD_MESSAGE', null)}
         >
           <IconButton onClick={async () => state.send('COPIED_TO_CLIPBOARD')}>
-            <Clipboard size={18} />
+            <Clipboard size={20} />
           </IconButton>
         </Alert>
-        <IconButton onClick={() => state.send('TOGGLED_DARK_MODE')}>
-          <Sun size={18} />
+        <IconButton onClick={() => state.send('TOGGLED_CONTROLS')}>
+          <Settings size={20} />
+        </IconButton>
+        <IconButton onClick={() => state.send('CLEARED_CANVAS')}>
+          <Trash size={20} />
         </IconButton>
       </ButtonGroup>
-    </ToolbarContainer>
+    </FooterBarContainer>
   )
 }

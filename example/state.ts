@@ -4,6 +4,7 @@ import { Mark, ClipboardMessage } from './types'
 import getStroke from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
+import { bezier } from '@leva-ui/plugin-bezier'
 import * as svg from 'svg'
 import * as vec from 'vec'
 
@@ -65,15 +66,15 @@ function getStrokePath(
 ) {
   const stroke = getStroke(points, {
     ...options,
-    easing: easings[options.easing],
+    easing: options.easing.evaluate,
     simulatePressure: points[0].pressure === 0,
     start: {
       taper: options.taperStart,
-      easing: easings[options.taperStartEasing],
+      easing: options.taperStartEasing.evaluate,
     },
     end: {
       taper: options.taperEnd,
-      easing: easings[options.taperEndEasing],
+      easing: options.taperEndEasing.evaluate,
     },
     last,
   })
@@ -83,18 +84,26 @@ function getStrokePath(
     : getSvgPathFromStroke(stroke)
 }
 
+interface Easing {
+  0: number
+  1: number
+  2: number
+  3: number
+  evaluate: (t: number) => number
+}
+
 interface AppOptions {
   size: number
   streamline: number
   clip: boolean
-  easing: string
+  easing: Easing
   thinning: number
   smoothing: number
   simulatePressure: boolean
   taperStart: number
+  taperStartEasing: Easing
   taperEnd: number
-  taperStartEasing: string
-  taperEndEasing: string
+  taperEndEasing: Easing
 }
 
 const defaultOptions: AppOptions = {
@@ -104,11 +113,29 @@ const defaultOptions: AppOptions = {
   streamline: 0.5,
   simulatePressure: true,
   clip: false,
-  easing: 'linear',
+  easing: {
+    0: 0.25,
+    1: 0.25,
+    2: 0.75,
+    3: 0.75,
+    evaluate: t => t,
+  },
   taperStart: 0,
   taperEnd: 0,
-  taperStartEasing: 'linear',
-  taperEndEasing: 'linear',
+  taperStartEasing: {
+    0: 0.25,
+    1: 0.25,
+    2: 0.75,
+    3: 0.75,
+    evaluate: t => t,
+  },
+  taperEndEasing: {
+    0: 0.25,
+    1: 0.25,
+    2: 0.75,
+    3: 0.75,
+    evaluate: t => t,
+  },
 }
 
 const defaultSettings = {

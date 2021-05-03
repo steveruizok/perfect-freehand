@@ -18,83 +18,85 @@ export const pointer: Pointer = {
   type: 'mouse',
 }
 
+const keys: Keys = {
+  shift: false,
+  meta: false,
+  alt: false,
+}
+
+function updatePointer(e: PointerEvent | React.PointerEvent<HTMLDivElement>) {
+  const dpr = window.devicePixelRatio || 1
+
+  const x = e.pageX,
+    y = e.pageY,
+    cx = x * dpr,
+    cy = y * dpr,
+    dx = x - pointer.x,
+    dy = y - pointer.y,
+    type = e.pointerType as 'pen' | 'mouse' | 'touch',
+    p = e.pressure
+
+  if (dx === 0 && dy === 0) return false
+
+  pointer.x = x
+  pointer.y = y
+  pointer.cx = cx
+  pointer.cy = cy
+  pointer.dx = dx
+  pointer.dy = dy
+  pointer.tx += dx
+  pointer.ty += dy
+  pointer.p = p
+  pointer.type = type
+  keys.shift = e.shiftKey
+  keys.meta = e.metaKey
+  keys.alt = e.altKey
+
+  return true
+}
+
+function handlePointerMove(
+  e: PointerEvent | React.PointerEvent<HTMLDivElement>
+) {
+  if (updatePointer(e)) {
+    state.send('MOVED_POINTER', { pointer, keys })
+  }
+}
+
+function handlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
+  updatePointer(e)
+  e.currentTarget.releasePointerCapture(e.pointerId)
+  pointerIds.delete(e.pointerId)
+  pointer.p = e.pointerType === 'pen' ? e.pressure : 0
+  state.send('LIFTED_POINTER', { pointer, keys })
+}
+
+function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+  e.preventDefault()
+  e.currentTarget.setPointerCapture(e.pointerId)
+  if (pointerIds.size === 0) first = e.pointerId
+  pointerIds.add(e.pointerId)
+
+  setTimeout(() => {
+    if (pointerIds.size === 2) {
+      if (first === e.pointerId) {
+        state.send('UNDO')
+      }
+    } else if (pointerIds.size === 3) {
+      if (first === e.pointerId) {
+        state.send('REDO')
+      }
+    } else {
+      updatePointer(e)
+      pointer.p = e.pointerType === 'pen' ? e.pressure : 0
+      state.send('DOWNED_POINTER', { pointer, keys })
+    }
+  }, 16)
+}
+
 export default function useEvents() {
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-
-    let keys: Keys = {
-      shift: false,
-      meta: false,
-      alt: false,
-    }
-
-    const dpr = window.devicePixelRatio || 1
-
-    function updatePointer(e: PointerEvent) {
-      const x = e.pageX,
-        y = e.pageY,
-        cx = x * dpr,
-        cy = y * dpr,
-        dx = x - pointer.x,
-        dy = y - pointer.y,
-        type = e.pointerType as 'pen' | 'mouse' | 'touch',
-        p = e.pressure
-
-      if (dx === 0 && dy === 0) return false
-
-      pointer.x = x
-      pointer.y = y
-      pointer.cx = cx
-      pointer.cy = cy
-      pointer.dx = dx
-      pointer.dy = dy
-      pointer.tx += dx
-      pointer.ty += dy
-      pointer.p = p
-      pointer.type = type
-      keys.shift = e.shiftKey
-      keys.meta = e.metaKey
-      keys.alt = e.altKey
-
-      return true
-    }
-
-    function handlePointerMove(e: PointerEvent) {
-      if (updatePointer(e)) {
-        state.send('MOVED_POINTER', { pointer, keys })
-      }
-    }
-
-    function handlePointerDown(e: PointerEvent) {
-      e.preventDefault()
-      document.body.setPointerCapture(e.pointerId)
-      if (pointerIds.size === 0) first = e.pointerId
-      pointerIds.add(e.pointerId)
-
-      setTimeout(() => {
-        if (pointerIds.size === 2) {
-          if (first === e.pointerId) {
-            state.send('UNDO')
-          }
-        } else if (pointerIds.size === 3) {
-          if (first === e.pointerId) {
-            state.send('REDO')
-          }
-        } else {
-          updatePointer(e)
-          pointer.p = e.pointerType === 'pen' ? e.pressure : 0
-          state.send('DOWNED_POINTER', { pointer, keys })
-        }
-      }, 16)
-    }
-
-    function handlePointerUp(e: PointerEvent) {
-      document.body.releasePointerCapture(e.pointerId)
-      updatePointer(e)
-      pointerIds.delete(e.pointerId)
-      pointer.p = e.pointerType === 'pen' ? e.pressure : 0
-      state.send('LIFTED_POINTER', { pointer, keys })
-    }
 
     function handleKeydown(e: KeyboardEvent) {
       keys.shift = e.shiftKey
@@ -113,24 +115,22 @@ export default function useEvents() {
       state.send('RESIZED')
     }
 
-    window.addEventListener('pointermove', handlePointerMove)
-    document.body.addEventListener('pointerdown', handlePointerDown)
-    document.body.addEventListener('pointerup', handlePointerUp)
-    document.body.addEventListener('pointerleave', handlePointerUp)
     window.addEventListener('keydown', handleKeydown)
     window.addEventListener('keyup', handleKeyup)
     window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove)
-      document.body.removeEventListener('pointerdown', handlePointerDown)
-      document.body.removeEventListener('pointerup', handlePointerUp)
-      document.body.removeEventListener('pointerleave', handlePointerUp)
       window.removeEventListener('keydown', handleKeydown)
       window.removeEventListener('keyup', handleKeyup)
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+
+  return {
+    onPointerMove: handlePointerMove,
+    onPointerDown: handlePointerDown,
+    onPointerUp: handlePointerUp,
+  }
 }
 
 export function getPointer(): Pointer {
