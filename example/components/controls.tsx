@@ -153,7 +153,9 @@ export default function Controls() {
         size: options.size,
         thinning: options.thinning,
         streamline: options.streamline,
+        // @ts-ignore
         taperStart: options.taperStart,
+        // @ts-ignore
         taperEnd: options.taperEnd,
       })
     }),

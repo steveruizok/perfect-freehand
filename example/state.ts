@@ -107,8 +107,8 @@ interface AppOptions {
 }
 
 const defaultOptions: AppOptions = {
-  size: 16,
-  thinning: 0.75,
+  size: 24,
+  thinning: 0.5,
   smoothing: 0.5,
   streamline: 0.5,
   simulatePressure: true,
