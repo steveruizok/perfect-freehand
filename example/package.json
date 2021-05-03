@@ -10,7 +10,7 @@
   "dependencies": {
     "@state-designer/react": "^1.7.1",
     "next": "10.0.7",
-    "perfect-freehand": "^0.4.2",
+    "perfect-freehand": "latest",
     "polygon-clipping": "^0.15.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",

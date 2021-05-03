@@ -1,3 +1,8 @@
+## 0.4.3
+
+- Improves caps, corners.
+- Re-writes most comments.
+
 ## 0.4.2
 
 - Fixes dots.

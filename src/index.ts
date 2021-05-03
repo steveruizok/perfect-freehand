@@ -9,6 +9,7 @@ const { min, PI } = Math
  * @description Get points for a stroke.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
  * @param streamline How much to streamline the stroke.
+ * @param size The stroke's size.
  */
 export function getStrokePoints<
   T extends number[],
@@ -102,6 +103,8 @@ export function getStrokePoints<
  * @param options.smoothing	How much to soften the stroke's edges.
  * @param options.easing	An easing function to apply to each point's pressure.
  * @param options.simulatePressure Whether to simulate pressure based on velocity.
+ * @param options.start Tapering and easing function for the start of the line.
+ * @param options.end Tapering and easing function for the end of the line.
  * @param options.last Whether to handle the points as a completed stroke.
  */
 export function getStrokeOutlinePoints(
@@ -401,14 +404,17 @@ export function getStrokeOutlinePoints(
 
 /**
  * ## getStroke
- * @description Returns a stroke as an array of points.
+ * @description Returns a stroke as an array of outline points.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
  * @param options An (optional) object with options.
  * @param options.size	The base size (diameter) of the stroke.
  * @param options.thinning The effect of pressure on the stroke's size.
  * @param options.smoothing	How much to soften the stroke's edges.
- * @param options.streamline How much to streamline the stroke.
+ * @param options.easing	An easing function to apply to each point's pressure.
  * @param options.simulatePressure Whether to simulate pressure based on velocity.
+ * @param options.start Tapering and easing function for the start of the line.
+ * @param options.end Tapering and easing function for the end of the line.
+ * @param options.last Whether to handle the points as a completed stroke.
  */
 export default function getStroke<
   T extends number[],
