@@ -7,7 +7,6 @@ import {
   Trash,
   RotateCcw,
   RotateCw,
-  Settings,
   Clipboard,
   GitHub,
 } from 'react-feather'
@@ -24,6 +23,8 @@ const ToolbarContainer = styled.div`
   user-select: none;
   overflow: visible;
   font-size: 14px;
+  z-index: 10;
+  touch-action: manipulation;
 `
 
 const ButtonGroup = styled.div`

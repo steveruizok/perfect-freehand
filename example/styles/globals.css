@@ -3,6 +3,7 @@ html,
   box-sizing: border-box;
   overscroll-behavior: none;
   overflow: hidden;
+  touch-action: none;
 }
 
 :root {
@@ -47,11 +48,12 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+  height: 100%;
+  width: 100%;
   font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
   font-weight: 500;
   font-size: 15px;
   overscroll-behavior: none;
-  touch-action: manipulation;
   overflow: hidden;
   color: var(--color-text);
   background-color: var(--color-background);
@@ -61,8 +63,4 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-svg {
-  touch-action: none;
 }
