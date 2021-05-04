@@ -2,6 +2,7 @@ import * as React from 'react'
 import state, { useSelector } from '../state'
 import Alert from './alert'
 import styled from 'styled-components'
+import { IconButton } from './styled'
 import {
   Sun,
   Trash,
@@ -25,6 +26,7 @@ const ToolbarContainer = styled.div`
   font-size: 14px;
   z-index: 10;
   touch-action: manipulation;
+  background-color: var(--color-background);
 `
 
 const ButtonGroup = styled.div`
@@ -32,27 +34,6 @@ const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   overflow: inherit;
-`
-
-const IconButton = styled.button`
-  background: transparent;
-  display: flex;
-  border: none;
-  align-items: center;
-  font-size: 32px;
-  padding: 8px;
-  color: var(--color-text);
-  cursor: pointer;
-  border-radius: 4px;
-  outline: none;
-
-  &:disabled {
-    opacity: 0.3;
-  }
-
-  &:hover {
-    background-color: var(--color-hover);
-  }
 `
 
 export default function Toolbar() {

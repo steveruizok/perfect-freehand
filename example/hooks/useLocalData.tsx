@@ -5,7 +5,7 @@ export default function useLocalData() {
   React.useEffect(() => {
     if (typeof localStorage === 'undefined') return
 
-    const local = localStorage.getItem('perfect-freehand-demo-1')
+    const local = localStorage.getItem('perfect-freehand-demo-2')
 
     const data = local
       ? JSON.parse(local)
@@ -26,7 +26,7 @@ export default function useLocalData() {
     const unsub = state.onUpdate(d => {
       if (d.isIn('up')) {
         localStorage.setItem(
-          'perfect-freehand-demo-1',
+          'perfect-freehand-demo-2',
           JSON.stringify({
             alg: d.data.alg,
             marks: d.data.marks,

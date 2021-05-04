@@ -14,7 +14,15 @@ const { min, PI } = Math
 export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], streamline = 0.5, size = 8): StrokePoint[] {
+>(points: (T | K)[], options: StrokeOptions): StrokePoint[] {
+  let { simulatePressure = true, streamline = 0.5, size = 8 } = options
+
+  streamline /= 2
+
+  if (!simulatePressure) {
+    streamline /= 2
+  }
+
   const pts = toPointsArray(points)
   const len = pts.length
 
@@ -52,23 +60,6 @@ export function getStrokePoints<
     })
   }
 
-  /*
-    Align vectors at the start of the line
-    
-    Find the first stroke point past the size and then set all preceding points' 
-    vectors to match this point's vector. This aligns the start cap and reduces
-    noise at the start of the line.
-  */
-  for (let i = 0; i < len; i++) {
-    const { runningLength, vector } = strokePoints[i]
-    if (runningLength > size || i === len - 1) {
-      for (let j = 0; j < i; j++) {
-        strokePoints[j].vector = vector
-      }
-      break
-    }
-  }
-
   /* 
     Align vectors at the end of the line
 
@@ -81,9 +72,12 @@ export function getStrokePoints<
 
   const totalLength = strokePoints[len - 1].runningLength
 
-  for (let i = len - 1; i > 1; i--) {
+  for (let i = len - 2; i > 1; i--) {
     const { runningLength, vector } = strokePoints[i]
-    if (totalLength - runningLength > size / 2) {
+    if (
+      totalLength - runningLength > size / 2 ||
+      vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector) < 0.8
+    ) {
       for (let j = i; j < len; j++) {
         strokePoints[j].vector = vector
       }
@@ -122,6 +116,10 @@ export function getStrokeOutlinePoints(
     end = {},
     last: isComplete = false,
   } = options
+
+  let { streamline = 0.5 } = options
+
+  streamline /= 2
 
   const {
     taper: taperStart = 0,
@@ -261,25 +259,16 @@ export function getStrokeOutlinePoints(
     tl = vec.sub(point, offset)
     tr = vec.add(point, offset)
 
-    const tlu = vec.uni(vec.vec(tr, pr))
-    const tru = vec.uni(vec.vec(tl, pl))
-
     const alwaysAdd = i === 1 || dpr < 0.25
     const minDistance = (runningLength > size ? size : size / 2) * smoothing
 
-    if (
-      alwaysAdd ||
-      (vec.dist(pl, tl) > minDistance && vec.dpr(tlu, vector) > 0)
-    ) {
-      leftPts.push(vec.med(pl, tl))
+    if (alwaysAdd || vec.dist(pl, tl) > minDistance) {
+      leftPts.push(vec.lrp(pl, tl, streamline))
       pl = tl
     }
 
-    if (
-      alwaysAdd ||
-      (vec.dist(pr, tr) > minDistance && vec.dpr(tru, vector) > 0)
-    ) {
-      rightPts.push(vec.med(pr, tr))
+    if (alwaysAdd || vec.dist(pr, tr) > minDistance) {
+      rightPts.push(vec.lrp(pr, tr, streamline))
       pr = tr
     }
 
@@ -387,9 +376,6 @@ export function getStrokeOutlinePoints(
     for (let t = 0, step = 0.1; t <= 1; t += step) {
       endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
     }
-
-    leftPts.pop()
-    rightPts.pop()
   } else {
     endCap.push(lastPoint.point)
   }
@@ -421,10 +407,7 @@ export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
-  return getStrokeOutlinePoints(
-    getStrokePoints(points, options.streamline, options.size),
-    options
-  )
+  return getStrokeOutlinePoints(getStrokePoints(points, options), options)
 }
 
 export { StrokeOptions }

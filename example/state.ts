@@ -32,7 +32,7 @@ function getSvgPathFromStroke(stroke: number[][]) {
 
   // for (let i = 0; i < stroke.length; i++) {
   //   const pt = stroke[i]
-  //   d.push(svg.dot(pt, i > stroke.length / 2 ? 0.5 : 1))
+  //   d.push(svg.dot(pt, i > stroke.length / 2 ? 1 : 1.5))
   // }
 
   return d.join(' ')
@@ -61,13 +61,14 @@ const easings = {
 
 function getStrokePath(
   points: Mark['points'],
+  simulatePressure: boolean,
   options: AppOptions,
   last: boolean
 ) {
   const stroke = getStroke(points, {
     ...options,
     easing: options.easing.evaluate,
-    simulatePressure: points[0].pressure === 0,
+    simulatePressure,
     start: {
       taper: options.taperStart,
       easing: options.taperStartEasing.evaluate,
@@ -155,6 +156,7 @@ const state = createState({
     marks: [] as Mark[],
     currentMark: null as Mark | null,
     clipboardMessage: null as ClipboardMessage | null,
+    lastPressure: 0,
   },
   states: {
     app: {
@@ -166,6 +168,7 @@ const state = createState({
             CHANGED_OPTIONS: ['changeOptions', 'updatePaths'],
             CHANGED_SETTINGS: ['changeSettings'],
             TOGGLED_CONTROLS: 'toggleControls',
+            EXITED_PEN_MODE: 'clearPenMode',
             LOADED: ['setup', 'setDarkMode'],
             CLEARED_CANVAS: ['clearMarks'],
             UNLOADED: 'cleanup',
@@ -213,13 +216,20 @@ const state = createState({
       states: {
         up: {
           on: {
-            DOWNED_POINTER: ['beginMark', { to: 'down' }],
+            DOWNED_POINTER: [
+              { if: 'inPenMode', unless: 'hasPressure', break: true },
+              { if: 'hasPressure', unless: 'inPenMode', do: 'setPenMode' },
+              { do: 'beginMark', to: 'down' },
+            ],
           },
         },
         down: {
           on: {
             LIFTED_POINTER: { do: 'completeMark', to: 'up' },
-            MOVED_POINTER: 'addPointToMark',
+            MOVED_POINTER: [
+              { if: 'hasPressure', unless: 'inPenMode', do: 'setPenMode' },
+              'addPointToMark',
+            ],
           },
         },
       },
@@ -232,6 +242,13 @@ const state = createState({
     },
   },
   conditions: {
+    hasPressure() {
+      const { p, type } = getPointer()
+      return type === 'pen' || p !== 0
+    },
+    inPenMode(data) {
+      return data.settings.penMode
+    },
     hasCurrentMark(data) {
       return !!data.currentMark
     },
@@ -261,6 +278,12 @@ const state = createState({
     toggledTrace(data) {
       data.settings.showTrace = !data.settings.showTrace
     },
+    setPenMode(data) {
+      data.settings.penMode = true
+    },
+    clearPenMode(data) {
+      data.settings.penMode = false
+    },
     setup(
       data,
       payload: {
@@ -275,7 +298,7 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, alg, true),
+        path: getStrokePath(mark.points, mark.simulatePressure, alg, true),
       }))
 
       data.settings = {
@@ -289,9 +312,10 @@ const state = createState({
     beginMark(data) {
       const { alg } = data
       const { x, y, p, type } = getPointer()
-      data.settings.penMode = type === 'pen'
 
       data.redos = []
+
+      data.lastPressure = p
 
       const point = {
         x,
@@ -300,16 +324,18 @@ const state = createState({
       }
 
       data.currentMark = {
-        type,
+        simulatePressure: true,
         points: [point],
-        path: getStrokePath([point], alg, false),
+        path: getStrokePath([point], true, alg, false),
       }
     },
     addPointToMark(data) {
-      const { x, y, p, type } = getPointer()
-      const { currentMark, alg } = data
+      const { x, y, p } = getPointer()
+      const { currentMark, alg, settings } = data
 
-      if (type !== currentMark!.type) return
+      data.lastPressure = p
+
+      currentMark!.simulatePressure = !settings.penMode
 
       currentMark!.points.push({
         x,
@@ -317,7 +343,12 @@ const state = createState({
         pressure: p,
       })
 
-      currentMark!.path = getStrokePath(currentMark!.points, alg, false)
+      currentMark!.path = getStrokePath(
+        currentMark!.points,
+        currentMark!.simulatePressure,
+        alg,
+        false
+      )
     },
     completeMark(data) {
       const { currentMark, alg } = data
@@ -326,7 +357,12 @@ const state = createState({
 
       data.marks.push({
         ...currentMark,
-        path: getStrokePath(currentMark.points, alg, true),
+        path: getStrokePath(
+          currentMark!.points,
+          currentMark!.simulatePressure,
+          alg,
+          true
+        ),
       })
 
       data.currentMark = null
@@ -339,7 +375,7 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, alg, true),
+        path: getStrokePath(mark.points, mark.simulatePressure, alg, true),
       }))
     },
     undoMark(data) {
@@ -375,11 +411,16 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = getStrokePath(mark.points, alg, true)
+        mark.path = getStrokePath(mark.points, mark.simulatePressure, alg, true)
       }
 
       if (currentMark) {
-        currentMark.path = getStrokePath(currentMark.points, alg, false)
+        currentMark.path = getStrokePath(
+          currentMark.points,
+          currentMark.simulatePressure,
+          alg,
+          false
+        )
       }
     },
     // Clipboard message

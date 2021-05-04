@@ -64,6 +64,7 @@ export default function Controls() {
       max: 64,
       step: 1,
       onChange: v => state.send('CHANGED_OPTIONS', { size: v }),
+      transient: true,
     },
     thinning: {
       label: 'Thinning',
@@ -72,12 +73,13 @@ export default function Controls() {
       max: 1,
       step: 0.01,
       onChange: v => state.send('CHANGED_OPTIONS', { thinning: v }),
+      transient: true,
     },
     smoothing: {
       label: 'Smoothing',
       value: options.smoothing,
       min: 0,
-      max: 2,
+      max: 1,
       step: 0.01,
       onChange: v => state.send('CHANGED_OPTIONS', { smoothing: v }),
     },

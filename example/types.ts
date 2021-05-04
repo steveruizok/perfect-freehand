@@ -1,5 +1,5 @@
 export interface Mark {
-  type: 'pen' | 'mouse' | 'touch'
+  simulatePressure: boolean
   points: {
     x: number
     y: number

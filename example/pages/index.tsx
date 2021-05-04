@@ -7,10 +7,16 @@ import useEvents from '../hooks/useEvents'
 import useLocalData from '../hooks/useLocalData'
 import useDarkMode from '../hooks/useDarkMode'
 import useSvgResizer from 'hooks/useSvgResizer'
+import PenMode from 'components/pen-mode'
+import PressureIndicator from 'components/pressure-indicator'
 const Controls = dynamic(() => import('../components/controls'), { ssr: false })
 const Toolbar = dynamic(() => import('../components/toolbar'), { ssr: false })
 
 function handleTouchStart(e: React.TouchEvent) {
+  e.preventDefault()
+}
+
+function handleTouchMove(e: React.TouchEvent) {
   e.preventDefault()
 }
 
@@ -27,6 +33,7 @@ export default function Home() {
   const currentMark = useSelector(state => state.data.currentMark)
   const showTrace = useSelector(state => state.data.settings.showTrace)
   const darkMode = useSelector(state => state.data.settings.darkMode)
+  const lastPressure = useSelector(state => state.data.lastPressure)
 
   return (
     <>
@@ -44,6 +51,7 @@ export default function Home() {
             pointerEvents="none"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
           >
             <g strokeWidth={showTrace ? 2 : 0}>
               {marks.map((mark, i) => (
@@ -61,10 +69,12 @@ export default function Home() {
                   fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
                 />
               )}
+              <PressureIndicator />
             </g>
           </SVGCanvas>
           <Controls />
         </Wrapper>
+        <PenMode />
       </main>
     </>
   )

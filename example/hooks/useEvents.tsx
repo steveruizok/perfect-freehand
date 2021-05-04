@@ -34,7 +34,7 @@ function updatePointer(e: PointerEvent | React.PointerEvent<HTMLDivElement>) {
     dx = x - pointer.x,
     dy = y - pointer.y,
     type = e.pointerType as 'pen' | 'mouse' | 'touch',
-    p = e.pressure
+    p = e.pressure === 0.5 ? 0 : e.pressure
 
   if (dx === 0 && dy === 0) return false
 
@@ -66,31 +66,31 @@ function handlePointerMove(
 function handlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
   updatePointer(e)
   e.currentTarget.releasePointerCapture(e.pointerId)
-  pointerIds.delete(e.pointerId)
-  pointer.p = e.pointerType === 'pen' ? e.pressure : 0
   state.send('LIFTED_POINTER', { pointer, keys })
 }
 
 function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
   e.preventDefault()
   e.currentTarget.setPointerCapture(e.pointerId)
+
   if (pointerIds.size === 0) first = e.pointerId
+
   pointerIds.add(e.pointerId)
 
+  updatePointer(e)
+
   setTimeout(() => {
-    if (pointerIds.size === 2) {
-      if (first === e.pointerId) {
-        state.send('UNDO')
-      }
-    } else if (pointerIds.size === 3) {
-      if (first === e.pointerId) {
-        state.send('REDO')
-      }
-    } else {
-      updatePointer(e)
-      pointer.p = e.pointerType === 'pen' ? e.pressure : 0
-      state.send('DOWNED_POINTER', { pointer, keys })
-    }
+    // if (pointerIds.size === 2) {
+    //   if (first === e.pointerId) {
+    //     state.send('UNDO')
+    //   }
+    // } else if (pointerIds.size === 3) {
+    //   if (first === e.pointerId) {
+    //     state.send('REDO')
+    //   }
+    // } else {
+    state.send('DOWNED_POINTER', { pointer, keys })
+    // }
   }, 16)
 }
 
