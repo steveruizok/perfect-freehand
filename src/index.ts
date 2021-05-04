@@ -78,6 +78,7 @@ export function getStrokePoints<
     removes the "noise" at the end of the line and allows for a better-facing
     end cap.
   */
+
   const totalLength = strokePoints[len - 1].runningLength
 
   for (let i = len - 1; i > 1; i--) {
@@ -421,7 +422,7 @@ export default function getStroke<
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
   return getStrokeOutlinePoints(
-    getStrokePoints(points, options.streamline),
+    getStrokePoints(points, options.streamline, options.size),
     options
   )
 }

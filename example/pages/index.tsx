@@ -37,7 +37,7 @@ export default function Home() {
       <main>
         <Toolbar />
         <Wrapper {...events}>
-          <svg
+          <SVGCanvas
             ref={ref}
             viewBox={'0 0 800 600'}
             id="drawable-svg"
@@ -62,7 +62,7 @@ export default function Home() {
                 />
               )}
             </g>
-          </svg>
+          </SVGCanvas>
           <Controls />
         </Wrapper>
       </main>
@@ -72,4 +72,8 @@ export default function Home() {
 
 const Wrapper = styled.div`
   height: 100%;
+`
+
+const SVGCanvas = styled.svg`
+  touch-action: none;
 `
