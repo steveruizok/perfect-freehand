@@ -10,8 +10,8 @@ import { bezier } from '@leva-ui/plugin-bezier'
 const LightTheme = {
   colors: {
     elevation1: '#ced1e5', // bg color of the root panel (main title bar)
-    elevation2: '#fafafa', // bg color of the rows (main panel color)
-    elevation3: '#f8f8f8', // bg color of the inputs
+    elevation2: '#ffffff', // bg color of the rows (main panel color)
+    elevation3: '#e9eefb', // bg color of the inputs
     accent1: '#3a96ff',
     accent2: '#439efe',
     accent3: '#9ac8ff',
@@ -142,7 +142,7 @@ export default function Controls() {
         onChange: v => state.send('CHANGED_OPTIONS', { taperEndEasing: v }),
       }),
     }),
-    reset: button(() => {
+    Reset: button(() => {
       state.send('RESET_OPTIONS')
       const {
         data: { settings, alg },
@@ -261,6 +261,10 @@ const StyledControls = styled.div`
   height: 400px;
   overflow: visible;
   pointer-events: none;
+
+  & input[type='checkbox'] {
+    border: 1px solid red;
+  }
 
   & > * {
     position: absolute;
