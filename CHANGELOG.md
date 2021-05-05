@@ -1,3 +1,11 @@
+## 0.4.6
+
+- Reduce the effect of streamline by half.
+- If using actual pressure, reduce the effect by half again.
+- Lerp between previous and next left/right point using streamline.
+- Adds check for hard turns to line end alignment.
+- Removes line start alignment. This still needs to be improved, but the previous solution is not the right one.
+
 ## 0.4.5
 
 - Fixes typings.
