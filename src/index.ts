@@ -1,12 +1,14 @@
 import { toPointsArray, clamp, lerp } from './utils'
-import { StrokeOptions } from './types'
+import { SplinePoint, StrokeOptions } from './types'
 import * as vec from './vec'
 
 export class FreehandSpline {
+  inputPoints: number[][]
   looped: boolean
-  points: number[][]
-  lengths: number[]
-  length: number
+
+  lengths: number[] = []
+  length: number = 0
+  points: SplinePoint[] = []
 
   size: number
   thinning: number
@@ -22,7 +24,7 @@ export class FreehandSpline {
     taper: number
     easing: (distance: number) => number
   }
-  last: boolean
+  isComplete: boolean
 
   constructor(
     points: (number[] | { x: number; y: number; pressure?: number })[],
@@ -38,7 +40,7 @@ export class FreehandSpline {
       easing = t => t,
       start = {},
       end = {},
-      last = false,
+      isComplete = false,
     } = options
 
     const {
@@ -54,52 +56,79 @@ export class FreehandSpline {
     this.size = size
     this.thinning = thinning
     this.smoothing = smoothing
-    this.streamline = streamline
+    this.streamline = streamline / 2
     this.simulatePressure = simulatePressure
     this.easing = easing
     this.start = { taper: taperStart, easing: taperStartCurve }
     this.end = { taper: taperEnd, easing: taperEndCurve }
-    this.last = last
-
-    let length: number
-    let totalLength = 0
-    let lengths: number[] = []
-
-    const pts = toPointsArray(points)
-    const len = pts.length
-
-    // Apply streamline
-    let [p0] = pts
-    this.points = [p0]
-
-    for (let i = 1; i < len; i++) {
-      p0 = [...vec.lrp(p0, pts[i], 1 - streamline), pts[i][2]]
-      this.points.push(p0)
-    }
-
-    // if (len > 3) {
-    //   this.points.push(this.points[len - 2])
-    // }
-
-    // Calculate simulated presssures
-    let pp = 0.5
-
-    for (let i = 0; i < this.points.length - 1; i++) {
-      length = vec.dist(this.points[i], this.points[i + 1])
-      lengths.push(length)
-      totalLength += length
-
-      if (simulatePressure) {
-        const rp = Math.min(1 - length / size, 1)
-        const sp = Math.min(length / size, 1)
-        this.points[i][2] = Math.min(1, pp + (rp - pp) * (sp / 2))
-        pp = this.points[i][2]
-      }
-    }
-
+    this.isComplete = isComplete
     this.looped = looped
+    this.inputPoints = toPointsArray(points)
+    this.updatePoints()
+  }
+
+  updatePoints() {
+    const { streamline, size } = this
+
+    let p0 = this.inputPoints[0],
+      p1: number[]
+
+    const streamlined = this.inputPoints.reduce(
+      (acc, cur) => {
+        p1 = vec.lrp(p0, cur, 1 - streamline)
+        if (!vec.isEqual(p0, p1)) {
+          acc.push(p1)
+          p0 = p1
+        }
+        return acc
+      },
+      [p0]
+    )
+
+    let lengths: number[] = []
+    let runningLength = 0
+    let vector: number[]
+    const points: SplinePoint[] = []
+    let pressure = 0
+    let prevPressure = 0.5
+
+    for (let i = 0; i < streamlined.length; i++) {
+      p0 = streamlined[i]
+      p1 = streamlined[i + 1]
+
+      if (p1) {
+        length = vec.dist(p0, p1)
+        lengths.push(length)
+        runningLength += length
+        vector = vec.div(vec.vec(p0, p1), length)
+      } else {
+        length = 0
+        vector = [0, 0]
+      }
+
+      if (this.thinning) {
+        if (this.simulatePressure) {
+          const rp = Math.min(1, 1 - length / this.size)
+          const sp = Math.min(1, length / size)
+          pressure = Math.min(1, prevPressure + (rp - prevPressure) * (sp / 2))
+          prevPressure = pressure
+        }
+      } else {
+        pressure = p0[2]
+      }
+
+      points.push({
+        point: p0,
+        pressure,
+        length,
+        vector,
+        runningLength,
+      })
+    }
+
+    this.points = points
     this.lengths = lengths
-    this.length = totalLength
+    this.length = runningLength
   }
 
   getStrokeRadius(pressure = 0.5) {
@@ -114,9 +143,10 @@ export class FreehandSpline {
   }
 
   getPointsToDistance(distance: number) {
+    // Could be made O(log n) because we already store runningLength
     const { points, lengths } = this
 
-    const results: number[][] = []
+    const results: SplinePoint[] = []
 
     let i = 1
     let traveled = 0
@@ -126,28 +156,30 @@ export class FreehandSpline {
       traveled += lengths[i]
       i++
     }
+
+    return results
   }
 
   getOutlineShape() {
-    const { lengths, size, smoothing, points } = this
+    const { lengths, size, smoothing, points, start, end } = this
 
-    if (points.length < 2) {
-      return points
-    }
+    const len = points.length
+
+    if (len < 2) return this.inputPoints
 
     const results: {
       point: number[]
       gradient: number[]
+      runningLength: number
     }[] = []
 
     let error = 0
     let traveled = 0
     let point: number[]
     let gradient: number[]
-    let short = true
 
     // Get evenly spaced points along the center spline
-    for (let i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i < len - 1; i++) {
       // distance to previous point
       const length = lengths[i]
 
@@ -158,14 +190,7 @@ export class FreehandSpline {
         point = this.getSplinePoint(i + trav / length)
         gradient = vec.uni(this.getSplinePointGradient(i + trav / length))
 
-        if (short && traveled + trav > size / 2) {
-          for (let result of results) {
-            result.gradient = gradient
-          }
-          short = false
-        }
-
-        results.push({ point, gradient })
+        results.push({ point, gradient, runningLength: traveled + trav })
         trav += size / 4
       }
 
@@ -174,19 +199,16 @@ export class FreehandSpline {
     }
 
     // For the last gradient, average the previous three points
-    const lastGradient = results
-      .slice(-3)
-      .reduce(
-        (acc, cur) => (acc ? vec.med(acc, cur.gradient) : cur.gradient),
-        vec.uni(this.getSplinePointGradient(points.length - 1.1))
-      )
-
     results.push({
-      point: this.getSplinePoint(points.length - 1),
-      gradient: lastGradient,
+      point: this.getSplinePoint(len - 1),
+      gradient: results
+        .slice(-3)
+        .reduce(
+          (acc, cur) => (acc ? vec.med(acc, cur.gradient) : cur.gradient),
+          vec.uni(this.getSplinePointGradient(len - 1.1))
+        ),
+      runningLength: this.length,
     })
-
-    // results.push({ ...results[results.length - 1], isSharp: true })
 
     const leftSpline: number[][] = []
     const rightSpline: number[][] = []
@@ -202,11 +224,39 @@ export class FreehandSpline {
     let dpr = 0
     let ldpr = 1
     let rdpr = 1
+    let pressure = 1
+    let pResult = results[0]
 
     const minDist = size * smoothing
 
+    let prevPressure = points
+      .slice(0, 5)
+      .reduce((acc, cur) => (acc + cur.pressure) / 2, points[0].pressure)
+
+    let radius = this.getStrokeRadius(points[len - 1].pressure)
+
     for (let i = 0; i < results.length - 1; i++) {
-      const { point, gradient } = results[i]
+      const { point, gradient, runningLength } = results[i]
+      const pressure = point[2]
+
+      /*
+      Apply tapering
+      If the current length is within the taper distance at either the
+      start or the end, calculate the taper strengths. Apply the smaller 
+      of the two taper strengths to the radius.
+    */
+
+      const ts =
+        runningLength < start.taper
+          ? start.easing(runningLength / start.taper)
+          : 1
+
+      const te =
+        this.length - runningLength < end.taper
+          ? end.easing((this.length - runningLength) / end.taper)
+          : 1
+
+      radius = this.getStrokeRadius(pressure) * Math.min(ts, te)
 
       // Sharp corners
 
@@ -215,99 +265,70 @@ export class FreehandSpline {
       if (i > 0 && dpr < 0) {
         const { gradient: pg } = results[i - 1]
 
-        const v = vec.mul(vec.per(pg), this.getStrokeRadius(point[2]))
-        const l1 = vec.add(point, v)
-        const r1 = vec.sub(point, v)
-
-        if (l0) {
-          plu = vec.uni(vec.vec(l0, l1))
-        }
-
-        if (r0) {
-          plu = vec.uni(vec.vec(r0, r1))
-        }
+        const v = vec.mul(vec.per(pg), radius)
+        const l1 = vec.sub(point, v)
+        const r1 = vec.add(point, v)
 
         for (let t = 0; t <= 1; t += 0.25) {
           const r = Math.PI * t
-          tl = vec.rotAround(l1, point, r, r)
-          tr = vec.rotAround(r1, point, -r, -r)
+          tr = vec.rotAround(r1, point, r, r)
+          tl = vec.rotAround(l1, point, -r, -r)
           leftSpline.push(tl)
           rightSpline.push(tr)
         }
 
         l0 = tl
+        r0 = tr
         continue
       }
 
       // Regular points
-      const r = vec.mul(vec.per(gradient), this.getStrokeRadius(point[2]))
 
       let addLeft = false
       let addRight = false
 
-      tl = vec.add(point, r)
-      tr = vec.sub(point, r)
+      const offset = vec.mul(vec.per(gradient), radius)
 
-      if (!l0 || i === results.length - 1) {
+      tl = vec.sub(point, offset)
+      tr = vec.add(point, offset)
+
+      if (!l0 || vec.dist(l0, tl) > minDist) {
         addLeft = true
-      } else {
-        tlu = vec.uni(vec.vec(l0, tl))
-        if (!plu) {
-          plu = tlu
-        } else {
-          ldpr = vec.dpr(tlu, gradient)
-          if (ldpr > 0 && vec.dist(l0, tl) > minDist) {
-            addLeft = true
-          }
-        }
       }
 
-      if (!r0 || i === results.length - 1) {
+      if (!r0 || vec.dist(r0, tr) > minDist) {
         addRight = true
-      } else {
-        tru = vec.uni(vec.vec(r0, tr))
-        if (!pru) {
-          pru = tru
-        } else {
-          rdpr = vec.dpr(tru, gradient)
-          if (rdpr > 0 && vec.dist(r0, tr) > minDist) {
-            addRight = true
-          }
-        }
       }
 
       if (addLeft) {
         leftSpline.push(tl)
         l0 = tl
-        plu = tlu
       }
 
       if (addRight) {
         rightSpline.push(tr)
         r0 = tr
-        pru = tru
+      }
+
+      if (addLeft || addRight) {
+        pResult = results[i]
       }
     }
 
-    // Draw start cap
+    // // Draw start cap
     const startCap: number[][] = []
 
-    r0 = rightSpline[0]
-    tl = results[0].point
+    // r0 = rightSpline[0]
+    // tl = results[0].point
 
-    for (let t = 0; t <= 1; t += 0.25) {
-      const r = Math.PI * t
-      startCap.push(vec.rotAround(r0, tl, r, r))
-    }
+    // for (let t = 0; t <= 1; t += 0.25) {
+    //   const r = Math.PI * t
+    //   startCap.push(vec.rotAround(r0, tl, r, r))
+    // }
 
-    // Draw end cap
+    // // Draw end cap
 
     const endCap: number[][] = []
-
-    // l0 = leftSpline[leftSpline.length - 1]
-    // r0 = rightSpline[rightSpline.length - 1]
-
-    // endCap.push(points[points.length - 1])
 
     // tl = this.getSplinePoint(points.length - 1)
     // l0 = vec.add(
@@ -317,17 +338,13 @@ export class FreehandSpline {
     //     this.getStrokeRadius(tl[2])
     //   )
     // )
-    // // const endCapDist = vec.dist(l0, r0)
 
     // for (let t = 0; t <= 1; t += 0.25) {
     //   const r = Math.PI * t
     //   endCap.push(vec.rotAround(l0, tl, r, r))
     // }
 
-    // Reverse the right spline
-    rightSpline.reverse()
-
-    return [...startCap, ...leftSpline, ...endCap, ...rightSpline]
+    return startCap.concat(leftSpline, endCap, rightSpline.reverse())
   }
 
   getSplinePoint(index: number): number[] {
@@ -362,20 +379,20 @@ export class FreehandSpline {
 
     return [
       0.5 *
-        (points[p0][0] * q1 +
-          points[p1][0] * q2 +
-          points[p2][0] * q3 +
-          points[p3][0] * q4),
+        (points[p0].point[0] * q1 +
+          points[p1].point[0] * q2 +
+          points[p2].point[0] * q3 +
+          points[p3].point[0] * q4),
       0.5 *
-        (points[p0][1] * q1 +
-          points[p1][1] * q2 +
-          points[p2][1] * q3 +
-          points[p3][1] * q4),
+        (points[p0].point[1] * q1 +
+          points[p1].point[1] * q2 +
+          points[p2].point[1] * q3 +
+          points[p3].point[1] * q4),
       0.5 *
-        (points[p0][2] * q1 +
-          points[p1][2] * q2 +
-          points[p2][2] * q3 +
-          points[p3][2] * q4),
+        (points[p0].pressure * q1 +
+          points[p1].pressure * q2 +
+          points[p2].pressure * q3 +
+          points[p3].pressure * q4),
     ]
   }
 
@@ -410,20 +427,20 @@ export class FreehandSpline {
 
     return [
       0.5 *
-        (points[p0][0] * q1 +
-          points[p1][0] * q2 +
-          points[p2][0] * q3 +
-          points[p3][0] * q4),
+        (points[p0].point[0] * q1 +
+          points[p1].point[0] * q2 +
+          points[p2].point[0] * q3 +
+          points[p3].point[0] * q4),
       0.5 *
-        (points[p0][1] * q1 +
-          points[p1][1] * q2 +
-          points[p2][1] * q3 +
-          points[p3][1] * q4),
+        (points[p0].point[1] * q1 +
+          points[p1].point[1] * q2 +
+          points[p2].point[1] * q3 +
+          points[p3].point[1] * q4),
       0.5 *
-        (points[p0][2] * q1 +
-          points[p1][2] * q2 +
-          points[p2][2] * q3 +
-          points[p3][2] * q4),
+        (points[p0].pressure * q1 +
+          points[p1].pressure * q2 +
+          points[p2].pressure * q3 +
+          points[p3].pressure * q4),
     ]
   }
 

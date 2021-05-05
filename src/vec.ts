@@ -3,7 +3,7 @@
  * @param A
  */
 export function neg(A: number[]) {
-  return [-A[0], -A[1]]
+  return [-A[0], -A[1], A[2] || 1]
 }
 
 /**
@@ -12,7 +12,11 @@ export function neg(A: number[]) {
  * @param B
  */
 export function add(A: number[], B: number[]) {
-  return [A[0] + B[0], A[1] + B[1]]
+  if (A[2] !== undefined) {
+    return [A[0] + B[0], A[1] + B[1], A[2] + B[2]]
+  } else {
+    return [A[0] + B[0], A[1] + B[1]]
+  }
 }
 
 /**
@@ -21,7 +25,11 @@ export function add(A: number[], B: number[]) {
  * @param B
  */
 export function sub(A: number[], B: number[]) {
-  return [A[0] - B[0], A[1] - B[1]]
+  if (A[2] !== undefined) {
+    return [A[0] - B[0], A[1] - B[1], A[2] - B[2]]
+  } else {
+    return [A[0] - B[0], A[1] - B[1]]
+  }
 }
 
 /**
@@ -31,7 +39,7 @@ export function sub(A: number[], B: number[]) {
  */
 export function vec(A: number[], B: number[]) {
   // A, B as vectors get the vector from A to B
-  return [B[0] - A[0], B[1] - A[1]]
+  return sub(B, A)
 }
 
 /**
@@ -40,7 +48,11 @@ export function vec(A: number[], B: number[]) {
  * @param n
  */
 export function mul(A: number[], n: number) {
-  return [A[0] * n, A[1] * n]
+  if (A[2] !== undefined) {
+    return [A[0] * n, A[1] * n, A[2] * n]
+  } else {
+    return [A[0] * n, A[1] * n]
+  }
 }
 
 /**
@@ -49,7 +61,11 @@ export function mul(A: number[], n: number) {
  * @param n
  */
 export function div(A: number[], n: number) {
-  return [A[0] / n, A[1] / n]
+  if (A[2] !== undefined) {
+    return [A[0] / n, A[1] / n, A[2] / n]
+  } else {
+    return [A[0] / n, A[1] / n]
+  }
 }
 
 /**
@@ -57,7 +73,7 @@ export function div(A: number[], n: number) {
  * @param A
  */
 export function per(A: number[]) {
-  return [A[1], -A[0]]
+  return [A[1], -A[0], A[2]]
 }
 
 /**
@@ -127,7 +143,7 @@ export function rotAround(A: number[], C: number[], rx: number, ry: number) {
   const nx = px * c - py * s
   const ny = px * s + py * c
 
-  return [nx + C[0], ny + C[1]]
+  return [nx + C[0], ny + C[1], A[2]]
 }
 
 /**
@@ -138,4 +154,8 @@ export function rotAround(A: number[], C: number[], rx: number, ry: number) {
  */
 export function lrp(A: number[], B: number[], t: number) {
   return add(A, mul(vec(A, B), t))
+}
+
+export function isEqual(A: number[], B: number[]) {
+  return A[0] === B[0] && A[1] === B[1]
 }

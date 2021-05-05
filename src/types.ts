@@ -13,13 +13,13 @@ export interface StrokeOptions {
     taper?: number
     easing?: (distance: number) => number
   }
-  last?: boolean
+  isComplete?: boolean
 }
 
-export interface StrokePoint {
+export interface SplinePoint {
   point: number[]
   pressure: number
   vector: number[]
-  distance: number
+  length: number
   runningLength: number
 }
