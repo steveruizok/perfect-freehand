@@ -55,6 +55,10 @@ function updatePointer(e: PointerEvent | React.PointerEvent<HTMLDivElement>) {
   return true
 }
 
+function handleTouchMove(e: TouchEvent | React.TouchEvent<HTMLDivElement>) {
+  e.preventDefault()
+}
+
 function handlePointerMove(
   e: PointerEvent | React.PointerEvent<HTMLDivElement>
 ) {
