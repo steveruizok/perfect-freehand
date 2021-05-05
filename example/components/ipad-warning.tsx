@@ -9,8 +9,8 @@ export default function PenMode() {
   const [visible, setVisible] = useState(true)
 
   if (
-    visible &&
-    penMode &&
+    !visible ||
+    !penMode ||
     ['iPad Simulator', 'iPad'].includes(navigator.platform)
   ) {
     return null
