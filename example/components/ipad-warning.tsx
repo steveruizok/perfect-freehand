@@ -8,20 +8,14 @@ export default function PenMode() {
   const penMode = useSelector(state => state.data.settings.penMode)
   const [visible, setVisible] = useState(true)
 
-  if (
-    !(
-      visible &&
-      penMode &&
-      ['iPad Simulator', 'iPad'].includes(navigator.platform)
-    )
-  ) {
+  if (!(visible && penMode && isIpadOS())) {
     return null
   }
 
   return (
     <Container onPointerDown={e => e.preventDefault()}>
       <Alert>
-        Using an iPad pencil?&nbsp;
+        {navigator.platform} Using an iPad pencil?&nbsp;
         <a
           href="https://discussions.apple.com/thread/251808014"
           rel="nofollow"
@@ -58,3 +52,11 @@ const Alert = styled.div`
   justify-content: center;
   overflow: visible;
 `
+
+function isIpadOS() {
+  return (
+    navigator.maxTouchPoints &&
+    navigator.maxTouchPoints > 2 &&
+    /MacIntel/.test(navigator.platform)
+  )
+}

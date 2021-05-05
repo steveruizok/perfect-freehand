@@ -8,9 +8,11 @@ import useLocalData from '../hooks/useLocalData'
 import useDarkMode from '../hooks/useDarkMode'
 import useSvgResizer from 'hooks/useSvgResizer'
 import PenMode from 'components/pen-mode'
-import IPadWarning from 'components/ipad-warning'
 import MarkPath from 'components/mark-path'
 import PressureIndicator from 'components/pressure-indicator'
+const IPadWarning = dynamic(() => import('components/ipad-warning'), {
+  ssr: false,
+})
 const Controls = dynamic(() => import('../components/controls'), { ssr: false })
 const Toolbar = dynamic(() => import('../components/toolbar'), { ssr: false })
 
