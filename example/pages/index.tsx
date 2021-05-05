@@ -9,6 +9,7 @@ import useDarkMode from '../hooks/useDarkMode'
 import useSvgResizer from 'hooks/useSvgResizer'
 import PenMode from 'components/pen-mode'
 import IPadWarning from 'components/ipad-warning'
+import MarkPath from 'components/mark-path'
 import PressureIndicator from 'components/pressure-indicator'
 const Controls = dynamic(() => import('../components/controls'), { ssr: false })
 const Toolbar = dynamic(() => import('../components/toolbar'), { ssr: false })
@@ -72,22 +73,15 @@ export default function Home() {
             id="drawable-svg"
             pointerEvents="none"
           >
-            <g strokeWidth={showTrace ? 2 : 0}>
+            <g
+              strokeWidth={showTrace ? 2 : 0}
+              stroke={darkMode ? '#fff' : '#000'}
+              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+            >
               {marks.map((mark, i) => (
-                <path
-                  key={i}
-                  d={mark.path}
-                  stroke={darkMode ? '#fff' : '#000'}
-                  fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-                />
+                <MarkPath key={mark.id} mark={mark} />
               ))}
-              {currentMark && (
-                <path
-                  d={currentMark.path}
-                  stroke={darkMode ? '#fff' : '#000'}
-                  fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
-                />
-              )}
+              {currentMark && <MarkPath mark={currentMark} />}
               <PressureIndicator />
             </g>
           </SVGCanvas>

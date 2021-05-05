@@ -1,4 +1,5 @@
 export interface Mark {
+  id: string
   simulatePressure: boolean
   points: {
     x: number

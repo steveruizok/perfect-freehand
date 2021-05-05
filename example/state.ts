@@ -1,4 +1,5 @@
 import { createState, createSelectorHook } from '@state-designer/react'
+import { v4 as uuid } from 'uuid'
 import { getPointer } from './hooks/useEvents'
 import { Mark, ClipboardMessage } from './types'
 import getStroke from 'perfect-freehand'
@@ -52,20 +53,13 @@ function getFlatSvgPathFromStroke(stroke: number[][]) {
   return d.join(' ')
 }
 
-const easings = {
-  linear: (t: number) => t,
-  easeIn: (t: number) => t * t,
-  easeOut: (t: number) => t * (2 - t),
-  easeInOut: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-}
-
 function getStrokePath(
-  points: Mark['points'],
+  mark: Mark,
   simulatePressure: boolean,
   options: AppOptions,
   last: boolean
 ) {
-  const stroke = getStroke(points, {
+  const stroke = getStroke(mark.points, {
     ...options,
     easing: options.easing.evaluate,
     simulatePressure,
@@ -80,9 +74,11 @@ function getStrokePath(
     last,
   })
 
-  return options.clip
+  const path = options.clip
     ? getFlatSvgPathFromStroke(stroke)
     : getSvgPathFromStroke(stroke)
+
+  return path
 }
 
 interface Easing {
@@ -298,7 +294,7 @@ const state = createState({
 
       data.marks = marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, mark.simulatePressure, alg, true),
+        path: getStrokePath(mark, mark.simulatePressure, alg, true),
       }))
 
       data.settings = {
@@ -324,10 +320,13 @@ const state = createState({
       }
 
       data.currentMark = {
+        id: uuid(),
         simulatePressure: true,
         points: [point],
-        path: getStrokePath([point], true, alg, false),
+        path: '',
       }
+
+      data.currentMark.path = getStrokePath(data.currentMark, true, alg, false)
     },
     addPointToMark(data) {
       const { x, y, p } = getPointer()
@@ -344,7 +343,7 @@ const state = createState({
       })
 
       currentMark!.path = getStrokePath(
-        currentMark!.points,
+        currentMark!,
         currentMark!.simulatePressure,
         alg,
         false
@@ -358,7 +357,7 @@ const state = createState({
       data.marks.push({
         ...currentMark,
         path: getStrokePath(
-          currentMark!.points,
+          currentMark!,
           currentMark!.simulatePressure,
           alg,
           true
@@ -375,7 +374,8 @@ const state = createState({
       const { alg } = data
       data.marks = payload.marks.map(mark => ({
         ...mark,
-        path: getStrokePath(mark.points, mark.simulatePressure, alg, true),
+        id: uuid(),
+        path: getStrokePath(mark, mark.simulatePressure, alg, true),
       }))
     },
     undoMark(data) {
@@ -411,12 +411,12 @@ const state = createState({
     updatePaths(data) {
       const { currentMark, alg, marks } = data
       for (let mark of marks) {
-        mark.path = getStrokePath(mark.points, mark.simulatePressure, alg, true)
+        mark.path = getStrokePath(mark, mark.simulatePressure, alg, true)
       }
 
       if (currentMark) {
         currentMark.path = getStrokePath(
-          currentMark.points,
+          currentMark,
           currentMark.simulatePressure,
           alg,
           false
