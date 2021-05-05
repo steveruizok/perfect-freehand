@@ -133,9 +133,9 @@ export function med(A: number[], B: number[]) {
  * @param C center
  * @param r rotation in radians
  */
-export function rotAround(A: number[], C: number[], rx: number, ry: number) {
-  const s = Math.sin(rx)
-  const c = Math.cos(ry)
+export function rotAround(A: number[], C: number[], r: number) {
+  const s = Math.sin(r)
+  const c = Math.cos(r)
 
   const px = A[0] - C[0]
   const py = A[1] - C[1]

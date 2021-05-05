@@ -23,3 +23,10 @@ export interface SplinePoint {
   length: number
   runningLength: number
 }
+
+export interface SpacedPoint {
+  point: number[]
+  pressure: number
+  gradient: number[]
+  runningLength: number
+}

@@ -25,9 +25,12 @@ function getSvgPathFromStroke(stroke: number[][]) {
     p1 = stroke[i]
   }
 
-  for (let point of stroke) {
-    d.push(svg.dot(point, 1))
-  }
+  p1 = stroke[0]
+  d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
+
+  // for (let point of stroke) {
+  //   d.push(svg.dot(point, 1))
+  // }
 
   d.push('Z')
 
