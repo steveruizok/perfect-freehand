@@ -31,7 +31,7 @@ yarn add perfect-freehand
 This package's default export is a function that:
 
 - accepts an array of points and an (optional) options object
-- returns a stroke as an array of points formatted as `[x, y]`
+- returns a stroke outline as an array of points formatted as `[x, y]`
 
 ```js
 import getStroke from 'perfect-freehand'
@@ -67,7 +67,7 @@ The options object is optional, as are each of its properties.
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
 | `start`            | function | t => t  | Tapering options for the start of the line.           |
 | `end`              | { }      |         | Tapering options for the end of the line.             |
-| `last`             | boolean  | false   | Whether the stroke is complete.                       |
+| `last`             | boolean  | true   | Whether the stroke is complete.                       |
 
 The `start` and `end` options accept an object:
 
@@ -104,37 +104,54 @@ getStroke(myPoints, {
 
 ### Rendering
 
-While `getStroke` returns an array of points representing a stroke, it's up to you to decide how you will render the stroke. The library does not export any rendering solutions.
+While `getStroke` returns an array of points representing the outline of a stroke, it's up to you to decide how you will render these points.
 
-For example, the function below will turn a stroke into SVG path data for use with either [SVG paths](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d) or HTML Canvas (using the [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths)).
+The function below will turn the points returned by `getStroke` into SVG path data.
 
 ```js
-// Create SVG path data using the points from perfect-freehand.
-function getSvgPathFromStroke(points) {
-  const d = []
+function getSvgPathFromStroke(stroke) {
+  if (!stroke.length) return ""
 
-  if (stroke.length < 3) {
-    return ''
-  }
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length]
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
+      return acc
+    },
+    ["M", ...stroke[0], "Q"]
+  )
 
-  let p0 = stroke[stroke.length - 3]
-  let p1 = stroke[stroke.length - 2]
-
-  d.push('M', p0[0], p0[1], 'Q')
-
-  for (let i = 0; i < stroke.length; i++) {
-    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
-    p0 = p1
-    p1 = stroke[i]
-  }
-
-  d.push('Z')
-
-  return d.join(' ')
+  d.push("Z")
+  return d.join(" ")
 }
 ```
 
-To render a stroke as a flat polygon, add the [`polygon-clipping`](https://github.com/mfogel/polygon-clipping) package and use the following function together with the `getSvgPathFromStroke`.
+To use this function, first use perfect-freehand to turn your input points into a stroke outline, then pass the result to `getSvgPathFromStroke`.
+
+```js
+import getStroke from "perfect-freehand"
+
+const myStroke = getStroke(myInputPoints)
+
+const pathData = getSvgPathFromStroke(myStroke)
+```
+
+You could then pass this string either to an [SVG path](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d) element:
+
+```jsx
+<path d={pathData}/>
+```
+
+Or, if you are rendering with HTML Canvas, you can pass the result to a [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths)).
+
+```js
+const myPath = new Path2D(pathData)
+ctx.fill(myPath)
+```
+
+### Flattening
+
+To render a stroke as a "flattened" polygon, add the [`polygon-clipping`](https://github.com/mfogel/polygon-clipping) package and use the following function together with the `getSvgPathFromStroke`.
 
 ```js
 import polygonClipping from 'polygon-clipping'
@@ -159,28 +176,22 @@ function getFlatSvgPathFromStroke(stroke) {
 ### Example
 
 ```jsx
-import * as React from 'react'
-import getStroke from 'perfect-freehand'
-import { getSvgPathFromStroke } from './utils'
+import * as React from "react"
+import getStroke from "perfect-freehand"
+import { getSvgPathFromStroke } from "./utils"
 
 export default function Example() {
-  const [currentMark, setCurrentMark] = React.useState()
+  const [points, setPoints] = React.useState()
 
   function handlePointerDown(e) {
     e.preventDefault()
-    setCurrentMark({
-      type: e.pointerType,
-      points: [[e.pageX, e.pageY, e.pressure]],
-    })
+    setPoints([[e.pageX, e.pageY, e.pressure]])
   }
 
   function handlePointerMove(e) {
-    e.preventDefault()
     if (e.buttons === 1) {
-      setCurrentMark({
-        ...currentMark,
-        points: [...currentMark.points, [e.pageX, e.pageY, e.pressure]],
-      })
+      e.preventDefault()
+      setPoints([...points, [e.pageX, e.pageY, e.pressure]])
     }
   }
 
@@ -188,17 +199,16 @@ export default function Example() {
     <svg
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: "none" }}
     >
-      {currentMark && (
+      {points && (
         <path
           d={getSvgPathFromStroke(
-            getStroke(currentMark.points, {
+            getStroke(points, {
               size: 24,
-              thinning: 0.75,
+              thinning: 0.5,
               smoothing: 0.5,
-              streamline: 0.5,
-              simulatePressure: currentMark.type !== 'pen',
+              streamline: 0.5
             })
           )}
         />
