@@ -78,6 +78,23 @@ export function len(A: number[]) {
 }
 
 /**
+ * Length of the vector squared
+ * @param A
+ */
+export function len2(A: number[]) {
+  return A[0] * A[0] + A[1] * A[1]
+}
+
+/**
+ * Dist length from A to B squared.
+ * @param A
+ * @param B
+ */
+export function dist2(A: number[], B: number[]) {
+  return len2(sub(A, B))
+}
+
+/**
  * Get normalized / unit vector.
  * @param A
  */

@@ -24,6 +24,7 @@ export function getStrokePoints<
   }
 
   const pts = toPointsArray(points)
+
   const len = pts.length
 
   if (len === 0) return []
@@ -74,10 +75,8 @@ export function getStrokePoints<
 
   for (let i = len - 2; i > 1; i--) {
     const { runningLength, vector } = strokePoints[i]
-    if (
-      totalLength - runningLength > size / 2 ||
-      vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector) < 0.8
-    ) {
+    const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
+    if (totalLength - runningLength > size / 2 || dpr < 0.8) {
       for (let j = i; j < len; j++) {
         strokePoints[j].vector = vector
       }
@@ -260,14 +259,17 @@ export function getStrokeOutlinePoints(
     tr = vec.add(point, offset)
 
     const alwaysAdd = i === 1 || dpr < 0.25
-    const minDistance = (runningLength > size ? size : size / 2) * smoothing
+    const minDistance = Math.pow(
+      (runningLength > size ? size : size / 2) * smoothing,
+      2
+    )
 
-    if (alwaysAdd || vec.dist(pl, tl) > minDistance) {
+    if (alwaysAdd || vec.dist2(pl, tl) > minDistance) {
       leftPts.push(vec.lrp(pl, tl, streamline))
       pl = tl
     }
 
-    if (alwaysAdd || vec.dist(pr, tr) > minDistance) {
+    if (alwaysAdd || vec.dist2(pr, tr) > minDistance) {
       rightPts.push(vec.lrp(pr, tr, streamline))
       pr = tr
     }
