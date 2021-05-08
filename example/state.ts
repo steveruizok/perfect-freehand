@@ -2,33 +2,40 @@ import { createState, createSelectorHook } from '@state-designer/react'
 import { v4 as uuid } from 'uuid'
 import { getPointer } from './hooks/useEvents'
 import { Mark, ClipboardMessage } from './types'
-import getStroke from 'perfect-freehand'
+import getStroke, { Segment } from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
 import { bezier } from '@leva-ui/plugin-bezier'
 import * as svg from 'svg'
 import * as vec from 'vec'
 
-function getSvgPathFromStroke(stroke: number[][]) {
+function getSvgPathFromStroke(stroke: Segment[]) {
   const d = []
 
-  if (stroke.length < 3) {
+  const globSroke = svg.getGlobStroke(stroke)
+
+  if (globSroke.length < 3) {
     return ''
   }
 
-  let p0 = stroke[stroke.length - 3]
-  let p1 = stroke[stroke.length - 2]
+  let p0 = globSroke[0]
+  let p1 = globSroke[1]
 
   d.push('M', p0[0], p0[1], 'Q')
 
-  for (let i = 0; i < stroke.length; i++) {
+  for (let i = 0; i < globSroke.length; i++) {
     d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
     p0 = p1
-    p1 = stroke[i]
+    p1 = globSroke[i]
   }
 
   d.push('Z')
 
+  // for (let segment of stroke) {
+  //   if (segment.isSharp) {
+  //     d.push(svg.dot(segment.point, segment.radius))
+  //   }
+  // }
   // d.length = 0
 
   // for (let i = 0; i < stroke.length; i++) {
@@ -39,21 +46,7 @@ function getSvgPathFromStroke(stroke: number[][]) {
   return d.join(' ')
 }
 
-function getFlatSvgPathFromStroke(stroke: number[][]) {
-  const poly = polygonClipping.union([stroke] as any)
-
-  const d = []
-
-  for (let face of poly) {
-    for (let points of face) {
-      d.push(getSvgPathFromStroke(points))
-    }
-  }
-
-  return d.join(' ')
-}
-
-function getStrokePath(
+export function getStrokePath(
   mark: Mark,
   simulatePressure: boolean,
   options: AppOptions,
@@ -74,9 +67,7 @@ function getStrokePath(
     last,
   })
 
-  const path = options.clip
-    ? getFlatSvgPathFromStroke(stroke)
-    : getSvgPathFromStroke(stroke)
+  const path = getSvgPathFromStroke(stroke)
 
   return path
 }

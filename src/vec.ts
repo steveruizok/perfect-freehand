@@ -95,6 +95,16 @@ export function dist2(A: number[], B: number[]) {
 }
 
 /**
+ * Get the tangent between two vectors.
+ * @param A
+ * @param B
+ * @returns
+ */
+export function tangent(A: number[], B: number[]) {
+  return uni(sub(A, B))
+}
+
+/**
  * Get normalized / unit vector.
  * @param A
  */

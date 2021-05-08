@@ -16,12 +16,31 @@ export function add(A: number[], B: number[]) {
 }
 
 /**
+ * Angle between vector A and vector B in radians
+ * @param A
+ * @param B
+ */
+export function angle(A: number[], B: number[]) {
+  return Math.atan2(B[1] - A[1], B[0] - A[0])
+}
+
+/**
  * Subtract vectors.
  * @param A
  * @param B
  */
 export function sub(A: number[], B: number[]) {
   return [A[0] - B[0], A[1] - B[1]]
+}
+
+/**
+ * Get the tangent between two vectors.
+ * @param A
+ * @param B
+ * @returns
+ */
+export function tangent(A: number[], B: number[]) {
+  return uni(sub(A, B))
 }
 
 /**

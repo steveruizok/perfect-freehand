@@ -4,6 +4,12 @@ import * as vec from './vec'
 
 const { min, PI } = Math
 
+export interface Segment {
+  point: number[]
+  radius: number
+  isSharp: boolean
+}
+
 /**
  * ## getStrokePoints
  * @description Get points for a stroke.
@@ -104,7 +110,7 @@ export function getStrokePoints<
 export function getStrokeOutlinePoints(
   points: StrokePoint[],
   options: Partial<StrokeOptions> = {} as Partial<StrokeOptions>
-): number[][] {
+): Segment[] {
   const {
     size = 8,
     thinning = 0.5,
@@ -139,9 +145,11 @@ export function getStrokeOutlinePoints(
   // The total length of the line
   const totalLength = points[len - 1].runningLength
 
+  const segments: Segment[] = []
+
   // Our collected left and right points
-  const leftPts: number[][] = []
-  const rightPts: number[][] = []
+  // const leftPts: number[][] = []
+  // const rightPts: number[][] = []
 
   // Previous pressure (start with average of first five pressures)
   let prevPressure = points
@@ -225,17 +233,18 @@ export function getStrokeOutlinePoints(
     const dpr = vec.dpr(vector, nextVector)
 
     if (dpr < 0) {
-      const offset = vec.mul(vec.per(prevVector), radius)
-      const la = vec.add(point, offset)
-      const ra = vec.sub(point, offset)
+      segments.push({ point, radius, isSharp: true })
+      // const offset = vec.mul(vec.per(prevVector), radius)
+      // const la = vec.add(point, offset)
+      // const ra = vec.sub(point, offset)
 
-      for (let t = 0.2; t < 1; t += 0.2) {
-        tr = vec.rotAround(la, point, PI * -t)
-        tl = vec.rotAround(ra, point, PI * t)
+      // for (let t = 0.2; t < 1; t += 0.2) {
+      // tr = vec.rotAround(la, point, PI * -t)
+      // tl = vec.rotAround(ra, point, PI * t)
 
-        rightPts.push(tr)
-        leftPts.push(tl)
-      }
+      // rightPts.push(tr)
+      // leftPts.push(tl)
+      // }
 
       pl = tl
       pr = tr
@@ -265,14 +274,20 @@ export function getStrokeOutlinePoints(
     )
 
     if (alwaysAdd || vec.dist2(pl, tl) > minDistance) {
-      leftPts.push(vec.lrp(pl, tl, streamline))
+      segments.push({
+        point,
+        radius,
+        isSharp: false,
+      })
+      // leftPts.push(vec.lrp(pl, tl, streamline))
       pl = tl
-    }
-
-    if (alwaysAdd || vec.dist2(pr, tr) > minDistance) {
-      rightPts.push(vec.lrp(pr, tr, streamline))
       pr = tr
     }
+
+    // if (alwaysAdd || vec.dist2(pr, tr) > minDistance) {
+    //   rightPts.push(vec.lrp(pr, tr, streamline))
+    //   pr = tr
+    // }
 
     // Set variables for next iteration
 
@@ -290,7 +305,7 @@ export function getStrokeOutlinePoints(
 
   const firstPoint = points[0]
   const lastPoint = points[len - 1]
-  const isVeryShort = rightPts.length < 2 || leftPts.length < 2
+  // const isVeryShort = rightPts.length < 2 || leftPts.length < 2
 
   /* 
     Draw a dot for very short or completed strokes
@@ -301,33 +316,38 @@ export function getStrokeOutlinePoints(
     we can just return those points.
   */
 
-  if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
-    let ir = 0
+  // if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
+  //   let ir = 0
 
-    for (let i = 0; i < len; i++) {
-      const { pressure, runningLength } = points[i]
-      if (runningLength > size) {
-        ir = getStrokeRadius(size, thinning, easing, pressure)
-        break
-      }
-    }
+  //   for (let i = 0; i < len; i++) {
+  //     const { pressure, runningLength } = points[i]
+  //     if (runningLength > size) {
+  //       ir = getStrokeRadius(size, thinning, easing, pressure)
+  //       break
+  //     }
+  //   }
 
-    const start = vec.sub(
-      firstPoint.point,
-      vec.mul(
-        vec.per(vec.uni(vec.vec(lastPoint.point, firstPoint.point))),
-        ir || radius
-      )
-    )
+  //   const start = vec.sub(
+  //     firstPoint.point,
+  //     vec.mul(
+  //       vec.per(vec.uni(vec.vec(lastPoint.point, firstPoint.point))),
+  //       ir || radius
+  //     )
+  //   )
 
-    const dotPts: number[][] = []
+  //   const dotPts: number[][] = []
 
-    for (let t = 0, step = 0.1; t <= 1; t += step) {
-      dotPts.push(vec.rotAround(start, firstPoint.point, PI * 2 * t))
-    }
+  //   for (let t = 0, step = 0.1; t <= 1; t += step) {
+  //     dotPts.push(vec.rotAround(start, firstPoint.point, PI * 2 * t))
+  //   }
 
-    return dotPts
-  }
+  //   return [
+  //     {
+  //       point: firstPoint.point,
+  //       radius: ir || radius,
+  //     },
+  //   ]
+  // }
 
   /*
     Draw a start cap
@@ -338,24 +358,30 @@ export function getStrokeOutlinePoints(
     Finally remove the first left and right points. :psyduck:
   */
 
-  const startCap: number[][] = []
+  // const startCap: Segment[] = [
+  //   {
+  //     point: points[0].point,
+  //     radius: 1,
+  //     isSharp: true,
+  //   },
+  // ]
 
-  if (!taperStart && !(taperEnd && isVeryShort)) {
-    tr = rightPts[1]
-    tl = leftPts[1]
+  // if (!taperStart && !(taperEnd && isVeryShort)) {
+  //   tr = rightPts[1]
+  //   tl = leftPts[1]
 
-    const start = vec.sub(
-      firstPoint.point,
-      vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
-    )
+  //   const start = vec.sub(
+  //     firstPoint.point,
+  //     vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
+  //   )
 
-    for (let t = 0, step = 0.2; t <= 1; t += step) {
-      startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
-    }
+  //   for (let t = 0, step = 0.2; t <= 1; t += step) {
+  //     startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+  //   }
 
-    leftPts.shift()
-    rightPts.shift()
-  }
+  //   leftPts.shift()
+  //   rightPts.shift()
+  // }
 
   /*
     Draw an end cap
@@ -367,20 +393,28 @@ export function getStrokeOutlinePoints(
     sharp end turns.
   */
 
-  const endCap: number[][] = []
+  const endCap: Segment[] = [
+    {
+      point: lastPoint.point,
+      radius,
+      isSharp: true,
+    },
+  ]
 
-  if (!taperEnd && !(taperStart && isVeryShort)) {
-    const start = vec.sub(
-      lastPoint.point,
-      vec.mul(vec.per(lastPoint.vector), radius)
-    )
+  // const endCap: number[][] = []
 
-    for (let t = 0, step = 0.1; t <= 1; t += step) {
-      endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
-    }
-  } else {
-    endCap.push(lastPoint.point)
-  }
+  // if (!taperEnd && !(taperStart && isVeryShort)) {
+  //   const start = vec.sub(
+  //     lastPoint.point,
+  //     vec.mul(vec.per(lastPoint.vector), radius)
+  //   )
+
+  //   for (let t = 0, step = 0.1; t <= 1; t += step) {
+  //     endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
+  //   }
+  // } else {
+  //   endCap.push(lastPoint.point)
+  // }
 
   /*
     Return the points in the correct windind order: begin on the left side, then 
@@ -388,7 +422,8 @@ export function getStrokeOutlinePoints(
     complete the start cap.
   */
 
-  return leftPts.concat(endCap, rightPts.reverse(), startCap)
+  return [...segments, ...endCap]
+  // return leftPts.concat(endCap, rightPts.reverse(), startCap)
 }
 
 /**
@@ -408,7 +443,7 @@ export function getStrokeOutlinePoints(
 export default function getStroke<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
+>(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): Segment[] {
   return getStrokeOutlinePoints(getStrokePoints(points, options), options)
 }
 

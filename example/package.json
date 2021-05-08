@@ -12,7 +12,7 @@
     "@state-designer/react": "^1.7.1",
     "leva": "^0.9.9",
     "next": "10.0.7",
-    "perfect-freehand": "latest",
+    "perfect-freehand": "../dist/",
     "polygon-clipping": "^0.15.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
