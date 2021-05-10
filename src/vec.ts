@@ -148,3 +148,14 @@ export function rotAround(A: number[], C: number[], r: number) {
 export function lrp(A: number[], B: number[], t: number) {
   return add(A, mul(vec(A, B), t))
 }
+
+//  isLeft: >0 for counterclockwise
+//          =0 for none (degenerate)
+//          <0 for clockwise
+export function isLeft(p1: number[], pc: number[], p2: number[]) {
+  return (pc[0] - p1[0]) * (p2[1] - p1[1]) - (p2[0] - p1[0]) * (pc[1] - p1[1])
+}
+
+export function clockwise(p1: number[], pc: number[], p2: number[]) {
+  return isLeft(p1, pc, p2) > 0
+}

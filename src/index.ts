@@ -226,12 +226,10 @@ export function getStrokeOutlinePoints(
 
     if (dpr < 0) {
       const offset = vec.mul(vec.per(prevVector), radius)
-      const la = vec.add(point, offset)
-      const ra = vec.sub(point, offset)
 
-      for (let t = 0.2; t < 1; t += 0.2) {
-        tr = vec.rotAround(la, point, PI * -t)
-        tl = vec.rotAround(ra, point, PI * t)
+      for (let t = 0; t < 1; t += 0.2) {
+        tr = vec.rotAround(vec.add(point, offset), point, PI * -t)
+        tl = vec.rotAround(vec.sub(point, offset), point, PI * t)
 
         rightPts.push(tr)
         leftPts.push(tl)
@@ -242,7 +240,6 @@ export function getStrokeOutlinePoints(
 
       continue
     }
-
     /* 
       Add regular points
 
