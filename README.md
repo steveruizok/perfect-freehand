@@ -235,16 +235,18 @@ For advanced usage, the library also exports smaller functions that `getStroke` 
 #### `getStrokePoints`
 
 ```js
+import { strokePoints } from 'perfect-freehand'
 const strokePoints = getStrokePoints(rawInputPoints)
 ```
 
 Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of streamlined points as `[x, y, pressure, angle, distance, lengthAtPoint]`. The path's total length will be the length of the last point in the array.
 
-#### `getStrokeOutlinePoints`
+#### `getOutlinePoints`
 
 Accepts an array of points (formatted as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
 ```js
+import { getOutlinePoints } from 'perfect-freehand'
 const outlinePoints = getOutlinePoints(strokePoints)
 ```
 
