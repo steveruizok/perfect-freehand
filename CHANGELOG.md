@@ -1,3 +1,8 @@
+## 0.4.8
+
+- Fixes bug on start caps.
+- Adds simple test.
+
 ## 0.4.6
 
 - Reduce the effect of streamline by half.

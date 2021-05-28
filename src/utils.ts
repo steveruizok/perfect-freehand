@@ -1,3 +1,5 @@
+import { isEqual, vec } from './vec'
+
 export function lerp(y1: number, y2: number, mu: number) {
   return y1 * (1 - mu) + y2 * mu
 }
@@ -51,4 +53,18 @@ export function getStrokeRadius(
       ? lerp(size, size + size * clamp(thinning, -0.95, -0.05), pressure)
       : lerp(size - size * clamp(thinning, 0.05, 0.95), size, pressure)) / 2
   )
+}
+
+export function withoutDuplicates(pts: number[][]) {
+  const unique: number[][] = []
+
+  let prev: number[] | undefined = undefined
+
+  for (let pt of pts) {
+    if (prev && isEqual(prev, pt)) continue
+    unique.push(pt)
+    prev = pt
+  }
+
+  return pts
 }

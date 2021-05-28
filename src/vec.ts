@@ -159,3 +159,7 @@ export function isLeft(p1: number[], pc: number[], p2: number[]) {
 export function clockwise(p1: number[], pc: number[], p2: number[]) {
   return isLeft(p1, pc, p2) > 0
 }
+
+export function isEqual(a: number[], b: number[]) {
+  return a[0] === b[0] && a[1] === b[1]
+}

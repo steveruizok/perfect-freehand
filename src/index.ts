@@ -339,19 +339,27 @@ export function getStrokeOutlinePoints(
 
   if (!taperStart && !(taperEnd && isVeryShort)) {
     tr = rightPts[1]
-    tl = leftPts[1]
 
-    const start = vec.sub(
-      firstPoint.point,
-      vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
-    )
-
-    for (let t = 0, step = 0.2; t <= 1; t += step) {
-      startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+    for (let i = 1; i < leftPts.length; i++) {
+      if (!vec.isEqual(tr, leftPts[i])) {
+        tl = leftPts[i]
+        break
+      }
     }
 
-    leftPts.shift()
-    rightPts.shift()
+    if (!vec.isEqual(tr, tl)) {
+      const start = vec.sub(
+        firstPoint.point,
+        vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
+      )
+
+      for (let t = 0, step = 0.2; t <= 1; t += step) {
+        startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+      }
+
+      leftPts.shift()
+      rightPts.shift()
+    }
   }
 
   /*
