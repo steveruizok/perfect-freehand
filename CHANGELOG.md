@@ -1,3 +1,7 @@
+## 0.4.9
+
+- Prevents duplicates when parsing points.
+
 ## 0.4.8
 
 - Fixes bug on start caps.

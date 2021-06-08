@@ -46,11 +46,14 @@ export function getStrokePoints<
     i < pts.length;
     i++, curr = pts[i], prev = strokePoints[i - 1]
   ) {
-    const point = vec.lrp(prev.point, curr, 1 - streamline),
-      pressure = curr[2],
-      vector = vec.uni(vec.vec(point, prev.point)),
-      distance = vec.dist(point, prev.point),
-      runningLength = prev.runningLength + distance
+    const point = vec.lrp(prev.point, curr, 1 - streamline)
+
+    if (vec.isEqual(prev.point, point)) continue
+
+    const pressure = curr[2]
+    const vector = vec.uni(vec.vec(point, prev.point))
+    const distance = vec.dist(point, prev.point)
+    const runningLength = prev.runningLength + distance
 
     strokePoints.push({
       point,
