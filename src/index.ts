@@ -42,13 +42,13 @@ export function getStrokePoints<
   ]
 
   for (
-    let i = 1, curr = pts[i], prev = strokePoints[0];
+    let i = 1, j = 0, curr = pts[i], prev = strokePoints[j];
     i < pts.length;
-    i++, curr = pts[i], prev = strokePoints[i - 1]
+    i++, curr = pts[i], prev = strokePoints[j]
   ) {
     const point = vec.lrp(prev.point, curr, 1 - streamline)
 
-    if (vec.isEqual(prev.point, point)) continue
+    if (vec.isEqual(prev.point, point)) continue;
 
     const pressure = curr[2]
     const vector = vec.uni(vec.vec(point, prev.point))
@@ -61,7 +61,8 @@ export function getStrokePoints<
       vector,
       distance,
       runningLength,
-    })
+    });
+    j += 1; // only increment j if we add an item to strokePoints
   }
 
   /* 
