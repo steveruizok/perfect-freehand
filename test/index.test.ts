@@ -1,4 +1,4 @@
-import getStroke from '../src'
+import getStroke, { getStrokePoints } from '../src'
 
 const points = [
   [-0.20210597826090293, 0.08050271739131176],
@@ -152,5 +152,38 @@ describe('The algorithm.', () => {
 
   it('Succeeds on tricky points', () => {
     expect(JSON.stringify(getStroke(points)).includes('null')).toBeFalsy()
+  })
+
+  it('Removes any duplicates', () => {
+    const pointsWithDuplicates = [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [10, 10],
+      [10, 10],
+      [10, 10],
+      [10, 10],
+      [10, 10],
+      [100, 100],
+      [100, 100],
+      [100, 100],
+      [100, 100],
+      [100, 100],
+      [100, 100],
+      [0, 0],
+      [0, 0],
+    ]
+
+    const strokePoints = getStrokePoints(pointsWithDuplicates)
+
+    expect(getStroke(pointsWithDuplicates)).toMatchSnapshot(
+      'stroke with duplicates removed'
+    )
+
+    expect(strokePoints).toMatchSnapshot(
+      'stroke-points with duplicates removed'
+    )
   })
 })
