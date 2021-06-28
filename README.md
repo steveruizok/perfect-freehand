@@ -2,9 +2,8 @@
 
 Draw perfect pressure-sensitive freehand strokes.
 
-🔗 [Demo](https://perfect-freehand-example.vercel.app/)
-
-💰 Using this library in a commercial product? [Let me know!](mailto:steveruizok+perfectfreehand@gmail.com)
+🔗 Try out a [demo](https://perfect-freehand-example.vercel.app/).
+💰 Using this library in a commercial product? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok).
 
 ## Table of Contents
 
