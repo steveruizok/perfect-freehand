@@ -14,7 +14,7 @@ const { min, PI } = Math
 export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options: StrokeOptions): StrokePoint[] {
+>(points: (T | K)[], options = {} as StrokeOptions): StrokePoint[] {
   let { simulatePressure = true, streamline = 0.5, size = 8 } = options
 
   streamline /= 2
