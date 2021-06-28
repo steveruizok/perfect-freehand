@@ -44,7 +44,6 @@ const DarkTheme = {
 export default function Controls() {
   const darkMode = useSelector(state => state.data.settings.darkMode)
   const options = useSelector(state => state.data.alg)
-  const settings = useSelector(state => state.data.settings)
 
   const [, set] = useControls(() => ({
     clipPath: {
@@ -168,7 +167,7 @@ export default function Controls() {
       <Leva
         flat={true}
         fill={true}
-        collapsed={true}
+        collapsed={false}
         theme={darkMode ? DarkTheme : LightTheme}
       />
     </StyledControls>

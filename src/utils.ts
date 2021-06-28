@@ -1,4 +1,4 @@
-import { isEqual, vec } from './vec'
+import { isEqual } from './vec'
 
 export function lerp(y1: number, y2: number, mu: number) {
   return y1 * (1 - mu) + y2 * mu
