@@ -65,7 +65,7 @@ The options object is optional, as are each of its properties.
 | `streamline`       | number   | .5      | How much to streamline the stroke.                    |
 | `simulatePressure` | boolean  | true    | Whether to simulate pressure based on velocity.       |
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
-| `start`            | function | t => t  | Tapering options for the start of the line.           |
+| `start`            | { }      |         | Tapering options for the start of the line.           |
 | `end`              | { }      |         | Tapering options for the end of the line.             |
 | `last`             | boolean  | true   | Whether the stroke is complete.                       |
 
@@ -74,7 +74,7 @@ The `start` and `end` options accept an object:
 | Property | Type     | Default | Description                                 |
 | -------- | -------- | ------- | ------------------------------------------- |
 | `taper`  | boolean  | 0       | The distance to taper.                      |
-| `easing` | function | t =>    | An easing function for the tapering effect. |
+| `easing` | function | t => t  | An easing function for the tapering effect. |
 
 When `taper` is zero for either start or end, the library will add a rounded cap at that end of the line.
 
