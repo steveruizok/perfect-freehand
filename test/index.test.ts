@@ -186,4 +186,19 @@ describe('The algorithm.', () => {
       'stroke-points with duplicates removed'
     )
   })
+
+  it('Solves a stroke with only one point.', () => {
+    const stroke = getStroke([[1, 1, 0]], {
+      size: 1,
+      thinning: 0.6,
+      smoothing: 0.5,
+      streamline: 0.5,
+      simulatePressure: true,
+      last: false,
+    })
+
+    expect(stroke).toMatchSnapshot()
+
+    expect(Number.isNaN([0][0])).toBe(false)
+  })
 })
