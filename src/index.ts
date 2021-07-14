@@ -15,7 +15,12 @@ export function getStrokePoints<
   T extends number[],
   K extends { x: number; y: number; pressure?: number }
 >(points: (T | K)[], options = {} as StrokeOptions): StrokePoint[] {
-  let { simulatePressure = true, streamline = 0.5, size = 8 } = options
+  let {
+    simulatePressure = true,
+    streamline = 0.5,
+    size = 8,
+    last = false,
+  } = options
 
   streamline /= 2
 
@@ -25,11 +30,9 @@ export function getStrokePoints<
 
   const pts = toPointsArray(points)
 
-  let len = pts.length
+  if (pts.length === 0) return []
 
-  if (len === 0) return []
-
-  if (len === 1) pts.push(vec.add(pts[0], [1, 0]))
+  if (pts.length === 1) pts.push([...vec.add(pts[0], [1, 1]), pts[0][2]])
 
   const strokePoints: StrokePoint[] = [
     {
@@ -43,7 +46,7 @@ export function getStrokePoints<
 
   for (
     let i = 1, j = 0, curr = pts[i], prev = strokePoints[j];
-    i < len;
+    i < pts.length;
     i++, curr = pts[i], prev = strokePoints[j]
   ) {
     const point = vec.lrp(prev.point, curr, 1 - streamline)
@@ -52,22 +55,25 @@ export function getStrokePoints<
 
     const pressure = curr[2]
     const vector = vec.uni(vec.vec(point, prev.point))
+
     const distance = vec.dist(point, prev.point)
     const runningLength = prev.runningLength + distance
 
-    strokePoints.push({
+    const strokePoint = {
       point,
       pressure,
       vector,
       distance,
       runningLength,
-    })
+    }
+
+    strokePoints.push(strokePoint)
 
     j += 1 // only increment j if we add an item to strokePoints
   }
 
   /* 
-    Align vectors at the end of the line
+    Align vectors at the end of the line (when last is true)
 
     Starting from the last point, work back until we've traveled more than
     half of the line's size (width). Take the current point's vector and then
@@ -76,19 +82,20 @@ export function getStrokePoints<
     end cap.
   */
 
-  // Update the length to the length of the strokePoints array.
-  len = strokePoints.length
+  if (last) {
+    const len = strokePoints.length
 
-  const totalLength = strokePoints[len - 1].runningLength
+    const totalLength = strokePoints[len - 1].runningLength
 
-  for (let i = len - 2; i > 1; i--) {
-    const { runningLength, vector } = strokePoints[i]
-    const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
-    if (totalLength - runningLength > size / 2 || dpr < 0.8) {
-      for (let j = i; j < len; j++) {
-        strokePoints[j].vector = vector
+    for (let i = len - 2; i > 1; i--) {
+      const { runningLength, vector } = strokePoints[i]
+      const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
+      if (totalLength - runningLength > size / 2 || dpr < 0.8) {
+        for (let j = i; j < len; j++) {
+          strokePoints[j].vector = vector
+        }
+        break
       }
-      break
     }
   }
 
