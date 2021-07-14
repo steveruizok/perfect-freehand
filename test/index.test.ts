@@ -187,23 +187,15 @@ describe('The algorithm.', () => {
     )
   })
 
-  it('Solves a stroke with only one line.', () => {
+  it('Solves a stroke with only one point.', () => {
     const stroke = getStroke([[1, 1, 0]], {
       size: 1,
       thinning: 0.6,
       smoothing: 0.5,
       streamline: 0.5,
-      start: {
-        taper: 0,
-      },
-      end: {
-        taper: 0,
-      },
       simulatePressure: true,
       last: false,
     })
-
-    expect(stroke).toHaveLength(0)
 
     expect(stroke).toMatchSnapshot()
 
