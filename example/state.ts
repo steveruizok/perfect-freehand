@@ -5,9 +5,6 @@ import { Mark, ClipboardMessage } from './types'
 import getStroke from 'perfect-freehand'
 import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
-import { bezier } from '@leva-ui/plugin-bezier'
-import * as svg from 'svg'
-import * as vec from 'vec'
 
 function getSvgPathFromStroke(stroke: number[][]) {
   const d = []
@@ -115,7 +112,7 @@ const defaultOptions: AppOptions = {
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: t => t,
+    evaluate: (t) => t,
   },
   taperStart: 0,
   taperEnd: 0,
@@ -124,14 +121,14 @@ const defaultOptions: AppOptions = {
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: t => t,
+    evaluate: (t) => t,
   },
   taperEndEasing: {
     0: 0.25,
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: t => t,
+    evaluate: (t) => t,
   },
 }
 
@@ -292,7 +289,7 @@ const state = createState({
 
       data.alg = { ...data.alg, ...alg }
 
-      data.marks = marks.map(mark => ({
+      data.marks = marks.map((mark) => ({
         ...mark,
         path: getStrokePath(mark, mark.simulatePressure, alg, true),
       }))
@@ -372,7 +369,7 @@ const state = createState({
     },
     loadData(data, payload: { marks: Mark[] }) {
       const { alg } = data
-      data.marks = payload.marks.map(mark => ({
+      data.marks = payload.marks.map((mark) => ({
         ...mark,
         id: uuid(),
         path: getStrokePath(mark, mark.simulatePressure, alg, true),

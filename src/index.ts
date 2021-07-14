@@ -27,9 +27,7 @@ export function getStrokePoints<
 
   let len = pts.length
 
-  if (len === 0) return []
-
-  if (len === 1) pts.push(vec.add(pts[0], [1, 0]))
+  if (len <= 1) return []
 
   const strokePoints: StrokePoint[] = [
     {

@@ -331,3 +331,5 @@ Array [
   },
 ]
 `;
+
+exports[`The algorithm. Solves a stroke with only one line. 1`] = `Array []`;
