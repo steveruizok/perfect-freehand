@@ -6,10 +6,12 @@ export interface StrokeOptions {
   easing?: (pressure: number) => number
   simulatePressure?: boolean
   start?: {
+    cap?: boolean
     taper?: number
     easing?: (distance: number) => number
   }
   end?: {
+    cap?: boolean
     taper?: number
     easing?: (distance: number) => number
   }

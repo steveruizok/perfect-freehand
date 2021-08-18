@@ -1,11 +1,9 @@
 import * as React from 'react'
-import NumberInput from './number-input'
-import BooleanInput from './boolean-input'
-import EnumInput from './enum-input'
 import state, { useSelector } from '../state'
 import styled from 'styled-components'
 import { button, folder, Leva, useControls } from 'leva'
 import { bezier } from '@leva-ui/plugin-bezier'
+import isMobile from 'is-mobile'
 
 const LightTheme = {
   colors: {
@@ -44,6 +42,7 @@ const DarkTheme = {
 export default function Controls() {
   const darkMode = useSelector(state => state.data.settings.darkMode)
   const options = useSelector(state => state.data.alg)
+  const settings = useSelector(state => state.data.settings)
 
   const [, set] = useControls(() => ({
     clipPath: {
@@ -52,8 +51,8 @@ export default function Controls() {
       onChange: v => state.send('CHANGED_OPTIONS', { clip: v }),
     },
     showPath: {
-      label: 'Stroke',
-      value: options.clip,
+      label: 'Fill',
+      value: !settings.showTrace,
       onChange: v => state.send('CHANGED_SETTINGS', { showTrace: v }),
     },
     size: {
@@ -102,6 +101,11 @@ export default function Controls() {
       onChange: v => state.send('CHANGED_OPTIONS', { easing: v }),
     }),
     start: folder({
+      capStart: {
+        label: 'Cap',
+        value: options.capStart,
+        onChange: v => state.send('CHANGED_OPTIONS', { capStart: v }),
+      },
       taperStart: {
         label: 'Taper',
         value: options.taperStart,
@@ -123,6 +127,11 @@ export default function Controls() {
       }),
     }),
     end: folder({
+      capEnd: {
+        label: 'Cap',
+        value: options.capEnd,
+        onChange: v => state.send('CHANGED_OPTIONS', { capEnd: v }),
+      },
       taperEnd: {
         label: 'Taper',
         value: options.taperEnd,
@@ -143,6 +152,14 @@ export default function Controls() {
         onChange: v => state.send('CHANGED_OPTIONS', { taperEndEasing: v }),
       }),
     }),
+    cssStroke: {
+      label: 'CSS Stroke',
+      value: options.cssStroke,
+      min: 0,
+      max: 100,
+      step: 1,
+      onChange: v => state.send('CHANGED_OPTIONS', { cssStroke: v }),
+    },
     Reset: button(() => {
       state.send('RESET_OPTIONS')
       const {
@@ -167,7 +184,7 @@ export default function Controls() {
       <Leva
         flat={true}
         fill={true}
-        collapsed={false}
+        collapsed={isMobile()}
         theme={darkMode ? DarkTheme : LightTheme}
       />
     </StyledControls>

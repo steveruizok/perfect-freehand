@@ -7,33 +7,22 @@ import polygonClipping from 'polygon-clipping'
 import { copyToClipboard } from './utils'
 
 function getSvgPathFromStroke(stroke: number[][]) {
-  const d = []
+  if (!stroke.length) return ''
 
-  if (stroke.length < 3) {
-    return ''
-  }
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length]
+      acc.push(` ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`)
+      return acc
+    },
+    ['M ', `${stroke[0][0]},${stroke[0][1]}`, ' Q']
+  )
 
-  let p0 = stroke[stroke.length - 3]
-  let p1 = stroke[stroke.length - 2]
+  d.push(' Z')
 
-  d.push('M', p0[0], p0[1], 'Q')
-
-  for (let i = 0; i < stroke.length; i++) {
-    d.push(p0[0], p0[1], (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2)
-    p0 = p1
-    p1 = stroke[i]
-  }
-
-  d.push('Z')
-
-  // d.length = 0
-
-  // for (let i = 0; i < stroke.length; i++) {
-  //   const pt = stroke[i]
-  //   d.push(svg.dot(pt, i > stroke.length / 2 ? 1 : 1.5))
-  // }
-
-  return d.join(' ')
+  return d
+    .join('')
+    .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, '$1')
 }
 
 function getFlatSvgPathFromStroke(stroke: number[][]) {
@@ -61,10 +50,12 @@ function getStrokePath(
     easing: options.easing.evaluate,
     simulatePressure,
     start: {
+      cap: options.capStart,
       taper: options.taperStart,
       easing: options.taperStartEasing.evaluate,
     },
     end: {
+      cap: options.capEnd,
       taper: options.taperEnd,
       easing: options.taperEndEasing.evaluate,
     },
@@ -94,10 +85,13 @@ interface AppOptions {
   thinning: number
   smoothing: number
   simulatePressure: boolean
+  capStart: boolean
   taperStart: number
   taperStartEasing: Easing
+  capEnd: boolean
   taperEnd: number
   taperEndEasing: Easing
+  cssStroke: number
 }
 
 const defaultOptions: AppOptions = {
@@ -112,24 +106,27 @@ const defaultOptions: AppOptions = {
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: (t) => t,
+    evaluate: t => t,
   },
+  capStart: true,
   taperStart: 0,
-  taperEnd: 0,
   taperStartEasing: {
     0: 0.25,
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: (t) => t,
+    evaluate: t => t,
   },
+  capEnd: true,
+  taperEnd: 0,
   taperEndEasing: {
     0: 0.25,
     1: 0.25,
     2: 0.75,
     3: 0.75,
-    evaluate: (t) => t,
+    evaluate: t => t,
   },
+  cssStroke: 0,
 }
 
 const defaultSettings = {
@@ -289,7 +286,7 @@ const state = createState({
 
       data.alg = { ...data.alg, ...alg }
 
-      data.marks = marks.map((mark) => ({
+      data.marks = marks.map(mark => ({
         ...mark,
         path: getStrokePath(mark, mark.simulatePressure, alg, true),
       }))
@@ -369,7 +366,7 @@ const state = createState({
     },
     loadData(data, payload: { marks: Mark[] }) {
       const { alg } = data
-      data.marks = payload.marks.map((mark) => ({
+      data.marks = payload.marks.map(mark => ({
         ...mark,
         id: uuid(),
         path: getStrokePath(mark, mark.simulatePressure, alg, true),

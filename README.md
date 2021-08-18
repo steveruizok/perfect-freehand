@@ -67,16 +67,19 @@ The options object is optional, as are each of its properties.
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
 | `start`            | { }      |         | Tapering options for the start of the line.           |
 | `end`              | { }      |         | Tapering options for the end of the line.             |
-| `last`             | boolean  | true   | Whether the stroke is complete.                       |
+| `last`             | boolean  | true    | Whether the stroke is complete.                       |
+
+**Note:** When the `last` property is `true`, the line's end will be drawn at the last input point, rather than slightly behind it.
 
 The `start` and `end` options accept an object:
 
 | Property | Type     | Default | Description                                 |
 | -------- | -------- | ------- | ------------------------------------------- |
-| `taper`  | boolean  | 0       | The distance to taper.                      |
+| `cap`    | boolean  | true    | Whether to draw a cap.                      |
+| `taper`  | number   | 0       | The distance to taper.                      |
 | `easing` | function | t => t  | An easing function for the tapering effect. |
 
-When `taper` is zero for either start or end, the library will add a rounded cap at that end of the line.
+**Note:** The `cap` property has no effect when `taper` is more than zero.
 
 ```js
 getStroke(myPoints, {
@@ -110,7 +113,7 @@ The function below will turn the points returned by `getStroke` into SVG path da
 
 ```js
 function getSvgPathFromStroke(stroke) {
-  if (!stroke.length) return ""
+  if (!stroke.length) return ''
 
   const d = stroke.reduce(
     (acc, [x0, y0], i, arr) => {
@@ -118,18 +121,18 @@ function getSvgPathFromStroke(stroke) {
       acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
       return acc
     },
-    ["M", ...stroke[0], "Q"]
+    ['M', ...stroke[0], 'Q']
   )
 
-  d.push("Z")
-  return d.join(" ")
+  d.push('Z')
+  return d.join(' ')
 }
 ```
 
 To use this function, first use perfect-freehand to turn your input points into a stroke outline, then pass the result to `getSvgPathFromStroke`.
 
 ```js
-import getStroke from "perfect-freehand"
+import getStroke from 'perfect-freehand'
 
 const myStroke = getStroke(myInputPoints)
 
@@ -139,7 +142,7 @@ const pathData = getSvgPathFromStroke(myStroke)
 You could then pass this string either to an [SVG path](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d) element:
 
 ```jsx
-<path d={pathData}/>
+<path d={pathData} />
 ```
 
 Or, if you are rendering with HTML Canvas, you can pass the result to a [`Path2D` constructor](https://developer.mozilla.org/en-US/docs/Web/API/Path2D/Path2D#using_svg_paths)).
@@ -176,9 +179,9 @@ function getFlatSvgPathFromStroke(stroke) {
 ### Example
 
 ```jsx
-import * as React from "react"
-import getStroke from "perfect-freehand"
-import { getSvgPathFromStroke } from "./utils"
+import * as React from 'react'
+import getStroke from 'perfect-freehand'
+import { getSvgPathFromStroke } from './utils'
 
 export default function Example() {
   const [points, setPoints] = React.useState()
@@ -199,7 +202,7 @@ export default function Example() {
     <svg
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: 'none' }}
     >
       {points && (
         <path
@@ -208,7 +211,7 @@ export default function Example() {
               size: 24,
               thinning: 0.5,
               smoothing: 0.5,
-              streamline: 0.5
+              streamline: 0.5,
             })
           )}
         />

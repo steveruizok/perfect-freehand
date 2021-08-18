@@ -22,6 +22,7 @@ export default function Home() {
   useLocalData()
   const events = useEvents()
   const ref = useSvgResizer()
+  const cssStroke = useSelector(state => state.data.alg.cssStroke)
   const marks = useSelector(state => state.data.marks)
   const currentMark = useSelector(state => state.data.currentMark)
   const showTrace = useSelector(state => state.data.settings.showTrace)
@@ -75,10 +76,30 @@ export default function Home() {
             id="drawable-svg"
             pointerEvents="none"
           >
+            {showTrace && cssStroke && (
+              <g
+                strokeWidth={cssStroke}
+                stroke={darkMode ? '#222' : '#ccc'}
+                fill={darkMode ? '#222' : '#ccc'}
+              >
+                {marks.map((mark, i) => (
+                  <MarkPath key={mark.id} mark={mark} />
+                ))}
+                {currentMark && <MarkPath mark={currentMark} />}
+              </g>
+            )}
             <g
-              strokeWidth={showTrace ? 2 : 0}
+              strokeWidth={showTrace ? 2 : cssStroke}
               stroke={darkMode ? '#fff' : '#000'}
-              fill={showTrace ? 'transparent' : darkMode ? '#fff' : '#000'}
+              fill={
+                showTrace
+                  ? darkMode
+                    ? '#222'
+                    : '#ccc'
+                  : darkMode
+                  ? '#fff'
+                  : '#000'
+              }
             >
               {marks.map((mark, i) => (
                 <MarkPath key={mark.id} mark={mark} />

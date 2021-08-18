@@ -1,4 +1,4 @@
-import { toPointsArray, getStrokeRadius } from './utils'
+import { clamp, toPointsArray, getStrokeRadius } from './utils'
 import { StrokeOptions, StrokePoint } from './types'
 import * as vec from './vec'
 
@@ -78,20 +78,20 @@ export function getStrokePoints<
   */
 
   // Update the length to the length of the strokePoints array.
-  const len = strokePoints.length
+  // const len = strokePoints.length
 
-  const totalLength = strokePoints[len - 1].runningLength
+  // const totalLength = strokePoints[len - 1].runningLength
 
-  for (let i = len - 2; i > 1; i--) {
-    const { runningLength, vector } = strokePoints[i]
-    const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
-    if (totalLength - runningLength > size / 2 || dpr < 0.8) {
-      for (let j = i; j < len; j++) {
-        strokePoints[j].vector = vector
-      }
-      break
-    }
-  }
+  // for (let i = len - 2; i > 1; i--) {
+  //   const { runningLength, vector } = strokePoints[i]
+  //   const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
+  //   if (totalLength - runningLength > size / 2 || dpr < 0.8) {
+  //     for (let j = i; j < len; j++) {
+  //       strokePoints[j].vector = vector
+  //     }
+  //     break
+  //   }
+  // }
 
   return strokePoints
 }
@@ -130,11 +130,13 @@ export function getStrokeOutlinePoints(
   streamline /= 2
 
   const {
+    cap: capStart = true,
     taper: taperStart = 0,
     easing: taperStartEase = t => t * (2 - t),
   } = start
 
   const {
+    cap: capEnd = true,
     taper: taperEnd = 0,
     easing: taperEndEase = t => --t * t * t + 1,
   } = end
@@ -159,6 +161,8 @@ export function getStrokeOutlinePoints(
 
   // The current radius
   let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
+
+  let firstRadius: number | undefined = undefined
 
   // Previous vector
   let prevVector = points[0].vector
@@ -199,6 +203,10 @@ export function getStrokeOutlinePoints(
       radius = getStrokeRadius(size, thinning, easing, pressure)
     } else {
       radius = size / 2
+    }
+
+    if (firstRadius === undefined) {
+      firstRadius = radius
     }
 
     /*
@@ -249,6 +257,7 @@ export function getStrokeOutlinePoints(
 
       continue
     }
+
     /* 
       Add regular points
 
@@ -264,9 +273,10 @@ export function getStrokeOutlinePoints(
     tl = vec.sub(point, offset)
     tr = vec.add(point, offset)
 
-    const alwaysAdd = i === 1 || dpr < 0.25
+    const alwaysAdd = dpr < 0.25
+
     const minDistance = Math.pow(
-      (runningLength > size ? size : size / 2) * smoothing,
+      Math.max((runningLength > size ? size : size / 2) * smoothing, 1),
       2
     )
 
@@ -345,8 +355,9 @@ export function getStrokeOutlinePoints(
   */
 
   const startCap: number[][] = []
+  const endCap: number[][] = []
 
-  if (!taperStart && !(taperEnd && isVeryShort)) {
+  if (leftPts.length > 1 && rightPts.length > 1) {
     tr = rightPts[1]
 
     for (let i = 1; i < leftPts.length; i++) {
@@ -356,22 +367,52 @@ export function getStrokeOutlinePoints(
       }
     }
 
-    if (!vec.isEqual(tr, tl)) {
-      const start = vec.sub(
-        firstPoint.point,
-        vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
-      )
+    if (capStart || taperStart) {
+      if (!taperStart && !(taperEnd && isVeryShort)) {
+        if (!vec.isEqual(tr, tl)) {
+          const start = vec.sub(
+            firstPoint.point,
+            vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
+          )
 
-      for (let t = 0, step = 0.2; t <= 1; t += step) {
-        startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+          for (let t = 0, step = 0.2; t <= 1; t += step) {
+            startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+          }
+
+          leftPts.shift()
+          rightPts.shift()
+        }
+      } else {
+        startCap.push(firstPoint.point)
+      }
+    } else {
+      if (!vec.isEqual(tr, tl)) {
+        const vector = vec.uni(vec.vec(tr, tl))
+        const dist = vec.dist(tr, tl) / 2
+
+        startCap.push(vec.sub(firstPoint.point, vec.mul(vector, dist * 0.95)))
+        startCap.push(vec.sub(firstPoint.point, vec.mul(vector, dist)))
+        startCap.push(vec.add(firstPoint.point, vec.mul(vector, dist)))
+        startCap.push(vec.add(firstPoint.point, vec.mul(vector, dist * 0.95)))
+
+        leftPts.shift()
+        rightPts.shift()
       }
 
-      leftPts.shift()
-      rightPts.shift()
+      // const first = firstPoint.point
+      // const firstLeft = leftPts[0]
+      // const firstRight = rightPts[0]
+      // const mid = vec.med(firstLeft, firstRight)
+      // const justBefore = vec.lrp(mid, first, 0.95)
+      // startCap.push(firstPoint.point, justBefore)
+      // const r = (firstRadius || radius) * 0.5
+      // startCap.push(vec.add(first, vec.mul(vec.per(vector), r)))
+      // startCap.push(vec.add(justBefore, vec.mul(vec.per(vector), r)))
+      // startCap.push(vec.sub(justBefore, vec.mul(vec.per(vector), r)))
+      // startCap.push(vec.sub(first, vec.mul(vec.per(vector), r)))
     }
-  }
 
-  /*
+    /*
     Draw an end cap
 
     If the line does not have a tapered end, and unless the line has a tapered
@@ -381,19 +422,34 @@ export function getStrokeOutlinePoints(
     sharp end turns.
   */
 
-  const endCap: number[][] = []
+    if (capEnd || taperEnd) {
+      if (!taperEnd && !(taperStart && isVeryShort)) {
+        const start = vec.sub(
+          lastPoint.point,
+          vec.mul(vec.per(lastPoint.vector), radius)
+        )
 
-  if (!taperEnd && !(taperStart && isVeryShort)) {
-    const start = vec.sub(
-      lastPoint.point,
-      vec.mul(vec.per(lastPoint.vector), radius)
-    )
-
-    for (let t = 0, step = 0.1; t <= 1; t += step) {
-      endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
+        for (let t = 0, step = 0.1; t <= 1; t += step) {
+          endCap.push(vec.rotAround(start, lastPoint.point, PI * 3 * t))
+        }
+      } else {
+        endCap.push(lastPoint.point)
+      }
+    } else {
+      const lastLeft = leftPts[leftPts.length - 1]
+      const lastRight = rightPts[rightPts.length - 1]
+      const mid = vec.med(lastLeft, lastRight)
+      const last = options.last
+        ? lastPoint.point
+        : vec.med(mid, lastPoint.point)
+      const vector = vec.uni(vec.vec(mid, lastPoint.point))
+      const justBefore = vec.lrp(mid, last, 0.95)
+      const r = radius * 0.95
+      endCap.push(vec.add(justBefore, vec.mul(vec.per(vector), r)))
+      endCap.push(vec.add(last, vec.mul(vec.per(vector), r)))
+      endCap.push(vec.sub(last, vec.mul(vec.per(vector), r)))
+      endCap.push(vec.sub(justBefore, vec.mul(vec.per(vector), r)))
     }
-  } else {
-    endCap.push(lastPoint.point)
   }
 
   /*

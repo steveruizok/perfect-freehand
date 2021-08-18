@@ -1,3 +1,8 @@
+## 0.4.10
+
+- Improves "popping" on large strokes
+- Adds `cap` to `start` and `end` options.
+
 ## 0.4.9
 
 - Prevents duplicates when parsing points.

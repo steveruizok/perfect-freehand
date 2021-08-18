@@ -10,9 +10,10 @@
   "dependencies": {
     "@leva-ui/plugin-bezier": "^0.9.9",
     "@state-designer/react": "^1.7.3",
+    "is-mobile": "^3.0.0",
     "leva": "^0.9.9",
     "next": "10.0.7",
-    "perfect-freehand": "^0.4.9",
+    "perfect-freehand": "latest",
     "polygon-clipping": "^0.15.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
