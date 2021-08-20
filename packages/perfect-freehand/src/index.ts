@@ -231,7 +231,7 @@ export function getStrokeOutlinePoints(
         ? taperEndEase((totalLength - runningLength) / taperEnd)
         : 1
 
-    radius = Math.max(0.5, radius * Math.min(ts, te))
+    radius = Math.max(0.01, radius * Math.min(ts, te))
 
     /*
       Handle sharp corners
