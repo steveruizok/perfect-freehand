@@ -1,3 +1,0 @@
-# Example
-
-For `perfect-freehand`.

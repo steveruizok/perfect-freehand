@@ -1,0 +1,32 @@
+.container {
+  position: fixed;
+  width: 320px;
+  top: 8px;
+  left: 8px;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 2px;
+  box-shadow: 0px 0px 16px -4px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-auto-rows: 28px;
+  align-items: center;
+  column-gap: 16px;
+}
+
+.colors {
+  padding: 12px 0;
+}
+
+hr {
+  grid-column: 1 / span 3;
+  height: 1px;
+  border: none;
+  background-color: gainsboro;
+  width: calc(100% + 24px);
+  margin-left: -12px;
+}

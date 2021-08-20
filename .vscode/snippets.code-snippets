@@ -1,0 +1,18 @@
+{
+  "createComment": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "/**",
+    "body": [
+      "/**",
+      " * ${1:description}",
+      " *",
+      " * ### Example",
+      " *",
+      " *```ts",
+      " * ${2:example}",
+      " *```",
+      " */"
+    ],
+    "description": "comment"
+  }
+}

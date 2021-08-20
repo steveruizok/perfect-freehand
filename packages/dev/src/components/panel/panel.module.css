@@ -1,0 +1,45 @@
+.container {
+  position: absolute;
+  display: flex;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.container a,
+.container button {
+  background: none;
+  border: none;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  text-shadow: 1px 1px 4px rgba(255, 255, 255, 1);
+}
+.container button {
+  padding: 12px 24px;
+}
+
+.container a:hover,
+.container button:hover,
+.container button[data-active='true'] {
+  color: dodgerblue;
+  background-color: white;
+}
+
+.bottom {
+  bottom: 8px;
+}
+
+.left {
+  left: 8px;
+}
+
+.right {
+  right: 8px;
+}
+
+.top {
+  top: 8px;
+}

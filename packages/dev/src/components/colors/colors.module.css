@@ -1,0 +1,11 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-auto-rows: 20px;
+  grid-column: span 2;
+}
+
+.color {
+  cursor: pointer;
+  border: none;
+}

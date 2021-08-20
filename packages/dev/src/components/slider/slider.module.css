@@ -1,0 +1,53 @@
+.root {
+  max-width: 200px;
+  height: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 1;
+  user-select: none;
+  touch-action: none;
+}
+
+.range {
+  position: absolute;
+  height: 3px;
+  background-color: dodgerblue;
+  border-radius: 5px;
+}
+
+.track {
+  position: relative;
+  height: 3px;
+  flex-grow: 1;
+  background-color: gainsboro;
+  border-radius: 5px;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  height: 16px;
+  width: 16px;
+  outline: none;
+}
+
+.thumb::after {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 100%;
+  background-color: white;
+  border: 2px solid dodgerblue;
+  transform: scale(1);
+  transition: all 0.12s;
+}
+
+.thumb:focus::after {
+  background-color: dodgerblue;
+  transform: scale(1);
+}
