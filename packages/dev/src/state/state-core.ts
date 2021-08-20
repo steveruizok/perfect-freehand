@@ -85,7 +85,7 @@ export class StateManager<T extends object> {
     if (this._pointer < 0) return this
     const patch = this._stack[this._pointer]
     this._pointer -= 1
-    this._current = this.merge(this._current, patch.before)
+    this._current = this.clean(this.merge(this._current, patch.before))
     this._previous = this._current
     idb.set(this._id, this._current)
     this._store.setState(this._current)

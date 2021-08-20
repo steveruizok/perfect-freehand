@@ -1,100 +1,100 @@
-{
-  "private": true,
-  "version": "0.4.11",
-  "name": "perfect-freehand-repo",
-  "author": {
-    "name": "Steve Ruiz",
-    "url": "https://twitter.com/steveruizok"
-  },
-  "repository": "https://github.com/steveruizok/perfect-freehand",
-  "keywords": [
-    "ink",
-    "draw",
-    "paint",
-    "signature",
-    "handwriting",
-    "text",
-    "drawing",
-    "painting"
-  ],
-  "license": "MIT",
-  "workspaces": [
-    "packages/perfect-freehand",
-    "packages/dev"
-  ],
-  "scripts": {
-    "test": "jest",
-    "lerna": "lerna",
-    "start": "lerna run start --stream --parallel",
-    "build": "yarn build:packages && cd packages/dev && yarn build",
-    "build:packages": "cd packages/perfect-freehand && yarn build",
-    "publish:patch": "yarn build:packages && lerna publish patch"
-  },
-  "devDependencies": {
-    "@babel/preset-react": "^7.14.5",
-    "@babel/preset-typescript": "^7.15.0",
-    "@testing-library/jest-dom": "^5.14.1",
-    "@types/node": "^15.0.1",
-    "@types/react": "^17.0.16",
-    "@types/react-dom": "^17.0.9",
-    "esbuild": "^0.12.21",
-    "jest": "^27.0.6",
-    "lerna": "^3.15.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "tslib": "^2.3.0",
-    "typescript": "^4.3.5"
-  },
-  "dependencies": {
-    "ts-jest": "^27.0.5"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "semi": false,
-    "printWidth": 80
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "setupFilesAfterEnv": [
-      "<rootDir>/setupTests.ts"
-    ],
-    "transform": {
-      "^.+\\.(tsx|jsx|ts|js)?$": "ts-jest"
+  {
+    "private": true,
+    "version": "0.4.11",
+    "name": "perfect-freehand-repo",
+    "author": {
+      "name": "Steve Ruiz",
+      "url": "https://twitter.com/steveruizok"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
+    "repository": "https://github.com/steveruizok/perfect-freehand",
+    "keywords": [
+      "ink",
+      "draw",
+      "paint",
+      "signature",
+      "handwriting",
+      "text",
+      "drawing",
+      "painting"
     ],
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "tsconfig.json",
-        "babelConfig": {
-          "presets": [
-            [
-              "@babel/preset-react"
+    "license": "MIT",
+    "workspaces": [
+      "packages/perfect-freehand",
+      "packages/dev"
+    ],
+    "scripts": {
+      "test": "jest",
+      "lerna": "lerna",
+      "start": "lerna run start --stream --parallel",
+      "build": "yarn build:packages && cd packages/dev && yarn build",
+      "build:packages": "cd packages/perfect-freehand && yarn build",
+      "publish:patch": "yarn build:packages && lerna publish patch"
+    },
+    "devDependencies": {
+      "@babel/preset-react": "^7.14.5",
+      "@babel/preset-typescript": "^7.15.0",
+      "@testing-library/jest-dom": "^5.14.1",
+      "@types/node": "^15.0.1",
+      "@types/react": "^17.0.16",
+      "@types/react-dom": "^17.0.9",
+      "esbuild": "^0.12.21",
+      "jest": "^27.0.6",
+      "lerna": "^3.15.0",
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "tslib": "^2.3.0",
+      "typescript": "^4.3.5"
+    },
+    "dependencies": {
+      "ts-jest": "^27.0.5"
+    },
+    "prettier": {
+      "trailingComma": "es5",
+      "singleQuote": true,
+      "semi": false,
+      "printWidth": 80
+    },
+    "jest": {
+      "preset": "ts-jest",
+      "setupFilesAfterEnv": [
+        "<rootDir>/setupTests.ts"
+      ],
+      "transform": {
+        "^.+\\.(tsx|jsx|ts|js)?$": "ts-jest"
+      },
+      "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+      "moduleFileExtensions": [
+        "ts",
+        "tsx",
+        "js",
+        "jsx",
+        "json",
+        "node"
+      ],
+      "globals": {
+        "ts-jest": {
+          "tsConfig": "tsconfig.json",
+          "babelConfig": {
+            "presets": [
+              [
+                "@babel/preset-react"
+              ],
+              "@babel/preset-typescript"
             ],
-            "@babel/preset-typescript"
-          ],
-          "plugins": [
-            "@babel/plugin-syntax-import-meta"
-          ]
+            "plugins": [
+              "@babel/plugin-syntax-import-meta"
+            ]
+          }
         }
+      },
+      "testEnvironment": "jsdom",
+      "modulePathIgnorePatterns": [
+        "<rootDir>/packages/perfect-freehand/build/",
+        "<rootDir>/packages/dev/build/"
+      ],
+      "moduleNameMapper": {
+        "perfect-freehand": "<rootDir>/packages/perfect-freehand/src",
+        "\\+(.*)": "<rootDir>/packages/perfect-freehand/src/$1"
       }
-    },
-    "testEnvironment": "jsdom",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/packages/perfect-freehand/build/",
-      "<rootDir>/packages/dev/build/"
-    ],
-    "moduleNameMapper": {
-      "perfect-freehand": "<rootDir>/packages/perfect-freehand/src",
-      "\\+(.*)": "<rootDir>/packages/perfect-freehand/src/$1"
     }
   }
-}

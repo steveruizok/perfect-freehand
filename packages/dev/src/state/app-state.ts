@@ -219,14 +219,17 @@ export class AppState extends StateManager<State> {
         },
         page: {
           shapes: {
-            [shape.id]: shapeUtils.draw.onSessionComplete({
+            [shape.id]: {
               ...shape,
-              points: [
-                ...shape.points,
-                [...Vec.sub(pt, shape.point), pressure],
-              ],
-              isDone: true,
-            }),
+              ...shapeUtils.draw.onSessionComplete({
+                ...shape,
+                points: [
+                  ...shape.points,
+                  [...Vec.sub(pt, shape.point), pressure],
+                ],
+                isDone: true,
+              }),
+            },
           },
         },
       },

@@ -91,7 +91,7 @@ export class Draw extends TLShapeUtil<DrawShape> {
     }
 
     if (shape.points.length > 2) {
-      const simulatePressure = shape.points[1][2] === 0.5
+      const simulatePressure = shape.points[2]?.[2] === 0.5
 
       const stroke = getStroke(shape.points.slice(2), {
         size,
