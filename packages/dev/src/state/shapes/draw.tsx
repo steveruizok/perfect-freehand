@@ -74,14 +74,10 @@ export class Draw extends TLShapeUtil<DrawShape> {
     // For very short lines, draw a point instead of a line
     const bounds = this.getBounds(shape)
 
-    if (
-      (shape.points.length <= 2 ||
-        (bounds.width < size / 2 && bounds.height < size / 2)) &&
-      isDone
-    ) {
+    if (bounds.width <= size && bounds.height <= size && isDone) {
       return (
         <circle
-          r={size * 0.32}
+          r={Math.max(size * 0.32, 1)}
           fill={fill}
           stroke={color}
           strokeWidth={fill ? strokeWidth || 1 : strokeWidth}

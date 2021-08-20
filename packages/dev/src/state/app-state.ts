@@ -195,9 +195,16 @@ export class AppState extends StateManager<State> {
     const { shapes } = state.page
     if (!state.appState.editingId) return this // Don't erase while drawing
 
-    const shape = shapes[state.appState.editingId]
+    let shape = shapes[state.appState.editingId]
     const camera = state.pageState.camera
     const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point)
+
+    shape.isDone = true
+    shape.points = [...shape.points, [...Vec.sub(pt, shape.point), pressure]]
+    shape = {
+      ...shape,
+      ...shapeUtils.draw.onSessionComplete(shape),
+    }
 
     return this.setState({
       id: 'complete_shape',
@@ -219,17 +226,7 @@ export class AppState extends StateManager<State> {
         },
         page: {
           shapes: {
-            [shape.id]: {
-              ...shape,
-              ...shapeUtils.draw.onSessionComplete({
-                ...shape,
-                points: [
-                  ...shape.points,
-                  [...Vec.sub(pt, shape.point), pressure],
-                ],
-                isDone: true,
-              }),
-            },
+            [shape.id]: shape,
           },
         },
       },
