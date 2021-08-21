@@ -1,5 +1,9 @@
 import type { TLBinding, TLPage, TLPageState, TLShape } from '@tldraw/core'
 
+export type Entries<T> = {
+  [K in keyof T]: [K, T[K]]
+}[keyof T][]
+
 export type Patch<T> = Partial<{ [P in keyof T]: Patch<T[P]> }>
 
 export type Command<T> = {

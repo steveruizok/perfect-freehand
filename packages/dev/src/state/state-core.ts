@@ -3,7 +3,7 @@ import merge from 'deepmerge'
 import * as idb from 'idb-keyval'
 import createReact, { UseStore } from 'zustand'
 import createVanilla, { StoreApi } from 'zustand/vanilla'
-import type { Patch, Command } from 'types'
+import type { Patch, Command, Entries } from 'types'
 import { deepMerge } from './merge'
 
 /* -------------------------------------------------- */
@@ -48,6 +48,22 @@ export class StateManager<T extends object> {
     })
 
     this._context = React.createContext(this)
+  }
+
+  deepMerge = <R>(target: R, elm: R): R => {
+    const result: R = { ...target }
+
+    const entries = Object.entries(elm) as [keyof R, R[keyof R]][]
+
+    entries.forEach(([key, value]) => {
+      if (value === Object(value) && !Array.isArray(value)) {
+        result[key] = this.deepMerge(result[key], value)
+      } else {
+        result[key] = value
+      }
+    })
+
+    return result
   }
 
   private merge = (a: T, b: Patch<T>) => {
