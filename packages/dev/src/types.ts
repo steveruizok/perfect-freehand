@@ -10,7 +10,8 @@ export type Command<T> = {
 
 export interface DrawStyles {
   size: number
-  color: string
+  fill: string
+  stroke: string
   strokeWidth: number
   thinning: number
   streamline: number

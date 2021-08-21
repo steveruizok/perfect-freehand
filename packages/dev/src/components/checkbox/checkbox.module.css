@@ -10,6 +10,14 @@
   padding: 0;
 }
 
+.root:focus {
+  outline: none;
+}
+
+.root:focus::after {
+  border: 2px solid dodgerblue;
+}
+
 .root::after {
   content: '';
   position: absolute;

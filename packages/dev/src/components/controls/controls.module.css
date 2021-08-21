@@ -1,19 +1,20 @@
 .container {
   position: fixed;
-  width: 320px;
-  top: 8px;
-  left: 8px;
+  width: min(100%, 320px);
+  top: 0px;
+  left: 0px;
   padding: 12px;
   background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 2px;
-  box-shadow: 0px 0px 16px -4px rgba(0, 0, 0, 0.2);
+  border-bottom-right-radius: 16px;
+  box-shadow: 0px 0px 8px -4px rgba(0, 0, 0, 0.16),
+    0px 0px 36px 0px rgba(0, 0, 0, 0.08);
   z-index: 100;
 }
 
 .inputs {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-auto-rows: 28px;
+  grid-auto-rows: 32px;
   align-items: center;
   column-gap: 16px;
 }
@@ -29,4 +30,28 @@ hr {
   background-color: gainsboro;
   width: calc(100% + 24px);
   margin-left: -12px;
+}
+
+.buttonsRow {
+  display: flex;
+  height: 48px;
+  padding-top: 8px;
+}
+
+.rowButton {
+  cursor: pointer;
+  flex-grow: 2;
+  font-family: 'Recursive', sans-serif;
+  border: none;
+  background-color: transparent;
+  border: 2px solid transparent;
+}
+
+.rowButton:hover {
+  color: dodgerblue;
+}
+
+.rowButton:focus {
+  outline: none;
+  border: 2px solid dodgerblue;
 }

@@ -1,6 +1,6 @@
   {
     "private": true,
-    "version": "0.4.11",
+    "version": "0.5.0",
     "name": "perfect-freehand-repo",
     "author": {
       "name": "Steve Ruiz",
@@ -19,8 +19,7 @@
     ],
     "license": "MIT",
     "workspaces": [
-      "packages/perfect-freehand",
-      "packages/dev"
+      "packages/*"
     ],
     "scripts": {
       "test": "jest",

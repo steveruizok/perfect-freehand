@@ -27,19 +27,25 @@
 
 .thumb {
   position: relative;
-  display: block;
-  height: 16px;
-  width: 16px;
+  height: 4px;
+  width: 4px;
   outline: none;
 }
 
-.thumb::after {
+.thumbBall {
+  display: block;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbBall::after {
+  display: block;
   content: '';
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  width: 12px;
+  height: 12px;
   border-radius: 100%;
   background-color: white;
   border: 2px solid dodgerblue;
@@ -47,7 +53,26 @@
   transition: all 0.12s;
 }
 
-.thumb:focus::after {
+.thumb:focus > .thumbBall::after {
   background-color: dodgerblue;
-  transform: scale(1);
+}
+
+.numberInput {
+  font-family: 'Recursive', sans-serif;
+  font-size: 12px;
+  border: none;
+  width: 40px;
+  text-align: right;
+  padding: 4px 4px;
+}
+
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInput:focus {
+  border-radius: 2px;
+  outline: 2px solid dodgerblue;
 }

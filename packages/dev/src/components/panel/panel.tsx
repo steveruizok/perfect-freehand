@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styles from './panel.module.css'
-import { Button } from 'components/button'
 import { useApp, useAppState } from 'state'
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
 
@@ -10,31 +9,44 @@ export function Panel() {
 
   return (
     <>
+      <div className={[styles.top, styles.center].join(' ')}>
+        <a
+          href="https://github.com/steveruizok/perfect-freehand"
+          target="_blank"
+          rel="noopener nofollow"
+        >
+          perfect-freehand
+        </a>
+      </div>
       <div className={[styles.container, styles.top, styles.right].join(' ')}>
-        <a href="https://github.com/steveruizok/perfect-freehand">
+        <a
+          href="https://github.com/steveruizok/perfect-freehand"
+          target="_blank"
+          rel="noopener nofollow"
+        >
           <GitHubLogoIcon height={24} width={24} />
         </a>
       </div>
       <div className={[styles.container, styles.bottom, styles.left].join(' ')}>
-        <Button
+        <button
           onClick={app.selectDrawingTool}
           data-active={tool === 'drawing'}
         >
           Draw
-        </Button>
-        <Button
+        </button>
+        <button
           onClick={app.selectErasingTool}
           data-active={tool === 'erasing'}
         >
           Erase
-        </Button>
+        </button>
       </div>
       <div
         className={[styles.container, styles.bottom, styles.right].join(' ')}
       >
-        <Button onClick={app.undo}>Undo</Button>
-        <Button onClick={app.redo}>Redo</Button>
-        <Button onClick={app.deleteAll}>Clear</Button>
+        <button onClick={app.undo}>Undo</button>
+        <button onClick={app.redo}>Redo</button>
+        <button onClick={app.deleteAll}>Clear</button>
       </div>
     </>
   )

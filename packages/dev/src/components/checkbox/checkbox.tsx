@@ -10,8 +10,10 @@ interface CheckboxProps extends CheckboxOwnProps {
 export function Checkbox(props: CheckboxProps) {
   return (
     <>
-      <Label.Root htmlFor={props.name}>{props.name}</Label.Root>
-      <Root {...props} className={styles.root}>
+      <Label.Root dir="ltr" htmlFor={props.name}>
+        {props.name}
+      </Label.Root>
+      <Root {...props} dir="ltr" className={styles.root}>
         <Indicator className={styles.indicator} />
       </Root>
       <div />

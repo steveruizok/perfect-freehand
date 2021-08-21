@@ -7,15 +7,13 @@ import type { State } from 'types'
 import { Colors } from 'components/colors'
 
 const colors = [
+  '#000000',
   '#ffc107',
   '#ff5722',
   '#e91e63',
   '#673ab7',
   '#00bcd4',
-  '#8bc34a',
   '#efefef',
-  '#777777',
-  '#000000',
 ]
 
 const appStateSelector = (s: State) => s.appState
@@ -106,8 +104,42 @@ export function Controls() {
     app.finishStyleUpdate()
   }, [])
 
-  const handleColorChange = React.useCallback((color: string) => {
-    app.patchStyle({ color })
+  const handleStrokeColorChange = React.useCallback((color: string) => {
+    app.patchStyle({ stroke: color })
+  }, [])
+
+  const handleFillColorChange = React.useCallback((color: string) => {
+    app.patchStyle({ fill: color })
+  }, [])
+
+  // Resets
+
+  const handleResetSize = React.useCallback(() => {
+    app.resetStyle('size')
+  }, [])
+
+  const handleResetThinning = React.useCallback(() => {
+    app.resetStyle('thinning')
+  }, [])
+
+  const handleResetStreamline = React.useCallback(() => {
+    app.resetStyle('streamline')
+  }, [])
+
+  const handleResetSmoothing = React.useCallback(() => {
+    app.resetStyle('smoothing')
+  }, [])
+
+  const handleResetTaperStart = React.useCallback(() => {
+    app.resetStyle('taperStart')
+  }, [])
+
+  const handleResetTaperEnd = React.useCallback(() => {
+    app.resetStyle('taperEnd')
+  }, [])
+
+  const handleResetStrokeWidth = React.useCallback(() => {
+    app.resetStyle('strokeWidth')
   }, [])
 
   return (
@@ -119,6 +151,7 @@ export function Controls() {
           min={1}
           max={100}
           step={1}
+          onDoubleClick={handleResetSize}
           onValueChange={handleSizeChange}
           onPointerDown={handleSizeChangeStart}
           onPointerUp={handleStyleChangeComplete}
@@ -129,6 +162,7 @@ export function Controls() {
           min={-0.99}
           max={0.99}
           step={0.01}
+          onDoubleClick={handleResetThinning}
           onValueChange={handleThinningChange}
           onPointerDown={handleThinningChangeStart}
           onPointerUp={handleStyleChangeComplete}
@@ -139,6 +173,7 @@ export function Controls() {
           min={0.01}
           max={0.99}
           step={0.01}
+          onDoubleClick={handleResetStreamline}
           onValueChange={handleStreamlineChange}
           onPointerDown={handleStreamlineChangeStart}
           onPointerUp={handleStyleChangeComplete}
@@ -149,6 +184,7 @@ export function Controls() {
           min={0.01}
           max={0.99}
           step={0.01}
+          onDoubleClick={handleResetSmoothing}
           onValueChange={handleSmoothingChange}
           onPointerDown={handleSmoothingChangeStart}
           onPointerUp={handleStyleChangeComplete}
@@ -165,6 +201,7 @@ export function Controls() {
           min={0}
           max={100}
           step={1}
+          onDoubleClick={handleResetTaperStart}
           onValueChange={handleTaperStartChange}
           onPointerDown={handleTaperStartChangeStart}
           onPointerUp={handleStyleChangeComplete}
@@ -181,32 +218,53 @@ export function Controls() {
           min={0}
           max={100}
           step={1}
+          onDoubleClick={handleResetTaperEnd}
           onValueChange={handleTaperEndChange}
           onPointerDown={handleTaperEndChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
         <hr />
-        <Slider
-          name="CSS Stroke"
-          value={[style.strokeWidth]}
-          min={0}
-          max={100}
-          step={1}
-          onValueChange={handleStrokeWidthChange}
-          onPointerDown={handleStrokeWidthChangeStart}
-          onPointerUp={handleStyleChangeComplete}
-        />
         <Checkbox
           name="Fill"
           checked={style.isFilled}
           onCheckedChange={handleIsFilledChange}
         />
-        <Colors
-          name="Color"
-          color={style.color}
-          colors={colors}
-          onChange={handleColorChange}
+        {style.isFilled && (
+          <Colors
+            name=""
+            color={style.fill}
+            colors={colors}
+            onChange={handleFillColorChange}
+          />
+        )}
+        <Slider
+          name="Stroke"
+          value={[style.strokeWidth]}
+          min={0}
+          max={100}
+          step={1}
+          onDoubleClick={handleResetStrokeWidth}
+          onValueChange={handleStrokeWidthChange}
+          onPointerDown={handleStrokeWidthChangeStart}
+          onPointerUp={handleStyleChangeComplete}
         />
+        {style.strokeWidth > 0 && (
+          <Colors
+            name=""
+            color={style.stroke}
+            colors={colors}
+            onChange={handleStrokeColorChange}
+          />
+        )}
+      </div>
+      <hr />
+      <div className={styles.buttonsRow}>
+        <button className={styles.rowButton} onClick={app.resetStyles}>
+          Reset
+        </button>
+        <button className={styles.rowButton} onClick={app.copyStyles}>
+          Copy
+        </button>
       </div>
     </div>
   )

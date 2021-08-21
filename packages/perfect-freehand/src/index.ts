@@ -379,7 +379,7 @@ export function getStrokeOutlinePoints(
             vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
           )
 
-          for (let t = 0, step = 0.15; t <= 1; t += step) {
+          for (let t = 0, step = 0.1; t <= 1; t += step) {
             startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
           }
 

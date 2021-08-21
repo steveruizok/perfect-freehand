@@ -33,9 +33,9 @@ export const initialDoc: Doc = {
 }
 
 export const defaultStyle = {
-  size: 8,
+  size: 20,
   strokeWidth: 0,
-  thinning: 0.75,
+  thinning: 0.8,
   streamline: 0.5,
   smoothing: 0.5,
   taperStart: 0,
@@ -43,7 +43,8 @@ export const defaultStyle = {
   capStart: true,
   capEnd: true,
   isFilled: true,
-  color: '#000',
+  fill: '#000000',
+  stroke: '#000000',
 }
 
 export const initialState: State = {
@@ -99,7 +100,9 @@ export class AppState extends StateManager<State> {
     }
   }
 
-  onPointerMove: TLPointerEventHandler = (info) => {
+  onPointerMove: TLPointerEventHandler = (info, event) => {
+    if (event.buttons > 1) return
+
     const { status, tool } = this.state.appState
 
     switch (tool) {
@@ -141,6 +144,75 @@ export class AppState extends StateManager<State> {
         break
       }
     }
+  }
+
+  onPinchEnd: TLPinchEventHandler = () => {
+    this.patchState({
+      appState: { status: 'idle' },
+    })
+  }
+
+  onPinch: TLPinchEventHandler = ({ point, delta }, e) => {
+    if (this.state.appState.status !== 'pinching') return
+
+    const { camera } = this.state.pageState
+    const zoomDelta = delta[2] / 350
+    const nextPoint = Vec.add(camera.point, Vec.div(delta, camera.zoom))
+    const nextZoom = Utils.clamp(camera.zoom - zoomDelta * camera.zoom, 0.25, 5)
+    const p0 = Vec.sub(Vec.div(point, camera.zoom), nextPoint)
+    const p1 = Vec.sub(Vec.div(point, nextZoom), nextPoint)
+
+    return this.patchState({
+      pageState: {
+        camera: {
+          point: Vec.round(Vec.add(nextPoint, Vec.sub(p1, p0))),
+          zoom: nextZoom,
+        },
+      },
+    })
+  }
+
+  onPan: TLWheelEventHandler = (info) => {
+    const { state } = this
+    if (state.appState.status === 'pinching') return this
+
+    const { camera } = state.pageState
+    const delta = Vec.div(info.delta, camera.zoom)
+    const prev = camera.point
+    const next = Vec.sub(prev, delta)
+
+    if (Vec.isEqual(next, prev)) return this
+
+    const point = Vec.round(next)
+
+    if (state.appState.editingId && state.appState.status === 'drawing') {
+      const shape = state.page.shapes[state.appState.editingId]
+      const camera = state.pageState.camera
+      const pt = Vec.sub(Vec.div(info.point, camera.zoom), point)
+
+      return this.patchState({
+        pageState: {
+          camera: {
+            point,
+          },
+        },
+        page: {
+          shapes: {
+            [shape.id]: {
+              points: [...shape.points, [...Vec.sub(pt, shape.point), 0.5]],
+            },
+          },
+        },
+      })
+    }
+
+    return this.patchState({
+      pageState: {
+        camera: {
+          point,
+        },
+      },
+    })
   }
 
   createShape = (point: number[]) => {
@@ -405,6 +477,86 @@ export class AppState extends StateManager<State> {
     })
   }
 
+  resetStyle = (prop: keyof DrawStyles) => {
+    const { shapes } = this.state.page
+    const { state } = this
+
+    const initialStyle = initialState.appState.style[prop]
+
+    return this.setState({
+      id: 'set_style',
+      before: {
+        appState: state.appState,
+        page: {
+          shapes: {
+            ...Object.fromEntries(
+              Object.entries(shapes).map(([id, shape]) => [
+                id,
+                {
+                  style: { [prop]: shape.style[prop] },
+                },
+              ])
+            ),
+          },
+        },
+      },
+      after: {
+        appState: {
+          style: { [prop]: initialStyle },
+        },
+        page: {
+          shapes: {
+            ...Object.fromEntries(
+              Object.keys(shapes).map((id) => [id, { [prop]: initialStyle }])
+            ),
+          },
+        },
+      },
+    })
+  }
+
+  resetStyles = () => {
+    const { shapes } = this.state.page
+    const { state } = this
+
+    const currentAppState = state.appState
+    const initialAppState = initialState.appState
+
+    return this.setState({
+      id: 'set_style',
+      before: {
+        appState: currentAppState,
+        page: {
+          shapes: {
+            ...Object.fromEntries(
+              Object.entries(shapes).map(([id, shape]) => [
+                id,
+                {
+                  style: currentAppState.style,
+                },
+              ])
+            ),
+          },
+        },
+      },
+      after: {
+        appState: initialAppState,
+        page: {
+          shapes: {
+            ...Object.fromEntries(
+              Object.keys(shapes).map((id) => [
+                id,
+                { style: initialAppState.style },
+              ])
+            ),
+          },
+        },
+      },
+    })
+  }
+
+  copyStyles = () => {}
+
   deleteAll = () => {
     const { shapes } = this.state.page
 
@@ -432,75 +584,6 @@ export class AppState extends StateManager<State> {
 
     this.patchState({
       appState: { status: 'pinching' },
-    })
-  }
-
-  onPinchEnd: TLPinchEventHandler = () => {
-    this.patchState({
-      appState: { status: 'idle' },
-    })
-  }
-
-  onPinch: TLPinchEventHandler = ({ point, delta }, e) => {
-    if (this.state.appState.status !== 'pinching') return
-
-    const { camera } = this.state.pageState
-    const zoomDelta = delta[2] / 350
-    const nextPoint = Vec.add(camera.point, Vec.div(delta, camera.zoom))
-    const nextZoom = Utils.clamp(camera.zoom - zoomDelta * camera.zoom, 0.25, 5)
-    const p0 = Vec.sub(Vec.div(point, camera.zoom), nextPoint)
-    const p1 = Vec.sub(Vec.div(point, nextZoom), nextPoint)
-
-    return this.patchState({
-      pageState: {
-        camera: {
-          point: Vec.round(Vec.add(nextPoint, Vec.sub(p1, p0))),
-          zoom: nextZoom,
-        },
-      },
-    })
-  }
-
-  onPan: TLWheelEventHandler = (info) => {
-    const { state } = this
-    if (state.appState.status === 'pinching') return this
-
-    const { camera } = state.pageState
-    const delta = Vec.div(info.delta, camera.zoom)
-    const prev = camera.point
-    const next = Vec.sub(prev, delta)
-
-    if (Vec.isEqual(next, prev)) return this
-
-    const point = Vec.round(next)
-
-    if (state.appState.editingId && state.appState.status === 'drawing') {
-      const shape = state.page.shapes[state.appState.editingId]
-      const camera = state.pageState.camera
-      const pt = Vec.sub(Vec.div(info.point, camera.zoom), point)
-
-      return this.patchState({
-        pageState: {
-          camera: {
-            point,
-          },
-        },
-        page: {
-          shapes: {
-            [shape.id]: {
-              points: [...shape.points, [...Vec.sub(pt, shape.point), 0.5]],
-            },
-          },
-        },
-      })
-    }
-
-    return this.patchState({
-      pageState: {
-        camera: {
-          point,
-        },
-      },
     })
   }
 

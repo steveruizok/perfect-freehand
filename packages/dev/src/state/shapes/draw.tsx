@@ -41,7 +41,8 @@ export class Draw extends TLShapeUtil<DrawShape> {
       capStart: true,
       capEnd: true,
       isFilled: true,
-      color: '#000',
+      stroke: 'black',
+      fill: 'black',
     },
   }
 
@@ -61,7 +62,8 @@ export class Draw extends TLShapeUtil<DrawShape> {
         taperEnd,
         capStart,
         capEnd,
-        color,
+        stroke,
+        fill,
         isFilled,
       },
       isDone,
@@ -69,20 +71,29 @@ export class Draw extends TLShapeUtil<DrawShape> {
 
     let drawPathData = ''
 
-    const fill = isFilled ? color : 'none'
-
     // For very short lines, draw a point instead of a line
     const bounds = this.getBounds(shape)
 
     if (bounds.width <= size && bounds.height <= size && isDone) {
       return (
-        <circle
-          r={Math.max(size * 0.32, 1)}
-          fill={fill}
-          stroke={color}
-          strokeWidth={fill ? strokeWidth || 1 : strokeWidth}
-          pointerEvents="all"
-        />
+        <>
+          {strokeWidth > 0 && (
+            <circle
+              r={Math.max(size * 0.32, 1)}
+              fill={'transparent'}
+              stroke={stroke}
+              strokeWidth={strokeWidth}
+              pointerEvents="all"
+            />
+          )}
+          <circle
+            r={Math.max(size * 0.32, 1)}
+            fill={isFilled ? fill : 'transparent'}
+            stroke={isFilled || strokeWidth > 0 ? 'transparent' : 'black'}
+            strokeWidth={1}
+            pointerEvents="all"
+          />
+        </>
       )
     }
 
@@ -106,15 +117,30 @@ export class Draw extends TLShapeUtil<DrawShape> {
     }
 
     return (
-      <path
-        d={drawPathData}
-        fill={fill}
-        stroke={color}
-        strokeWidth={fill ? strokeWidth || 1 : strokeWidth}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        pointerEvents="all"
-      />
+      <>
+        {strokeWidth && (
+          <path
+            d={drawPathData}
+            fill={'transparent'}
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            pointerEvents="all"
+          />
+        )}
+        {
+          <path
+            d={drawPathData}
+            fill={isFilled ? fill : 'transparent'}
+            stroke={isFilled || strokeWidth > 0 ? 'transparent' : 'black'}
+            strokeWidth={1}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            pointerEvents="all"
+          />
+        }
+      </>
     )
   }
 

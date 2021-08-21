@@ -8,6 +8,10 @@ body {
   font-size: 13px;
 }
 
+span[role='label'] {
+  user-select: none;
+}
+
 .app {
   position: fixed;
   top: 0;

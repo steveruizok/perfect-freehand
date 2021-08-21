@@ -18,10 +18,13 @@ export function Colors(props: ColorsProps) {
           return (
             <button
               key={color}
-              className={styles.color}
+              className={
+                color === props.color
+                  ? [styles.color, styles.selected].join(' ')
+                  : styles.color
+              }
               style={{
                 backgroundColor: color,
-                borderBottom: color === props.color ? '3px solid #000' : 'none',
               }}
               onClick={() => props.onChange(color)}
             />

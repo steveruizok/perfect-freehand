@@ -7,15 +7,12 @@ const name = process.env.npm_package_name || ''
 async function main() {
   esbuild.build({
     entryPoints: ['./src/index.ts'],
-    outdir: 'dist/cjs',
+    outdir: 'dist/esm',
     minify: false,
     bundle: true,
-    format: 'cjs',
+    format: 'esm',
     target: 'esnext',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
     tsconfig: './tsconfig.json',
-    external: ['react', 'react-dom'],
     watch: {
       onRebuild(error) {
         if (error) {
@@ -26,8 +23,6 @@ async function main() {
       },
     },
   })
-
-  // result.stop();
 }
 
 main()
