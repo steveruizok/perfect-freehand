@@ -53,6 +53,7 @@ export const initialState: State = {
     tool: 'drawing',
     editingId: undefined,
     style: defaultStyle,
+    isPanelOpen: true,
   },
   ...initialDoc,
 }
@@ -211,6 +212,17 @@ export class AppState extends StateManager<State> {
         camera: {
           point,
         },
+      },
+    })
+  }
+
+  /* --------------------- Methods -------------------- */
+
+  togglePanelOpen = () => {
+    const { state } = this
+    this.patchState({
+      appState: {
+        isPanelOpen: !state.appState.isPanelOpen,
       },
     })
   }

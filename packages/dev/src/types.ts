@@ -45,6 +45,7 @@ export interface State extends Doc {
     tool: 'drawing' | 'erasing'
     editingId?: string
     style: DrawStyles
+    isPanelOpen: boolean
   }
 }
 

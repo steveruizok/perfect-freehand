@@ -1,7 +1,7 @@
 .container {
   position: fixed;
   width: min(100%, 320px);
-  top: 0px;
+  top: 48px;
   left: 0px;
   padding: 12px;
   background-color: rgba(255, 255, 255, 0.95);
@@ -9,6 +9,12 @@
   box-shadow: 0px 0px 8px -4px rgba(0, 0, 0, 0.16),
     0px 0px 36px 0px rgba(0, 0, 0, 0.08);
   z-index: 100;
+  transform: translate(-100%, 0px);
+}
+
+.open {
+  transform: translate(0%, 0px);
+  transition: transform 0.2s;
 }
 
 .inputs {

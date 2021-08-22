@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styles from './panel.module.css'
 import { useApp, useAppState } from 'state'
-import { GitHubLogoIcon } from '@radix-ui/react-icons'
+import { GitHubLogoIcon, HamburgerMenuIcon } from '@radix-ui/react-icons'
 
 export function Panel() {
   const app = useApp()
@@ -16,6 +16,11 @@ export function Panel() {
           rel="noopener nofollow"
         >
           perfect-freehand
+        </a>
+      </div>
+      <div className={[styles.container, styles.top, styles.left].join(' ')}>
+        <a onClick={app.togglePanelOpen}>
+          <HamburgerMenuIcon height={24} width={24} color="black" />
         </a>
       </div>
       <div className={[styles.container, styles.top, styles.right].join(' ')}>

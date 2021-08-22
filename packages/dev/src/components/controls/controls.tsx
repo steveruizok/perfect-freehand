@@ -20,8 +20,8 @@ const appStateSelector = (s: State) => s.appState
 
 export function Controls() {
   const app = useApp()
-  const state = useAppState(appStateSelector)
-  const { style } = state
+  const appState = useAppState(appStateSelector)
+  const { style } = appState
 
   const handleSizeChangeStart = React.useCallback(() => {
     app.startStyleUpdate('size')
@@ -143,7 +143,12 @@ export function Controls() {
   }, [])
 
   return (
-    <div className={styles.container}>
+    <div
+      className={[
+        styles.container,
+        appState.isPanelOpen ? styles.open : '',
+      ].join(' ')}
+    >
       <div className={styles.inputs}>
         <Slider
           name="Size"
