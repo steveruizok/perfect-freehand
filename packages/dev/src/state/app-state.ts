@@ -10,7 +10,7 @@ import {
 import { StateManager } from './state-core'
 import { Draw } from './shapes'
 import type { StateSelector } from 'zustand'
-import { pointInPolygon } from './utils'
+import { copyTextToClipboard, pointInPolygon } from './utils'
 
 export const shapeUtils = {
   draw: new Draw(),
@@ -567,7 +567,24 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  copyStyles = () => {}
+  copyStyles = () => {
+    const { state } = this
+    const { style } = state.appState
+    copyTextToClipboard(`{
+  size: ${style.size},
+  smoothing: ${style.smoothing},
+  thinning: ${style.thinning},
+  streamline: ${style.streamline},
+  start: {
+    taper: ${style.taperStart},
+    cap: ${style.capStart},
+  },
+  end: {
+    taper: ${style.taperEnd},
+    cap: ${style.capEnd},
+  },
+}`)
+  }
 
   deleteAll = () => {
     const { shapes } = this.state.page
