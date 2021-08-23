@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src", "decs.d.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "dist"],
+  "compilerOptions": {
+    "baseUrl": "./src"
+  }
+}

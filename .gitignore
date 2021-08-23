@@ -1,7 +1,12 @@
-*.log
+node_modules/
+build/
+lib/
+dist/
+docs/
+.idea/*
+
 .DS_Store
-node_modules
-dist
-example/yarn.lock
+coverage
+*.log
 
 .vercel

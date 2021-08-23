@@ -1,0 +1,43 @@
+.root {
+  position: relative;
+  flex-grow: 2;
+  max-width: 200px;
+  display: flex;
+  height: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.root:focus {
+  outline: none;
+}
+
+.root:focus::after {
+  border: 2px solid dodgerblue;
+}
+
+.root::after {
+  content: '';
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid gainsboro;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.indicator {
+  position: initial;
+  height: 16px;
+  width: 16px;
+  border-radius: 2px;
+  box-sizing: border-box;
+  background-color: dodgerblue;
+  border: 1px solid dodgerblue;
+  z-index: 2;
+}

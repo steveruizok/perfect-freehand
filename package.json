@@ -1,6 +1,7 @@
 {
-  "version": "0.4.11",
-  "name": "perfect-freehand",
+  "private": true,
+  "version": "0.5.0",
+  "name": "perfect-freehand-repo",
   "author": {
     "name": "Steve Ruiz",
     "url": "https://twitter.com/steveruizok"
@@ -17,54 +18,84 @@
     "painting"
   ],
   "license": "MIT",
-  "module": "dist/perfect-freehand.esm.js",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src"
+  "workspaces": [
+    "packages/*"
   ],
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "test": "jest",
+    "lerna": "lerna",
+    "start": "lerna run start --stream --parallel",
+    "build": "yarn build:packages && cd packages/dev && yarn build",
+    "build:packages": "cd packages/perfect-freehand && yarn build",
+    "publish:patch": "yarn build:packages && lerna publish patch",
+    "postinstall": "husky install"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
+  "devDependencies": {
+    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-typescript": "^7.15.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@types/node": "^15.0.1",
+    "@types/react": "^17.0.16",
+    "@types/react-dom": "^17.0.9",
+    "esbuild": "^0.12.21",
+    "husky": "^7.0.0",
+    "jest": "^27.0.6",
+    "lerna": "^3.15.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "tslib": "^2.3.0",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "ts-jest": "^27.0.5"
   },
   "prettier": {
-    "printWidth": 80,
-    "semi": false,
+    "trailingComma": "es5",
     "singleQuote": true,
-    "trailingComma": "es5"
+    "semi": false,
+    "printWidth": 80
   },
-  "size-limit": [
-    {
-      "path": "dist/perfect-freehand.cjs.production.min.js",
-      "limit": "10 KB"
+  "jest": {
+    "preset": "ts-jest",
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupTests.ts"
+    ],
+    "transform": {
+      "^.+\\.(tsx|jsx|ts|js)?$": "ts-jest"
     },
-    {
-      "path": "dist/perfect-freehand.esm.js",
-      "limit": "10 KB"
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json",
+        "babelConfig": {
+          "presets": [
+            [
+              "@babel/preset-react"
+            ],
+            "@babel/preset-typescript"
+          ],
+          "plugins": [
+            "@babel/plugin-syntax-import-meta"
+          ]
+        }
+      }
+    },
+    "testEnvironment": "jsdom",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/packages/perfect-freehand/build/",
+      "<rootDir>/packages/dev/build/"
+    ],
+    "moduleNameMapper": {
+      "perfect-freehand": "<rootDir>/packages/perfect-freehand/src",
+      "\\+(.*)": "<rootDir>/packages/perfect-freehand/src/$1"
     }
-  ],
-  "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.9.2",
-    "husky": "^5.0.9",
-    "size-limit": "^4.9.2",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.1.0",
-    "typescript": "^4.1.5"
-  },
-  "peerDependencies": {},
-  "dependencies": {}
+  }
 }

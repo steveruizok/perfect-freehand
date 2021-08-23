@@ -1,0 +1,59 @@
+{
+  "version": "0.5.0",
+  "private": true,
+  "name": "dev",
+  "description": "An example project for perfect-freehand.",
+  "author": {
+    "name": "Steve Ruiz",
+    "url": "https://twitter.com/steveruizok"
+  },
+  "repository": "https://github.com/steveruizok/perfect-freehand",
+  "keywords": [
+    "ink",
+    "draw",
+    "paint",
+    "signature",
+    "handwriting",
+    "text",
+    "drawing",
+    "painting"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./esbuild.config.mjs --dev tsc --watch",
+    "build": "yarn clean && node ./esbuild.config.mjs && tsc --project tsconfig.build.json  --emitDeclarationOnly --outDir dist/types",
+    "clean": "rm -rf dist"
+  },
+  "files": [
+    "README.md",
+    "src"
+  ],
+  "dependencies": {
+    "@radix-ui/react-checkbox": "^0.0.17",
+    "@radix-ui/react-icons": "^1.0.3",
+    "@radix-ui/react-label": "^0.0.15",
+    "@radix-ui/react-slider": "^0.0.17",
+    "@tldraw/core": "latest",
+    "fast-json-patch": "^3.1.0",
+    "idb": "^6.1.2",
+    "idb-keyval": "^5.1.3",
+    "perfect-freehand": "^0.5.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-hotkeys-hook": "^3.4.0",
+    "zustand": "^3.5.9"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.35",
+    "@types/react": "^17.0.19",
+    "@types/react-dom": "^17.0.9",
+    "concurrently": "6.0.1",
+    "create-serve": "1.0.1",
+    "css-tree": "^1.1.3",
+    "esbuild": "^0.12.21",
+    "esbuild-css-modules-plugin": "^2.0.8",
+    "perfect-freehand": "*",
+    "rimraf": "3.0.2",
+    "typescript": "4.2.3"
+  }
+}

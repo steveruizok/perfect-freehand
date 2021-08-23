@@ -1,0 +1,18 @@
+.grid {
+  display: flex;
+  grid-column: span 2;
+  margin-left: -4px;
+}
+
+.color {
+  cursor: pointer;
+  flex-grow: 2;
+  border: none;
+  height: 24px;
+  width: 100%;
+  padding: none;
+}
+
+.selected {
+  border-bottom: 5px solid dodgerblue;
+}

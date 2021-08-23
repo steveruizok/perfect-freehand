@@ -1,0 +1,78 @@
+.root {
+  max-width: 200px;
+  height: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 1;
+  user-select: none;
+  touch-action: none;
+}
+
+.range {
+  position: absolute;
+  height: 3px;
+  background-color: dodgerblue;
+  border-radius: 5px;
+}
+
+.track {
+  position: relative;
+  height: 3px;
+  flex-grow: 1;
+  background-color: gainsboro;
+  border-radius: 5px;
+}
+
+.thumb {
+  position: relative;
+  height: 4px;
+  width: 4px;
+  outline: none;
+}
+
+.thumbBall {
+  display: block;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbBall::after {
+  display: block;
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  background-color: white;
+  border: 2px solid dodgerblue;
+  transform: scale(1);
+  transition: all 0.12s;
+}
+
+.thumb:focus > .thumbBall::after {
+  background-color: dodgerblue;
+}
+
+.numberInput {
+  font-family: 'Recursive', sans-serif;
+  font-size: 12px;
+  border: none;
+  width: 40px;
+  text-align: right;
+  padding: 4px 4px;
+}
+
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInput:focus {
+  border-radius: 2px;
+  outline: 2px solid dodgerblue;
+}
