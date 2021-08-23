@@ -378,16 +378,14 @@ export function getStrokeOutlinePoints(
             firstPoint.point,
             vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
           )
-
           for (let t = 0, step = 0.1; t <= 1; t += step) {
             startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
           }
-
           leftPts.shift()
           rightPts.shift()
         }
       } else {
-        startCap.push(firstPoint.point)
+        startCap.push(firstPoint.point, vec.add(firstPoint.point, [0.1, 0.1]))
       }
     } else {
       if (!vec.isEqual(tr, tl)) {
