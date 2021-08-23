@@ -71,10 +71,12 @@ export class Draw extends TLShapeUtil<DrawShape> {
 
     let drawPathData = ''
 
+    const simulatePressure = shape.points[1]?.[2] === 0.5
+
     // For very short lines, draw a point instead of a line
     const bounds = this.getBounds(shape)
 
-    if (bounds.width <= size && bounds.height <= size && isDone) {
+    if (simulatePressure && bounds.width <= 4 && bounds.height <= 4 && isDone) {
       return (
         <>
           {strokeWidth > 0 && (
@@ -98,9 +100,6 @@ export class Draw extends TLShapeUtil<DrawShape> {
     }
 
     if (shape.points.length > 2) {
-      const simulatePressure =
-        shape.points[shape.points.length - 1]?.[2] === 0.5
-
       const stroke = getStroke(shape.points.slice(2), {
         size,
         thinning,
