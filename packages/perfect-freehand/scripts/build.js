@@ -8,7 +8,7 @@ async function main() {
   try {
     esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist/esm',
+      outdir: 'dist/cjs',
       minify: true,
       bundle: true,
       format: 'cjs',
@@ -18,7 +18,7 @@ async function main() {
 
     esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist/cjs',
+      outdir: 'dist/esm',
       minify: true,
       bundle: true,
       format: 'esm',
