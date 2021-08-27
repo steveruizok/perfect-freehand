@@ -18,15 +18,7 @@ function App(): JSX.Element {
 }
 
 const AppWrapper: React.FC = () => {
-  const [appState] = React.useState(
-    () => new AppState(initialState, 'state_v1')
-  )
-
-  return (
-    <context.Provider value={appState}>
-      <App />
-    </context.Provider>
-  )
+  return <App />
 }
 
 export default AppWrapper

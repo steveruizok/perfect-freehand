@@ -7,7 +7,7 @@ import {
   Utils,
   Vec,
 } from '@tldraw/core'
-import { StateManager } from './state-core'
+import { StateManager } from 'rko'
 import { Draw } from './shapes'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
@@ -61,13 +61,9 @@ export const initialState: State = {
 export const context = React.createContext<AppState>({} as AppState)
 
 export class AppState extends StateManager<State> {
-  constructor(initial: State, id = 'create', reset = false) {
-    super(initial, id, reset)
-  }
-
   shapeUtils = shapeUtils
 
-  protected clean = (state: State) => {
+  cleanup = (state: State) => {
     for (const id in state.page.shapes) {
       if (!state.page.shapes[id]) {
         delete state.page.shapes[id]
@@ -85,11 +81,7 @@ export class AppState extends StateManager<State> {
         break
       }
       case 'erasing': {
-        this.setSnapshot({
-          page: {
-            shapes: this.state.page.shapes,
-          },
-        })
+        this.setSnapshot()
         this.patchState({
           appState: {
             status: 'erasing',
@@ -131,7 +123,6 @@ export class AppState extends StateManager<State> {
       }
       case 'erasing': {
         this.setState({
-          id: 'erased',
           before: this.snapshot,
           after: {
             appState: {
@@ -291,7 +282,6 @@ export class AppState extends StateManager<State> {
     }
 
     return this.setState({
-      id: 'complete_shape',
       before: {
         appState: {
           status: 'idle',
@@ -360,7 +350,6 @@ export class AppState extends StateManager<State> {
     if (state.appState.editingId) return this // Don't erase while drawing
 
     return this.setState({
-      id: 'erase_all',
       before: {
         page: {
           shapes,
@@ -374,25 +363,8 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  startStyleUpdate = (key: keyof DrawStyles) => {
-    const { state } = this
-    const { shapes } = state.page
-
-    return this.setSnapshot({
-      appState: {
-        style: state.appState.style,
-      },
-      page: {
-        shapes: {
-          ...Object.fromEntries(
-            Object.entries(shapes).map(([id, { style }]) => [
-              id,
-              { style: { [key]: style[key] } },
-            ])
-          ),
-        },
-      },
-    })
+  startStyleUpdate = () => {
+    return this.setSnapshot()
   }
 
   patchStyleForAllShapes = (style: Partial<DrawStyles>) => {
@@ -425,7 +397,6 @@ export class AppState extends StateManager<State> {
     const { shapes } = state.page
 
     return this.setState({
-      id: 'finish_style_update',
       before: snapshot,
       after: {
         appState: {
@@ -446,7 +417,6 @@ export class AppState extends StateManager<State> {
     const { shapes } = this.state.page
 
     return this.setState({
-      id: 'set_style',
       before: {
         appState: {
           style: Object.fromEntries(
@@ -496,7 +466,6 @@ export class AppState extends StateManager<State> {
     const initialStyle = initialState.appState.style[prop]
 
     return this.setState({
-      id: 'set_style',
       before: {
         appState: state.appState,
         page: {
@@ -535,7 +504,6 @@ export class AppState extends StateManager<State> {
     const initialAppState = initialState.appState
 
     return this.setState({
-      id: 'set_style',
       before: {
         appState: currentAppState,
         page: {
@@ -590,7 +558,6 @@ export class AppState extends StateManager<State> {
     const { shapes } = this.state.page
 
     return this.setState({
-      id: 'delete_all',
       before: {
         page: {
           shapes,
@@ -633,17 +600,18 @@ export class AppState extends StateManager<State> {
   }
 }
 
-export function useApp() {
-  const appState = React.useContext(context)
-  return appState
-}
+export const app = new AppState(
+  initialState,
+  'perfect-freehand',
+  1,
+  (p, n) => n
+)
 
 export function useAppState(): State
 export function useAppState<K>(selector: StateSelector<State, K>): K
 export function useAppState(selector?: StateSelector<State, any>) {
-  const appState = React.useContext(context)
   if (selector) {
-    return appState.useAppState(selector)
+    return app.useStore(selector)
   }
-  return appState.useAppState()
+  return app.useStore()
 }

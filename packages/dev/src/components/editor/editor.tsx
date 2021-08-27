@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Renderer, TLPointerInfo } from '@tldraw/core'
-import { context, useApp, useAppState } from 'state'
+import { Renderer } from '@tldraw/core'
+import { app, useAppState } from 'state'
 import styles from './editor.module.css'
 
 export function Editor(): JSX.Element {
@@ -13,7 +13,7 @@ export function Editor(): JSX.Element {
     onPointerMove,
     onPointerUp,
     shapeUtils,
-  } = useApp()
+  } = app
   const { page, pageState } = useAppState()
 
   return (

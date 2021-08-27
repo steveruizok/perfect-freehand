@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Checkbox } from 'components/checkbox'
 import { Slider } from 'components/slider'
 import styles from './controls.module.css'
-import { useApp, useAppState } from 'state/app-state'
+import { app, useAppState } from 'state'
 import type { State } from 'types'
 import { Colors } from 'components/colors'
 
@@ -19,12 +19,11 @@ const colors = [
 const appStateSelector = (s: State) => s.appState
 
 export function Controls() {
-  const app = useApp()
   const appState = useAppState(appStateSelector)
   const { style } = appState
 
   const handleSizeChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('size')
+    app.setSnapshot()
   }, [])
 
   const handleSizeChange = React.useCallback((v: number[]) => {
@@ -32,7 +31,7 @@ export function Controls() {
   }, [])
 
   const handleStrokeWidthChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('strokeWidth')
+    app.setSnapshot()
   }, [])
 
   const handleStrokeWidthChange = React.useCallback((v: number[]) => {
@@ -40,7 +39,7 @@ export function Controls() {
   }, [])
 
   const handleThinningChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('thinning')
+    app.setSnapshot()
   }, [])
 
   const handleThinningChange = React.useCallback((v: number[]) => {
@@ -48,7 +47,7 @@ export function Controls() {
   }, [])
 
   const handleStreamlineChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('streamline')
+    app.setSnapshot()
   }, [])
 
   const handleStreamlineChange = React.useCallback((v: number[]) => {
@@ -56,7 +55,7 @@ export function Controls() {
   }, [])
 
   const handleSmoothingChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('smoothing')
+    app.setSnapshot()
   }, [])
 
   const handleSmoothingChange = React.useCallback((v: number[]) => {
@@ -71,7 +70,7 @@ export function Controls() {
   )
 
   const handleTaperStartChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('taperStart')
+    app.setSnapshot()
   }, [])
 
   const handleTaperStartChange = React.useCallback((v: number[]) => {
@@ -86,7 +85,7 @@ export function Controls() {
   )
 
   const handleTaperEndChangeStart = React.useCallback(() => {
-    app.startStyleUpdate('taperEnd')
+    app.setSnapshot()
   }, [])
 
   const handleTaperEndChange = React.useCallback((v: number[]) => {
