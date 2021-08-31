@@ -1,5 +1,5 @@
 {
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "name": "dev",
   "description": "An example project for perfect-freehand.",
@@ -34,7 +34,7 @@
     "@radix-ui/react-label": "^0.0.15",
     "@radix-ui/react-slider": "^0.0.17",
     "@tldraw/core": "latest",
-    "perfect-freehand": "^0.5.2",
+    "perfect-freehand": "^0.5.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hotkeys-hook": "^3.4.0",
