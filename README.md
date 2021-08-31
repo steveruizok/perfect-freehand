@@ -117,7 +117,7 @@ function getSvgPathFromStroke(stroke) {
 
   const d = stroke.reduce(
     (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length]
+      const [x1, y1] = arr[i === arr.length - 1 ? 0 : i + 1]
       acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
       return acc
     },

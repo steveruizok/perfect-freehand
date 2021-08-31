@@ -44,5 +44,9 @@
     "tslib": "^2.3.0",
     "typedoc": "^0.20.35",
     "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@tldraw/core": "^0.0.51",
+    "rko": "^0.5.19"
   }
 }
