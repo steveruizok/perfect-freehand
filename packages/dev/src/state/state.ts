@@ -496,6 +496,26 @@ export class AppState extends StateManager<State> {
     })
   }
 
+  zoomToContent = (): this => {
+    const shapes = Object.values(this.state.page.shapes)
+    const pageState = this.state.pageState
+
+    if (shapes.length === 0) return this
+
+    const bounds = Utils.getCommonBounds(
+      Object.values(shapes).map(shapeUtils.draw.getBounds)
+    )
+
+    const { zoom } = pageState.camera
+    const mx = (window.innerWidth - bounds.width * zoom) / 2 / zoom
+    const my = (window.innerHeight - bounds.height * zoom) / 2 / zoom
+    const point = Vec.round(Vec.add([-bounds.minX, -bounds.minY], [mx, my]))
+
+    return this.patchState({
+      pageState: { camera: { point } },
+    })
+  }
+
   resetStyles = () => {
     const { shapes } = this.state.page
     const { state } = this
@@ -529,6 +549,11 @@ export class AppState extends StateManager<State> {
                 { style: initialAppState.style },
               ])
             ),
+          },
+        },
+        pageState: {
+          camera: {
+            zoom: 1,
           },
         },
       },

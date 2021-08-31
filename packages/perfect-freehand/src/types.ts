@@ -21,7 +21,9 @@ export interface StrokeOptions {
 export interface StrokePoint {
   point: number[]
   pressure: number
-  vector: number[]
   distance: number
+  vector: number[]
   runningLength: number
 }
+
+export type InputPoint = { x: number; y: number; pressure?: number } | number[]

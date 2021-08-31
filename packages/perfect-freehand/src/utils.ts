@@ -9,9 +9,9 @@ export function clamp(n: number, a: number, b: number) {
 }
 
 /**
- * Convert an array of points to the correct format ([x, y, radius])
- * @param points
- * @returns
+ * Convert an array of points to the correct format ([x, y, pressure])
+ * @param points The points to format, an array of arrays or objects
+ * @returns number[][]
  */
 export function toPointsArray<
   T extends number[],
@@ -24,11 +24,13 @@ export function toPointsArray<
       pressure,
     ])
   } else {
-    return (points as {
-      x: number
-      y: number
-      pressure?: number
-    }[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
+    return (
+      points as {
+        x: number
+        y: number
+        pressure?: number
+      }[]
+    ).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
   }
 }
 
@@ -53,18 +55,4 @@ export function getStrokeRadius(
       ? lerp(size, size + size * clamp(thinning, -0.95, -0.05), pressure)
       : lerp(size - size * clamp(thinning, 0.05, 0.95), size, pressure)) / 2
   )
-}
-
-export function withoutDuplicates(pts: number[][]) {
-  const unique: number[][] = []
-
-  let prev: number[] | undefined = undefined
-
-  for (let pt of pts) {
-    if (prev && isEqual(prev, pt)) continue
-    unique.push(pt)
-    prev = pt
-  }
-
-  return pts
 }

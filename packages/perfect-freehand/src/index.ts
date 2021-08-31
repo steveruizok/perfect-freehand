@@ -6,50 +6,77 @@ const { min, PI } = Math
 
 /**
  * ## getStrokePoints
- * @description Get points for a stroke.
+ * @description Get points for a stroke. Returns an array of objects with an adjusted point, pressure, vector, distance, and runningLength.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
  * @param streamline How much to streamline the stroke.
  * @param size The stroke's size.
  */
-export function getStrokePoints<
-  T extends number[],
-  K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options = {} as StrokeOptions): StrokePoint[] {
-  let { streamline = 0.5 } = options
+export function getStrokePoints(
+  points: number[][] | { x: number; y: number; pressure?: number }[],
+  options = {} as StrokeOptions
+): StrokePoint[] {
+  let { streamline = 0.5, last: isComplete = false } = options
   const { simulatePressure = true } = options
 
-  streamline = streamline / (simulatePressure ? 4 : 2)
+  // If we don't have any points, return an empty array.
+  if (points.length === 0) return []
 
+  // Knock down the streamline (more if we're simulating pressure).
+  streamline = streamline / (simulatePressure ? 3 : 2)
+
+  // Whatever the input is, make sure that the points are in number[][].
   const pts = toPointsArray(points)
 
-  if (pts.length === 0) return []
-
+  // If there's only one point, add another point at a 1pt offset.
   if (pts.length === 1) pts.push([...vec.add(pts[0], [1, 1]), pts[0][2]])
 
-  const strokePoints: StrokePoint[] = [
-    {
-      point: [pts[0][0], pts[0][1]],
-      pressure: pts[0][2],
-      vector: [0, 0],
-      distance: 0,
-      runningLength: 0,
-    },
-  ]
+  // The strokePoints array will hold the points for the stroke.
+  // Start it out with the first point, which needs no adjustment.
+  const strokePoints: StrokePoint[] = []
 
-  for (
-    let i = 1, j = 0, curr = pts[i], prev = strokePoints[j];
-    i < pts.length;
-    i++, curr = pts[i], prev = strokePoints[j]
-  ) {
-    const point = vec.lrp(prev.point, curr, 1 - streamline)
+  let prev: StrokePoint = {
+    point: [pts[0][0], pts[0][1]],
+    pressure: pts[0][2],
+    vector: [0, 0],
+    distance: 0,
+    runningLength: 0,
+  }
 
+  strokePoints.push(prev)
+
+  // Iterate through all of the points.
+  const len = pts.length
+
+  let curr: number[]
+
+  for (let i = 0; i < len; i++) {
+    curr = pts[i]
+
+    // If we're at the last point, then add the actual input point.
+    // Otherwise, using the streamline option, interpolate a new point
+    // between the previous point the current point.
+    // More streamline = closer to the previous point;
+    // less streamline = closer to the current point.
+    // This takes a lot of the "noise" out of the input points.
+    const point =
+      isComplete && i === len - 1
+        ? curr
+        : vec.lrp(prev.point, curr, 1 - streamline)
+
+    // If the new point is the same as the previous point, skip ahead.
     if (vec.isEqual(prev.point, point)) continue
 
+    // What's the vector from the current point to the previous point?
     const vector = vec.uni(vec.sub(prev.point, point))
+
+    // How far is the new point from the previous point?
     const distance = vec.dist(point, prev.point)
+
+    // Add this distance to the total "running length" of the line.
     const runningLength = prev.runningLength + distance
 
-    const strokePoint = {
+    // Create a new strokepoint (it will be the new "previous" one)
+    prev = {
       point,
       pressure: curr[2],
       vector,
@@ -57,36 +84,8 @@ export function getStrokePoints<
       runningLength,
     }
 
-    strokePoints.push(strokePoint)
-
-    j += 1 // only increment j if we add an item to strokePoints
+    strokePoints.push(prev)
   }
-
-  /* 
-    Align vectors at the end of the line
-
-    Starting from the last point, work back until we've traveled more than
-    half of the line's size (width). Take the current point's vector and then
-    work forward, setting all remaining points' vectors to this vector. This
-    removes the "noise" at the end of the line and allows for a better-facing
-    end cap.
-  */
-
-  // Update the length to the length of the strokePoints array.
-  // const len = strokePoints.length
-
-  // const totalLength = strokePoints[len - 1].runningLength
-
-  // for (let i = len - 2; i > 1; i--) {
-  //   const { runningLength, vector } = strokePoints[i]
-  //   const dpr = vec.dpr(strokePoints[i - 1].vector, strokePoints[i].vector)
-  //   if (totalLength - runningLength > size / 2 || dpr < 0.8) {
-  //     for (let j = i; j < len; j++) {
-  //       strokePoints[j].vector = vector
-  //     }
-  //     break
-  //   }
-  // }
 
   return strokePoints
 }
@@ -149,14 +148,25 @@ export function getStrokeOutlinePoints(
   const leftPts: number[][] = []
   const rightPts: number[][] = []
 
-  // Previous pressure (start with average of first five pressures)
-  let prevPressure = points
-    .slice(0, 5)
-    .reduce((acc, cur) => (acc + cur.pressure) / 2, points[0].pressure)
+  // Previous pressure (start with average of first five pressures,
+  // in order to prevent fat starts for every line. Drawn lines
+  // almost always start slow!
+  let prevPressure = points.slice(0, 10).reduce((acc, curr) => {
+    let pressure = curr.pressure
+
+    if (simulatePressure) {
+      const sp = min(1, curr.distance / size)
+      const rp = min(1, 1 - sp)
+      pressure = min(1, acc + (rp - acc) * (sp / 4))
+    }
+
+    return (acc + pressure) / 2
+  }, points[0].pressure)
 
   // The current radius
   let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
 
+  // The radius of the first saved point
   let firstRadius: number | undefined = undefined
 
   // Previous vector
@@ -175,8 +185,8 @@ export function getStrokeOutlinePoints(
   /*
     Find the outline's left and right points
 
-   Iterating through the points and populate the rightPts and leftPts arrays,
-   skipping the first and last pointsm, which will get caps later on.
+    Iterating through the points and populate the rightPts and leftPts arrays,
+    skipping the first and last pointsm, which will get caps later on.
   */
 
   for (let i = 0; i < len - 1; i++) {
@@ -198,10 +208,13 @@ export function getStrokeOutlinePoints(
     */
 
     if (thinning) {
+      // If we're simulating pressure, then do so based on the distance
+      // between the current point and the previous point, and the size
+      // of the stroke.
       if (simulatePressure) {
-        const rp = min(1, 1 - distance / size)
         const sp = min(1, distance / size)
-        pressure = min(1, prevPressure + (rp - prevPressure) * (sp / 2))
+        const rp = min(1, 1 - sp)
+        pressure = min(1, prevPressure + (rp - prevPressure) * (sp / 4))
       }
 
       radius = getStrokeRadius(size, thinning, easing, pressure)
@@ -379,7 +392,9 @@ export function getStrokeOutlinePoints(
             vec.mul(vec.uni(vec.vec(tr, tl)), vec.dist(tr, tl) / 2)
           )
           for (let t = 0, step = 0.1; t <= 1; t += step) {
-            startCap.push(vec.rotAround(start, firstPoint.point, PI * t))
+            const pt = vec.rotAround(start, firstPoint.point, PI * t)
+            if (vec.dist(pt, tl) < 1) break
+            startCap.push(pt)
           }
           leftPts.shift()
           rightPts.shift()
@@ -412,21 +427,31 @@ export function getStrokeOutlinePoints(
     sharp end turns.
   */
 
-    const lastLeft = leftPts[leftPts.length - 1]
-    const lastRight = rightPts[rightPts.length - 1]
-    const mid = vec.med(lastLeft, lastRight)
-    const last = options.last
-      ? lastPoint.point
-      : vec.lrp(mid, lastPoint.point, 0.618)
+    // The last left point
+    const ll = leftPts[leftPts.length - 1]
+
+    // The last right point
+    const lr = rightPts[rightPts.length - 1]
+
+    // The point between the two
+    const mid = vec.med(ll, lr)
+
+    // The last provided point
+    const last = lastPoint.point
+
     const vector = vec.uni(vec.sub(last, mid))
 
     if (capEnd || taperEnd) {
       if (!taperEnd && !(taperStart && isVeryShort)) {
+        // Draw the end cap
         const start = vec.add(last, vec.mul(vec.per(vector), radius))
-        for (let t = 0, step = 0.15; t <= 1; t += step) {
-          endCap.push(vec.rotAround(start, last, PI * 3 * t))
+        for (let t = 0, step = 0.1; t <= 1; t += step) {
+          const pt = vec.rotAround(start, last, PI * 3 * t)
+          if (vec.dist(pt, lr) < 1) break
+          endCap.push(pt)
         }
       } else {
+        // Just push the last point to the line
         endCap.push(last)
       }
     } else {
@@ -451,8 +476,8 @@ export function getStrokeOutlinePoints(
 /**
  * ## getStroke
  * @description Returns a stroke as an array of outline points.
- * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional.
- * @param options An (optional) object with options.
+ * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional in both cases.
+ * @param options (optional) An object with options.
  * @param options.size	The base size (diameter) of the stroke.
  * @param options.thinning The effect of pressure on the stroke's size.
  * @param options.smoothing	How much to soften the stroke's edges.
@@ -462,11 +487,17 @@ export function getStrokeOutlinePoints(
  * @param options.end Tapering and easing function for the end of the line.
  * @param options.last Whether to handle the points as a completed stroke.
  */
-export default function getStroke<
-  T extends number[],
-  K extends { x: number; y: number; pressure?: number }
->(points: (T | K)[], options: StrokeOptions = {} as StrokeOptions): number[][] {
+function getStroke(points: number[][], options?: StrokeOptions): number[][]
+function getStroke(
+  points: { x: number; y: number; pressure?: number }[],
+  options?: StrokeOptions
+): number[][]
+function getStroke(
+  points: number[][] | { x: number; y: number; pressure?: number }[],
+  options: StrokeOptions = {} as StrokeOptions
+): number[][] {
   return getStrokeOutlinePoints(getStrokePoints(points, options), options)
 }
 
+export default getStroke
 export { StrokeOptions }
