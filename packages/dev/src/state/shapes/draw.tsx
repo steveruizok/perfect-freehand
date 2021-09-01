@@ -263,7 +263,9 @@ export class Draw extends TLShapeUtil<DrawShape> {
     const [x1, y1] = Vec.sub([bounds.minX, bounds.minY], shape.point)
 
     return {
-      points: shape.points.map(([x0, y0, p]) => [x0 - x1, y0 - y1, p]),
+      points: shape.points.map(([x0, y0, p, t]) =>
+        Vec.round([x0 - x1, y0 - y1]).concat(p, t)
+      ),
       point: Vec.add(shape.point, [x1, y1]),
     }
   }

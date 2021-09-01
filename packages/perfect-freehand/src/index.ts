@@ -15,8 +15,8 @@ export function getStrokePoints(
   points: number[][] | { x: number; y: number; pressure?: number }[],
   options = {} as StrokeOptions
 ): StrokePoint[] {
-  let { streamline = 0.5, last: isComplete = false } = options
-  const { simulatePressure = true } = options
+  let { streamline = 0.5 } = options
+  const { simulatePressure = true, last: isComplete = false } = options
 
   // If we don't have any points, return an empty array.
   if (points.length === 0) return []
@@ -90,6 +90,8 @@ export function getStrokePoints(
   return strokePoints
 }
 
+const RATE_OF_CHANGE = 0.25
+
 /**
  * ## getStrokeOutlinePoints
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
@@ -155,9 +157,12 @@ export function getStrokeOutlinePoints(
     let pressure = curr.pressure
 
     if (simulatePressure) {
+      // Speed of change - how fast should the the pressure changing?
       const sp = min(1, curr.distance / size)
+      // Rate of change - how much of a change is there?
       const rp = min(1, 1 - sp)
-      pressure = min(1, acc + (rp - acc) * (sp / 4))
+      // Accelerate the pressure
+      pressure = min(1, acc + (rp - acc) * (sp * RATE_OF_CHANGE))
     }
 
     return (acc + pressure) / 2
@@ -214,7 +219,10 @@ export function getStrokeOutlinePoints(
       if (simulatePressure) {
         const sp = min(1, distance / size)
         const rp = min(1, 1 - sp)
-        pressure = min(1, prevPressure + (rp - prevPressure) * (sp / 4))
+        pressure = min(
+          1,
+          prevPressure + (rp - prevPressure) * (sp * RATE_OF_CHANGE)
+        )
       }
 
       radius = getStrokeRadius(size, thinning, easing, pressure)

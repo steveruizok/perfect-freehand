@@ -62,6 +62,7 @@ export const context = React.createContext<AppState>({} as AppState)
 
 export class AppState extends StateManager<State> {
   shapeUtils = shapeUtils
+  startTime = 0
 
   cleanup = (state: State) => {
     for (const id in state.page.shapes) {
@@ -227,10 +228,12 @@ export class AppState extends StateManager<State> {
       point: pt,
       style: state.appState.style,
       points: [
-        [0, 0, 0.5],
-        [0, 0, 0.5],
+        [0, 0, 0.5, 0],
+        [0, 0, 0.5, 0],
       ],
     })
+
+    this.startTime = Date.now()
 
     return this.patchState({
       appState: {
@@ -252,13 +255,15 @@ export class AppState extends StateManager<State> {
 
     const shape = state.page.shapes[state.appState.editingId]
     const camera = state.pageState.camera
-    const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point)
+    const newPoint = Vec.round(
+      Vec.sub(Vec.sub(Vec.div(point, camera.zoom), camera.point), shape.point)
+    ).concat(pressure, Date.now() - this.startTime)
 
     return this.patchState({
       page: {
         shapes: {
           [shape.id]: {
-            points: [...shape.points, [...Vec.sub(pt, shape.point), pressure]],
+            points: [...shape.points, newPoint],
           },
         },
       },
@@ -272,14 +277,18 @@ export class AppState extends StateManager<State> {
 
     let shape = shapes[state.appState.editingId]
     const camera = state.pageState.camera
-    const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point)
+    const newPoint = Vec.round(
+      Vec.sub(Vec.sub(Vec.div(point, camera.zoom), camera.point), shape.point)
+    ).concat(pressure, Date.now() - this.startTime)
 
     shape.isDone = true
-    shape.points = [...shape.points, [...Vec.sub(pt, shape.point), pressure]]
+    shape.points = [...shape.points, newPoint]
     shape = {
       ...shape,
       ...shapeUtils.draw.onSessionComplete(shape),
     }
+
+    console.log(shape.points)
 
     return this.setState({
       before: {
