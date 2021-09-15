@@ -242,7 +242,6 @@ export function Controls() {
           />
         )}
         <Slider
-          name="Stroke"
           value={[style.strokeWidth]}
           min={0}
           max={100}

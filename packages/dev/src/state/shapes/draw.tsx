@@ -11,7 +11,7 @@ import {
   intersectBoundsPolyline,
 } from '@tldraw/intersect'
 import { Vec } from '@tldraw/vec'
-import getStroke, { getStrokePoints } from 'perfect-freehand'
+import { getStroke, getStrokePoints } from 'perfect-freehand'
 import type { DrawShape } from '../../types'
 
 const pointsBoundsCache = new WeakMap<DrawShape['points'], TLBounds>([])
@@ -105,6 +105,7 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
         start: { taper: taperStart, cap: capStart },
         simulatePressure,
         last: isDone,
+        easing: (t) => t,
       })
 
       drawPathData = Utils.getSvgPathFromStroke(stroke)

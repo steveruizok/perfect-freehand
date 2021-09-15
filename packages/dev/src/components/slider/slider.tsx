@@ -5,7 +5,7 @@ import {
   Track,
   Range,
   Thumb,
-  SliderOwnProps,
+  SliderProps as SliderOwnProps,
 } from '@radix-ui/react-slider'
 import styles from './slider.module.css'
 
@@ -24,6 +24,7 @@ export function Slider({
   min,
   max,
   step,
+  value = [0],
   ...props
 }: SliderProps) {
   const handleValueChange = React.useCallback(
@@ -45,6 +46,7 @@ export function Slider({
         min={min}
         max={max}
         step={step}
+        value={value}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onValueChange={onValueChange}
@@ -52,7 +54,7 @@ export function Slider({
         <Track className={styles.track}>
           <Range className={styles.range} />
         </Track>
-        {props.value.map((_, i) => (
+        {value.map((_, i) => (
           <Thumb className={styles.thumb} key={i}>
             <div className={styles.thumbBall} />
           </Thumb>
@@ -61,7 +63,7 @@ export function Slider({
       <input
         className={styles.numberInput}
         type="number"
-        value={props.value[0]}
+        value={value[0]}
         min={min}
         max={max}
         step={step}

@@ -5,9 +5,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "./dist/types",
-    "baseUrl": "src",
-    "paths": {
-      "+*": ["./*"]
-    }
+    "baseUrl": "src"
   }
 }
