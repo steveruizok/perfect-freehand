@@ -21,7 +21,7 @@ export function Editor(): JSX.Element {
       <Renderer
         page={page}
         pageState={pageState}
-        shapeUtils={shapeUtils}
+        shapeUtils={shapeUtils as any}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

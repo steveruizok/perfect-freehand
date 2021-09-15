@@ -30,7 +30,7 @@ esbuild
     watch: isDevServer && {
       onRebuild(err) {
         serve.update()
-        err ? error('❌ Failed') : log('✅ Updated')
+        err ? error('❌ Failed') : log('✅ Updated dev.')
       },
     },
     plugins: [cssModulesPlugin()],

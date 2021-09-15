@@ -19,7 +19,7 @@ async function main() {
           console.log(`× ${name}: An error in prevented the rebuild.`)
           return
         }
-        console.log(`✔ ${name}: Rebuilt.`)
+        console.log(`✔ ${name}: Rebuilt perfect-freehand.`)
       },
     },
   })

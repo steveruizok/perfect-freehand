@@ -33,12 +33,15 @@
     "@radix-ui/react-icons": "^1.0.3",
     "@radix-ui/react-label": "^0.0.15",
     "@radix-ui/react-slider": "^0.0.17",
-    "@tldraw/core": "latest",
+    "@tldraw/core": "^0.0.94",
+    "@tldraw/intersect": "^0.0.93",
+    "@tldraw/vec": "^0.0.93",
     "perfect-freehand": "^0.5.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hotkeys-hook": "^3.4.0",
-    "rko": "^0.5.19"
+    "rko": "^0.5.25",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.35",

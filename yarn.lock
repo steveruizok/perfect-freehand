@@ -2327,15 +2327,38 @@
     ismobilejs "^1.1.1"
     react-use-gesture "^9.1.3"
 
-"@tldraw/core@latest":
-  version "0.0.49"
-  resolved "https://registry.yarnpkg.com/@tldraw/core/-/core-0.0.49.tgz#948f7ca1af7239566b07fed1b18627d6ac09ba62"
-  integrity sha512-YeP8qjyscLznWEBBB2wFr7ZU5+cHCY9xftY6NvZou9GKRqKUdq60FTN1p3lpvpV4sBL53gc0RS2wevM6PfOTmA==
+"@tldraw/core@^0.0.94":
+  version "0.0.94"
+  resolved "https://registry.yarnpkg.com/@tldraw/core/-/core-0.0.94.tgz#ff86a38496c5fb59aabb53e8e3ed6e14c10e835c"
+  integrity sha512-Vz/DiIR6AXHQufKgdC7BZdfE5G/xR/WvtQ74HmrkLAOTMCcQT68wNymvMLznHcXQ9jIPJDDqozTl3knzQ55Zpw==
   dependencies:
-    deepmerge "^4.2.2"
-    ismobilejs "^1.1.1"
-    react-error-boundary "^3.1.3"
-    react-use-gesture "^9.1.3"
+    "@tldraw/intersect" "^0.0.94"
+    "@tldraw/vec" "^0.0.94"
+    "@use-gesture/react" "^10.0.0-beta.24"
+
+"@tldraw/intersect@^0.0.93":
+  version "0.0.93"
+  resolved "https://registry.yarnpkg.com/@tldraw/intersect/-/intersect-0.0.93.tgz#188a7e55f749c2304c3b629cefb1f612054a8040"
+  integrity sha512-9CJKuMMXdEiiZQiJDCQx9l30bsgFvLPvzS7inOm2Ru5OnUCSsDsh2YY0j5tcBoQM9NY3Ab0tpd2G0EOTQuTUHA==
+  dependencies:
+    "@tldraw/vec" "^0.0.93"
+
+"@tldraw/intersect@^0.0.94":
+  version "0.0.94"
+  resolved "https://registry.yarnpkg.com/@tldraw/intersect/-/intersect-0.0.94.tgz#3bbfb67c2e999da00354145239af7646e99cf681"
+  integrity sha512-vClJTxH1gVYY+98N/4lu54jvMn9mgTRJEQ6UQ/BPpvQrBf/6MhKqqlmtVKHTTNoxG8KBtJ2Glvl9Ren8TBj/MA==
+  dependencies:
+    "@tldraw/vec" "^0.0.94"
+
+"@tldraw/vec@^0.0.93":
+  version "0.0.93"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-0.0.93.tgz#c8f1735cf80c2435dfcb8b328aac413b12205659"
+  integrity sha512-c3Ynt3Z2gvl+52tejD5UBlccS693JOtCvPEcCK8d/H9v7sVUYnvtSyyqmKxjfc2sErGMkCg0XOVRCBIvJZJ7VQ==
+
+"@tldraw/vec@^0.0.94":
+  version "0.0.94"
+  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-0.0.94.tgz#8fc7ac6e90e4abb654d9047984d19f5d80c24004"
+  integrity sha512-IykDaEZXkI1sSul8oZ6xHvZS8kOW60ES0hbYEmnbLbasdI77INDAUGQ/4LZxJ18+1l8kpYgBgnPgkYsZ9ZDNJQ==
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -2580,6 +2603,18 @@
   dependencies:
     "@typescript-eslint/types" "4.30.0"
     eslint-visitor-keys "^2.0.0"
+
+"@use-gesture/core@^10.0.0-beta.25":
+  version "10.0.0-beta.25"
+  resolved "https://registry.yarnpkg.com/@use-gesture/core/-/core-10.0.0-beta.25.tgz#4e652cb5ef679bd04a213ef0952d9e95a48960ef"
+  integrity sha512-of0lh9pMjsps6Xxn9CqLd8dJynpWvqvHMmhcY8HelLopEDAKusCSM2ACrx+gR83hBKjYrmJBXuwfMLUebZFCrA==
+
+"@use-gesture/react@^10.0.0-beta.24":
+  version "10.0.0-beta.25"
+  resolved "https://registry.yarnpkg.com/@use-gesture/react/-/react-10.0.0-beta.25.tgz#f3034aa4fb539fefec7b44468265238b92a89594"
+  integrity sha512-bXwlYRP503Tl6iK+WxVH9Tm/S5C7lBSdKWgahEKcV6N0NKqCVkkMqz1Nrbmd51Hrexa4JGpoxNvZ7tzrVDfedw==
+  dependencies:
+    "@use-gesture/core" "^10.0.0-beta.25"
 
 "@zkochan/cmd-shim@^3.1.0":
   version "3.1.0"
@@ -7603,13 +7638,6 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
-react-error-boundary@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-3.1.3.tgz#276bfa05de8ac17b863587c9e0647522c25e2a0b"
-  integrity sha512-A+F9HHy9fvt9t8SNDlonq01prnU8AmkjvGKV4kk8seB9kU3xMEO8J/PQlLVmoOIDODl5U2kufSBs4vrWIqhsAA==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-
 react-hotkeys-hook@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-3.4.0.tgz#4d8a81e58eb7ec0d3f6e4fbc4cb0f7830fb6c2aa"
@@ -7989,6 +8017,14 @@ rko@^0.5.19:
   version "0.5.19"
   resolved "https://registry.yarnpkg.com/rko/-/rko-0.5.19.tgz#33577596167178abc30063b6dd0a8bbde0362c27"
   integrity sha512-0KSdDnbhD11GCDvZFARvCJedJuwWIh5F1cCqTGljFF/wQi9PUVu019qH4ME4LdPF3HotMLcdQsxEXmIDeeD0zQ==
+  dependencies:
+    idb-keyval "^5.1.3"
+    zustand "^3.5.9"
+
+rko@^0.5.25:
+  version "0.5.25"
+  resolved "https://registry.yarnpkg.com/rko/-/rko-0.5.25.tgz#1095803900e3f912f6adf8a1c113b8227d3d88bf"
+  integrity sha512-HU6M3PxK3VEqrr6QZKAsqO98juQX24kEgJkKSdFJhw8U/DBUGAnU/fgyxNIaTw7TCI7vjIy/RzBEXf5I4sijKg==
   dependencies:
     idb-keyval "^5.1.3"
     zustand "^3.5.9"
@@ -8867,7 +8903,7 @@ tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.3.0:
+tslib@^2.3.0, tslib@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==

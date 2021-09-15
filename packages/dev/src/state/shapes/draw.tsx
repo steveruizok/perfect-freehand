@@ -2,27 +2,27 @@ import * as React from 'react'
 import {
   TLBounds,
   Utils,
-  Vec,
-  TLShapeUtil,
   TLTransformInfo,
-  TLRenderInfo,
-  Intersect,
+  ShapeUtil,
+  SVGContainer,
 } from '@tldraw/core'
+import {
+  intersectBoundsBounds,
+  intersectBoundsPolyline,
+} from '@tldraw/intersect'
+import { Vec } from '@tldraw/vec'
 import getStroke, { getStrokePoints } from 'perfect-freehand'
 import type { DrawShape } from '../../types'
 
-export class Draw extends TLShapeUtil<DrawShape> {
-  type = 'draw' as const
+const pointsBoundsCache = new WeakMap<DrawShape['points'], TLBounds>([])
+const rotatedCache = new WeakMap<DrawShape, number[][]>([])
 
-  pointsBoundsCache = new WeakMap<DrawShape['points'], TLBounds>([])
-  rotatedCache = new WeakMap<DrawShape, number[][]>([])
-  drawPathCache = new WeakMap<DrawShape['points'], string>([])
-  simplePathCache = new WeakMap<DrawShape['points'], string>([])
-  strokeCache = new WeakMap<DrawShape, number[][]>([])
+export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
+  type: 'draw',
 
-  defaultProps: DrawShape = {
+  defaultProps: {
     id: 'id',
-    type: 'draw' as const,
+    type: 'draw',
     name: 'Draw',
     parentId: 'page',
     childIndex: 1,
@@ -44,13 +44,9 @@ export class Draw extends TLShapeUtil<DrawShape> {
       stroke: 'black',
       fill: 'black',
     },
-  }
+  },
 
-  shouldRender(prev: DrawShape, next: DrawShape): boolean {
-    return next.points !== prev.points || next.style !== prev.style
-  }
-
-  render(shape: DrawShape, { isDarkMode }: TLRenderInfo): JSX.Element {
+  Component({ shape, events }, ref) {
     const {
       style: {
         size,
@@ -69,8 +65,6 @@ export class Draw extends TLShapeUtil<DrawShape> {
       isDone,
     } = shape
 
-    let drawPathData = ''
-
     const simulatePressure = shape.points[1]?.[2] === 0.5
 
     // For very short lines, draw a point instead of a line
@@ -78,7 +72,7 @@ export class Draw extends TLShapeUtil<DrawShape> {
 
     if (simulatePressure && bounds.width <= 4 && bounds.height <= 4 && isDone) {
       return (
-        <>
+        <SVGContainer ref={ref} {...events}>
           {strokeWidth > 0 && (
             <circle
               r={Math.max(size * 0.32, 1)}
@@ -95,9 +89,11 @@ export class Draw extends TLShapeUtil<DrawShape> {
             strokeWidth={1}
             pointerEvents="all"
           />
-        </>
+        </SVGContainer>
       )
     }
+
+    let drawPathData = ''
 
     if (shape.points.length > 2) {
       const stroke = getStroke(shape.points.slice(2), {
@@ -111,13 +107,11 @@ export class Draw extends TLShapeUtil<DrawShape> {
         last: isDone,
       })
 
-      this.strokeCache.set(shape, stroke)
-
       drawPathData = Utils.getSvgPathFromStroke(stroke)
     }
 
     return (
-      <>
+      <SVGContainer ref={ref} {...events}>
         {strokeWidth && (
           <path
             d={drawPathData}
@@ -140,11 +134,11 @@ export class Draw extends TLShapeUtil<DrawShape> {
             pointerEvents="all"
           />
         }
-      </>
+      </SVGContainer>
     )
-  }
+  },
 
-  renderIndicator(shape: DrawShape): JSX.Element {
+  Indicator({ shape }) {
     const { points } = shape
 
     const path = Utils.getFromCache(this.simplePathCache, points, () =>
@@ -152,31 +146,20 @@ export class Draw extends TLShapeUtil<DrawShape> {
     )
 
     return <path d={path} />
-  }
+  },
 
-  getBounds = (shape: DrawShape): TLBounds => {
+  getBounds(shape: DrawShape): TLBounds {
     return Utils.translateBounds(
-      Utils.getFromCache(this.pointsBoundsCache, shape.points, () =>
+      Utils.getFromCache(pointsBoundsCache, shape.points, () =>
         Utils.getBoundsFromPoints(shape.points)
       ),
       shape.point
     )
-  }
+  },
 
-  getRotatedBounds = (shape: DrawShape): TLBounds => {
-    return Utils.translateBounds(
-      Utils.getBoundsFromPoints(shape.points, shape.rotation),
-      shape.point
-    )
-  }
-
-  getCenter = (shape: DrawShape): number[] => {
-    return Utils.getBoundsCenter(this.getBounds(shape))
-  }
-
-  hitTest(): boolean {
-    return true
-  }
+  shouldRender(prev: DrawShape, next: DrawShape): boolean {
+    return next.points !== prev.points || next.style !== prev.style
+  },
 
   hitTestBounds(shape: DrawShape, brushBounds: TLBounds): boolean {
     // Test axis-aligned shape
@@ -186,10 +169,10 @@ export class Draw extends TLShapeUtil<DrawShape> {
       return (
         Utils.boundsContain(brushBounds, bounds) ||
         ((Utils.boundsContain(bounds, brushBounds) ||
-          Intersect.bounds.bounds(bounds, brushBounds).length > 0) &&
-          Intersect.polyline.bounds(
-            shape.points,
-            Utils.translateBounds(brushBounds, Vec.neg(shape.point))
+          intersectBoundsBounds(bounds, brushBounds).length > 0) &&
+          intersectBoundsPolyline(
+            Utils.translateBounds(brushBounds, Vec.neg(shape.point)),
+            shape.points
           ).length > 0)
       )
     }
@@ -197,19 +180,19 @@ export class Draw extends TLShapeUtil<DrawShape> {
     // Test rotated shape
     const rBounds = this.getRotatedBounds(shape)
 
-    const rotatedBounds = Utils.getFromCache(this.rotatedCache, shape, () => {
+    const rotatedBounds = Utils.getFromCache(rotatedCache, shape, () => {
       const c = Utils.getBoundsCenter(Utils.getBoundsFromPoints(shape.points))
       return shape.points.map((pt) => Vec.rotWith(pt, c, shape.rotation || 0))
     })
 
     return (
       Utils.boundsContain(brushBounds, rBounds) ||
-      Intersect.bounds.polyline(
+      intersectBoundsPolyline(
         Utils.translateBounds(brushBounds, Vec.neg(shape.point)),
         rotatedBounds
       ).length > 0
     )
-  }
+  },
 
   transform(
     shape: DrawShape,
@@ -247,29 +230,8 @@ export class Draw extends TLShapeUtil<DrawShape> {
       points,
       point,
     }
-  }
-
-  transformSingle(
-    shape: DrawShape,
-    bounds: TLBounds,
-    info: TLTransformInfo<DrawShape>
-  ): Partial<DrawShape> {
-    return this.transform(shape, bounds, info)
-  }
-
-  onSessionComplete(shape: DrawShape): Partial<DrawShape> {
-    const bounds = this.getBounds(shape)
-
-    const [x1, y1] = Vec.sub([bounds.minX, bounds.minY], shape.point)
-
-    return {
-      points: shape.points.map(([x0, y0, p, t]) =>
-        Vec.round([x0 - x1, y0 - y1]).concat(p, t)
-      ),
-      point: Vec.add(shape.point, [x1, y1]),
-    }
-  }
-}
+  },
+}))
 
 function getSolidStrokePath(shape: DrawShape) {
   let { points } = shape

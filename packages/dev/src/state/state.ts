@@ -1,19 +1,20 @@
 import * as React from 'react'
-import type { Doc, DrawStyles, State } from 'types'
+import type { Doc, DrawShape, DrawStyles, State } from 'types'
 import {
   TLPinchEventHandler,
   TLPointerEventHandler,
+  TLShapeUtils,
   TLWheelEventHandler,
   Utils,
-  Vec,
 } from '@tldraw/core'
+import { Vec } from '@tldraw/vec'
 import { StateManager } from 'rko'
 import { Draw } from './shapes'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
 
-export const shapeUtils = {
-  draw: new Draw(),
+export const shapeUtils: TLShapeUtils<DrawShape> = {
+  draw: Draw,
 }
 
 export const initialDoc: Doc = {
@@ -62,7 +63,11 @@ export const context = React.createContext<AppState>({} as AppState)
 
 export class AppState extends StateManager<State> {
   shapeUtils = shapeUtils
-  startTime = 0
+
+  currentStroke = {
+    points: [] as number[][],
+    startTime: 0,
+  }
 
   cleanup = (state: State) => {
     for (const id in state.page.shapes) {
@@ -78,6 +83,7 @@ export class AppState extends StateManager<State> {
     const { state } = this
     switch (state.appState.tool) {
       case 'drawing': {
+        this.currentStroke.points = [info.point]
         this.createShape(info.point)
         break
       }
@@ -102,7 +108,17 @@ export class AppState extends StateManager<State> {
     switch (tool) {
       case 'drawing': {
         if (status === 'drawing') {
-          this.updateShape(info.point, info.pressure)
+          this.currentStroke.points.push(info.point)
+          const nextShape = this.getNextShape(info.point, info.pressure)
+          if (nextShape) {
+            this.patchState({
+              page: {
+                shapes: {
+                  [nextShape.id]: nextShape,
+                },
+              },
+            })
+          }
         }
         break
       }
@@ -119,7 +135,7 @@ export class AppState extends StateManager<State> {
     const { state } = this
     switch (state.appState.tool) {
       case 'drawing': {
-        this.completeShape(info.point, info.pressure)
+        this.completeShape()
         break
       }
       case 'erasing': {
@@ -183,7 +199,9 @@ export class AppState extends StateManager<State> {
       const camera = state.pageState.camera
       const pt = Vec.sub(Vec.div(info.point, camera.zoom), point)
 
-      return this.patchState({
+      const nextShape = this.getNextShape(info.point, info.pressure)
+
+      this.patchState({
         pageState: {
           camera: {
             point,
@@ -197,6 +215,16 @@ export class AppState extends StateManager<State> {
           },
         },
       })
+
+      if (nextShape) {
+        this.patchState({
+          page: {
+            shapes: {
+              [nextShape.id]: nextShape,
+            },
+          },
+        })
+      }
     }
 
     return this.patchState({
@@ -221,8 +249,11 @@ export class AppState extends StateManager<State> {
 
   createShape = (point: number[]) => {
     const { state } = this
+
     const camera = state.pageState.camera
-    const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point)
+
+    const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point).concat(0.5, 0)
+
     const shape = shapeUtils.draw.create({
       id: Utils.uniqueId(),
       point: pt,
@@ -233,7 +264,7 @@ export class AppState extends StateManager<State> {
       ],
     })
 
-    this.startTime = Date.now()
+    this.currentStroke.startTime = Date.now()
 
     return this.patchState({
       appState: {
@@ -248,47 +279,57 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  updateShape = (point: number[], pressure: number) => {
-    const { state } = this
-    if (state.appState.status !== 'drawing') return this
-    if (!state.appState.editingId) return this // Don't erase while drawing
+  getNextShape = (point: number[], pressure: number) => {
+    const { state, currentStroke } = this
+    if (state.appState.status !== 'drawing') return
+    if (!state.appState.editingId) return
 
     const shape = state.page.shapes[state.appState.editingId]
-    const camera = state.pageState.camera
-    const newPoint = Vec.round(
-      Vec.sub(Vec.sub(Vec.div(point, camera.zoom), camera.point), shape.point)
-    ).concat(pressure, Date.now() - this.startTime)
 
-    return this.patchState({
-      page: {
-        shapes: {
-          [shape.id]: {
-            points: [...shape.points, newPoint],
-          },
-        },
-      },
-    })
+    const camera = state.pageState.camera
+
+    const newPoint = Vec.sub(
+      Vec.round(Vec.sub(Vec.div(point, camera.zoom), camera.point)),
+      shape.point
+    ).concat(pressure, Date.now() - currentStroke.startTime)
+
+    let shapePoint = shape.point
+    let shapePoints = [...shape.points, newPoint]
+
+    // Does the new point create a negative offset?
+    const offset = [Math.min(newPoint[0], 0), Math.min(newPoint[1], 0)]
+
+    if (offset[0] < 0 || offset[1] < 0) {
+      // If so, then we need to move the shape to cancel the offset
+      shapePoint = Vec.round(Vec.add(shapePoint, offset))
+
+      // And we need to move the shape points to cancel the offset
+      shapePoints = shapePoints.map((pt) =>
+        Vec.round(Vec.sub(pt, offset)).concat(pt[2], pt[3])
+      )
+    }
+
+    return {
+      id: shape.id,
+      point: shapePoint,
+      points: shapePoints,
+    }
   }
 
-  completeShape = (point: number[], pressure: number) => {
+  completeShape = () => {
     const { state } = this
     const { shapes } = state.page
     if (!state.appState.editingId) return this // Don't erase while drawing
 
     let shape = shapes[state.appState.editingId]
-    const camera = state.pageState.camera
-    const newPoint = Vec.round(
-      Vec.sub(Vec.sub(Vec.div(point, camera.zoom), camera.point), shape.point)
-    ).concat(pressure, Date.now() - this.startTime)
 
     shape.isDone = true
-    shape.points = [...shape.points, newPoint]
     shape = {
       ...shape,
       ...shapeUtils.draw.onSessionComplete(shape),
     }
 
-    console.log(shape.points)
+    console.log(this.currentStroke.points)
 
     return this.setState({
       before: {
@@ -509,7 +550,16 @@ export class AppState extends StateManager<State> {
     const shapes = Object.values(this.state.page.shapes)
     const pageState = this.state.pageState
 
-    if (shapes.length === 0) return this
+    if (shapes.length === 0) {
+      this.patchState({
+        pageState: {
+          camera: {
+            zoom: 1,
+            point: [0, 0],
+          },
+        },
+      })
+    }
 
     const bounds = Utils.getCommonBounds(
       Object.values(shapes).map(shapeUtils.draw.getBounds)
@@ -538,7 +588,7 @@ export class AppState extends StateManager<State> {
         page: {
           shapes: {
             ...Object.fromEntries(
-              Object.entries(shapes).map(([id, shape]) => [
+              Object.keys(shapes).map((id) => [
                 id,
                 {
                   style: currentAppState.style,
@@ -603,6 +653,12 @@ export class AppState extends StateManager<State> {
             ...Object.fromEntries(
               Object.keys(shapes).map((key) => [key, undefined])
             ),
+          },
+        },
+        pageState: {
+          camera: {
+            point: [0, 0],
+            zoom: 1,
           },
         },
       },

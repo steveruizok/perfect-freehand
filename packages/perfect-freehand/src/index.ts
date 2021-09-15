@@ -90,7 +90,7 @@ export function getStrokePoints(
   return strokePoints
 }
 
-const RATE_OF_CHANGE = 0.25
+const RATE_OF_CHANGE = 0.3
 
 /**
  * ## getStrokeOutlinePoints
@@ -508,4 +508,5 @@ function getStroke(
 }
 
 export default getStroke
+export { getStroke }
 export { StrokeOptions }
