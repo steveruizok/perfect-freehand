@@ -1,5 +1,5 @@
 {
-  "version": "0.5.3",
+  "version": "0.5.4",
   "name": "perfect-freehand",
   "private": false,
   "description": "Draw perfect pressure-sensitive freehand strokes.",

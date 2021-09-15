@@ -1,5 +1,5 @@
 {
-  "version": "0.5.3",
+  "version": "0.5.4",
   "private": true,
   "name": "dev",
   "description": "An example project for perfect-freehand.",
@@ -36,7 +36,7 @@
     "@tldraw/core": "^0.0.94",
     "@tldraw/intersect": "^0.0.93",
     "@tldraw/vec": "^0.0.93",
-    "perfect-freehand": "^0.5.3",
+    "perfect-freehand": "^0.5.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hotkeys-hook": "^3.4.0",
