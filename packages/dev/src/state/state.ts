@@ -10,6 +10,7 @@ import {
 import { Vec } from '@tldraw/vec'
 import { StateManager } from 'rko'
 import { Draw } from './shapes'
+import * as sample from './sample.json'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
 
@@ -34,9 +35,9 @@ export const initialDoc: Doc = {
 }
 
 export const defaultStyle = {
-  size: 20,
+  size: 16,
   strokeWidth: 0,
-  thinning: 0.8,
+  thinning: 0.5,
   streamline: 0.5,
   smoothing: 0.5,
   taperStart: 0,
@@ -67,6 +68,11 @@ export class AppState extends StateManager<State> {
   currentStroke = {
     points: [] as number[][],
     startTime: 0,
+  }
+
+  onReady = () => {
+    this.addShape({ id: 'sample', points: sample.stroke })
+    this.centerShape('sample')
   }
 
   cleanup = (state: State) => {
@@ -329,8 +335,6 @@ export class AppState extends StateManager<State> {
       ...shapeUtils.draw.onSessionComplete(shape),
     }
 
-    console.log(this.currentStroke.points)
-
     return this.setState({
       before: {
         appState: {
@@ -352,6 +356,50 @@ export class AppState extends StateManager<State> {
           shapes: {
             [shape.id]: shape,
           },
+        },
+      },
+    })
+  }
+
+  centerShape = (id: string) => {
+    const shape = this.state.page.shapes[id]
+    const bounds = shapeUtils.draw.getBounds(this.state.page.shapes[id])
+    this.patchState({
+      pageState: {
+        camera: {
+          point: Vec.add(shape.point, [
+            window.innerWidth / 2 - bounds.width / 2,
+            window.innerHeight / 2 - bounds.height / 2,
+          ]),
+          zoom: 1,
+        },
+      },
+    })
+  }
+
+  addShape = (shape: Partial<DrawShape>) => {
+    const newShape = Draw.create({
+      id: Utils.uniqueId(),
+      parentId: 'page',
+      childIndex: 1,
+      point: [0, 0],
+      points: [],
+      style: this.state.appState.style,
+      ...shape,
+    })
+
+    const bounds = Utils.getBoundsFromPoints(newShape.points)
+
+    const topLeft = [bounds.minX, bounds.minY]
+
+    newShape.points = newShape.points.map((pt) =>
+      Vec.sub(pt, topLeft).concat(pt[2], pt[3])
+    )
+
+    this.patchState({
+      page: {
+        shapes: {
+          [newShape.id]: newShape,
         },
       },
     })
@@ -638,7 +686,7 @@ export class AppState extends StateManager<State> {
 }`)
   }
 
-  deleteAll = () => {
+  resetDoc = () => {
     const { shapes } = this.state.page
 
     return this.setState({

@@ -82,9 +82,17 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfig": "tsconfig.json",
+        "tsconfig": "tsconfig.json",
         "babelConfig": {
           "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "esmodules": true
+                }
+              }
+            ],
             [
               "@babel/preset-react"
             ],
@@ -102,8 +110,7 @@
       "<rootDir>/packages/dev/build/"
     ],
     "moduleNameMapper": {
-      "perfect-freehand": "<rootDir>/packages/perfect-freehand/src",
-      "\\+(.*)": "<rootDir>/packages/perfect-freehand/src/$1"
+      "perfect-freehand": "<rootDir>/packages/perfect-freehand/src"
     }
   }
 }

@@ -16,6 +16,12 @@ export function Editor(): JSX.Element {
   } = app
   const { page, pageState } = useAppState()
 
+  React.useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.freehand = app
+  }, [])
+
   return (
     <div className={styles.container}>
       <Renderer

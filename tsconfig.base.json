@@ -7,6 +7,7 @@
     "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "error",
     "incremental": true,
+    "resolveJsonModule": true,
     "importHelpers": true,
     "moduleResolution": "node",
     "noEmit": false,

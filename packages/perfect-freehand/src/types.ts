@@ -1,3 +1,6 @@
+/**
+ * The options object for `getStroke` or `getStrokePoints`.
+ */
 export interface StrokeOptions {
   size?: number
   thinning?: number
@@ -18,6 +21,9 @@ export interface StrokeOptions {
   last?: boolean
 }
 
+/**
+ * The points returned by `getStrokePoints`, and the input for `getStrokeOutlinePoints`.
+ */
 export interface StrokePoint {
   point: number[]
   pressure: number
@@ -25,5 +31,3 @@ export interface StrokePoint {
   vector: number[]
   runningLength: number
 }
-
-export type InputPoint = { x: number; y: number; pressure?: number } | number[]

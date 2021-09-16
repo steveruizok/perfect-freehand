@@ -1,6 +1,7 @@
 /**
  * Negate a vector.
  * @param A
+ * @internal
  */
 export function neg(A: number[]) {
   return [-A[0], -A[1]]
@@ -10,6 +11,7 @@ export function neg(A: number[]) {
  * Add vectors.
  * @param A
  * @param B
+ * @internal
  */
 export function add(A: number[], B: number[]) {
   return [A[0] + B[0], A[1] + B[1]]
@@ -19,25 +21,17 @@ export function add(A: number[], B: number[]) {
  * Subtract vectors.
  * @param A
  * @param B
+ * @internal
  */
 export function sub(A: number[], B: number[]) {
   return [A[0] - B[0], A[1] - B[1]]
 }
 
 /**
- * Get the vector from vectors A to B.
- * @param A
- * @param B
- */
-export function vec(A: number[], B: number[]) {
-  // A, B as vectors get the vector from A to B
-  return [B[0] - A[0], B[1] - A[1]]
-}
-
-/**
  * Vector multiplication by scalar
  * @param A
  * @param n
+ * @internal
  */
 export function mul(A: number[], n: number) {
   return [A[0] * n, A[1] * n]
@@ -47,6 +41,7 @@ export function mul(A: number[], n: number) {
  * Vector division by scalar.
  * @param A
  * @param n
+ * @internal
  */
 export function div(A: number[], n: number) {
   return [A[0] / n, A[1] / n]
@@ -55,6 +50,7 @@ export function div(A: number[], n: number) {
 /**
  * Perpendicular rotation of a vector A
  * @param A
+ * @internal
  */
 export function per(A: number[]) {
   return [A[1], -A[0]]
@@ -64,14 +60,26 @@ export function per(A: number[]) {
  * Dot product
  * @param A
  * @param B
+ * @internal
  */
 export function dpr(A: number[], B: number[]) {
   return A[0] * B[0] + A[1] * B[1]
 }
 
 /**
+ * Get whether two vectors are equal.
+ * @param A
+ * @param B
+ * @internal
+ */
+export function isEqual(A: number[], B: number[]) {
+  return A[0] === B[0] && A[1] === B[1]
+}
+
+/**
  * Length of the vector
  * @param A
+ * @internal
  */
 export function len(A: number[]) {
   return Math.hypot(A[0], A[1])
@@ -80,6 +88,7 @@ export function len(A: number[]) {
 /**
  * Length of the vector squared
  * @param A
+ * @internal
  */
 export function len2(A: number[]) {
   return A[0] * A[0] + A[1] * A[1]
@@ -89,6 +98,7 @@ export function len2(A: number[]) {
  * Dist length from A to B squared.
  * @param A
  * @param B
+ * @internal
  */
 export function dist2(A: number[], B: number[]) {
   return len2(sub(A, B))
@@ -97,6 +107,7 @@ export function dist2(A: number[], B: number[]) {
 /**
  * Get normalized / unit vector.
  * @param A
+ * @internal
  */
 export function uni(A: number[]) {
   return div(A, len(A))
@@ -106,6 +117,7 @@ export function uni(A: number[]) {
  * Dist length from A to B
  * @param A
  * @param B
+ * @internal
  */
 export function dist(A: number[], B: number[]) {
   return Math.hypot(A[1] - B[1], A[0] - B[0])
@@ -115,6 +127,7 @@ export function dist(A: number[], B: number[]) {
  * Mean between two vectors or mid vector between two vectors
  * @param A
  * @param B
+ * @internal
  */
 export function med(A: number[], B: number[]) {
   return mul(add(A, B), 0.5)
@@ -125,6 +138,7 @@ export function med(A: number[], B: number[]) {
  * @param A vector
  * @param C center
  * @param r rotation in radians
+ * @internal
  */
 export function rotAround(A: number[], C: number[], r: number) {
   const s = Math.sin(r)
@@ -144,22 +158,19 @@ export function rotAround(A: number[], C: number[], r: number) {
  * @param A
  * @param B
  * @param t scalar
+ * @internal
  */
 export function lrp(A: number[], B: number[], t: number) {
-  return add(A, mul(vec(A, B), t))
+  return add(A, mul(sub(B, A), t))
 }
 
-//  isLeft: >0 for counterclockwise
-//          =0 for none (degenerate)
-//          <0 for clockwise
-export function isLeft(p1: number[], pc: number[], p2: number[]) {
-  return (pc[0] - p1[0]) * (p2[1] - p1[1]) - (p2[0] - p1[0]) * (pc[1] - p1[1])
-}
-
-export function clockwise(p1: number[], pc: number[], p2: number[]) {
-  return isLeft(p1, pc, p2) > 0
-}
-
-export function isEqual(a: number[], b: number[]) {
-  return a[0] === b[0] && a[1] === b[1]
+/**
+ * Project a point A in the direction B by a scalar c
+ * @param A
+ * @param B
+ * @param c
+ * @internal
+ */
+export function prj(A: number[], B: number[], c: number) {
+  return add(A, mul(B, c))
 }

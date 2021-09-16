@@ -29,10 +29,11 @@
     "src"
   ],
   "dependencies": {
-    "@radix-ui/react-checkbox": "^0.0.17",
+    "@modulz/radix-icons": "^4.0.0",
+    "@radix-ui/react-checkbox": "^0.1.0",
     "@radix-ui/react-icons": "^1.0.3",
-    "@radix-ui/react-label": "^0.0.15",
-    "@radix-ui/react-slider": "^0.0.17",
+    "@radix-ui/react-label": "^0.1.0",
+    "@radix-ui/react-slider": "^0.1.0",
     "@tldraw/core": "^0.0.94",
     "@tldraw/intersect": "^0.0.93",
     "@tldraw/vec": "^0.0.93",

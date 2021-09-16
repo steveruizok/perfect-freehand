@@ -55,7 +55,7 @@ export interface Data extends State {
   completeShape: (point: number[], pressure: number) => void
   updateStyle: (style: Partial<DrawStyles>) => void
   load: (doc: Doc) => void
-  deleteAll: () => void
+  resetDoc: () => void
   undo: () => void
   redo: () => void
 }

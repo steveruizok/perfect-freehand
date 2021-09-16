@@ -12,6 +12,6 @@ export function useKeyboardShortcuts() {
   })
 
   useHotkeys('e,backspace', () => {
-    app.deleteAll()
+    app.resetDoc()
   })
 }
