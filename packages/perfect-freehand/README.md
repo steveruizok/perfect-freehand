@@ -187,13 +187,11 @@ export default function Example() {
   const [points, setPoints] = React.useState()
 
   function handlePointerDown(e) {
-    e.preventDefault()
     setPoints([[e.pageX, e.pageY, e.pressure]])
   }
 
   function handlePointerMove(e) {
     if (e.buttons === 1) {
-      e.preventDefault()
       setPoints([...points, [e.pageX, e.pageY, e.pressure]])
     }
   }
@@ -208,7 +206,7 @@ export default function Example() {
         <path
           d={getSvgPathFromStroke(
             getStroke(points, {
-              size: 24,
+              size: 16,
               thinning: 0.5,
               smoothing: 0.5,
               streamline: 0.5,
