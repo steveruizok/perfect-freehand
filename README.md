@@ -28,13 +28,13 @@ yarn add perfect-freehand
 
 ## Usage
 
-This package's default export is a function that:
+This package exports a function named `getStroke` that:
 
 - accepts an array of points and an (optional) options object
 - returns a stroke outline as an array of points formatted as `[x, y]`
 
 ```js
-import getStroke from 'perfect-freehand'
+import { getStroke } from 'perfect-freehand'
 ```
 
 You may format your input points as array _or_ an object. In both cases, the value for pressure is optional (it will default to `.5`).
@@ -132,7 +132,7 @@ function getSvgPathFromStroke(stroke) {
 To use this function, first use perfect-freehand to turn your input points into a stroke outline, then pass the result to `getSvgPathFromStroke`.
 
 ```js
-import getStroke from 'perfect-freehand'
+import { getStroke } from 'perfect-freehand'
 
 const myStroke = getStroke(myInputPoints)
 
@@ -180,7 +180,7 @@ function getFlatSvgPathFromStroke(stroke) {
 
 ```jsx
 import * as React from 'react'
-import getStroke from 'perfect-freehand'
+import { getStroke } from 'perfect-freehand'
 import { getSvgPathFromStroke } from './utils'
 
 export default function Example() {

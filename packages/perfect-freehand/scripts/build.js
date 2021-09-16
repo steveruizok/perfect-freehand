@@ -32,11 +32,7 @@ async function main() {
     esmSize += output.bytes
   })
 
-  for (const file of [
-    'README.md',
-    'perfect-freehand-card.png',
-    'perfect-freehand-logo.svg',
-  ]) {
+  for (const file of ['README.md']) {
     if (fs.existsSync(`../../${file}`)) {
       fs.rm(`../../${file}`, (err) => {
         if (err) throw err
