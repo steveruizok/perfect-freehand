@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { getStrokeRadius } from './getStrokeRadius'
 import type { StrokeOptions, StrokePoint } from './types'
 import {
@@ -70,7 +69,7 @@ export function getStrokeOutlinePoints(
   if (points.length === 0) return []
 
   // The total length of the line
-  const totalLength = points.at(-1)!.runningLength
+  const totalLength = points[points.length - 1].runningLength
 
   // Our collected left and right points
   const leftPts: number[][] = []
@@ -369,10 +368,10 @@ export function getStrokeOutlinePoints(
   */
 
     // The last left point
-    const ll = leftPts.at(-1)!
+    const ll = leftPts[leftPts.length - 1]
 
     // The last right point
-    const lr = rightPts.at(-1)!
+    const lr = rightPts[rightPts.length - 1]
 
     // The point between the two
     const mid = med(ll, lr)
