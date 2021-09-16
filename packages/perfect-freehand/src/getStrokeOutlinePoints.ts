@@ -192,7 +192,7 @@ export function getStrokeOutlinePoints(
       draw a cap at the current point.
     */
 
-    const nextVector = points[i + 1].vector
+    const nextVector = points[i + 1]?.vector || vector
 
     const nextDpr = dpr(vector, nextVector)
 
@@ -276,6 +276,10 @@ export function getStrokeOutlinePoints(
   if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
     let ir = 0
 
+    const lastPt = isEqual(firstPoint.point, lastPoint.point)
+      ? add(firstPoint.point, [1, 1])
+      : lastPoint.point
+
     for (let i = 0; i < points.length; i++) {
       const { pressure, runningLength } = points[i]
       if (runningLength > size) {
@@ -286,7 +290,7 @@ export function getStrokeOutlinePoints(
 
     const start = prj(
       firstPoint.point,
-      per(uni(sub(firstPoint.point, lastPoint.point))),
+      per(uni(sub(firstPoint.point, lastPt))),
       -(ir || radius)
     )
 

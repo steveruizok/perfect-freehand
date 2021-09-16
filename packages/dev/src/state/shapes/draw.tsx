@@ -67,36 +67,8 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
 
     const simulatePressure = shape.points[2]?.[2] === 0.5
 
-    // For very short lines, draw a point instead of a line
-    const bounds = this.getBounds(shape)
-
-    if (simulatePressure && bounds.width <= 4 && bounds.height <= 4 && isDone) {
-      return (
-        <SVGContainer ref={ref} {...events}>
-          {strokeWidth > 0 && (
-            <circle
-              r={Math.max(size * 0.32, 1)}
-              fill={'transparent'}
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-              pointerEvents="all"
-            />
-          )}
-          <circle
-            r={Math.max(size * 0.32, 1)}
-            fill={isFilled ? fill : 'transparent'}
-            stroke={isFilled || strokeWidth > 0 ? 'transparent' : 'black'}
-            strokeWidth={1}
-            pointerEvents="all"
-          />
-        </SVGContainer>
-      )
-    }
-
-    let drawPathData = ''
-
-    if (shape.points.length > 2) {
-      const stroke = getStroke(shape.points.slice(2), {
+    const drawPathData = getSvgPathFromStroke(
+      getStroke(shape.points, {
         size,
         thinning,
         streamline,
@@ -107,9 +79,7 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
         last: isDone,
         easing: (t) => t,
       })
-
-      drawPathData = Utils.getSvgPathFromStroke(stroke)
-    }
+    )
 
     return (
       <SVGContainer ref={ref} {...events}>
@@ -268,4 +238,25 @@ function getSolidStrokePath(shape: DrawShape) {
   const path = d.join(' ').replaceAll(/(\s[0-9]*\.[0-9]{2})([0-9]*)\b/g, '$1')
 
   return path
+}
+
+function getSvgPathFromStroke(stroke: number[][]): string {
+  if (!stroke.length) return ''
+
+  const max = stroke.length - 1
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      if (i === max) return acc
+      const [x1, y1] = arr[i + 1]
+      acc.push(` ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`)
+      return acc
+    },
+    ['M ', `${stroke[0][0]},${stroke[0][1]}`, ' Q']
+  )
+
+  return d
+    .concat('Z')
+    .join('')
+    .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, '$1')
 }

@@ -1,27 +1,44 @@
 import { getStroke } from '../getStroke'
 import inputs from './inputs.json'
 
-const { onePoint, twoPoints, manyPoints, withDuplicates } = inputs
+const { onePoint, twoPoints, twoEqualPoints, manyPoints, withDuplicates } =
+  inputs
 
 describe('getStroke', () => {
-  it('runs on a line with no points', () => {
+  for (const [key, value] of Object.entries(inputs)) {
+    it(`runs ${key} without generating NaN values`, () => {
+      expect(
+        getStroke(value).find((t) => JSON.stringify(t).includes('null'))
+      ).toBeUndefined()
+    })
+  }
+
+  it('gets stroke from a line with no points', () => {
     expect(getStroke([])).toMatchSnapshot('get-stroke-no-points')
   })
 
-  it('runs on a line with a single point', () => {
+  it('gets stroke from a line with a single point', () => {
     expect(getStroke(onePoint)).toMatchSnapshot('get-stroke-one-point')
   })
 
-  it('runs on a line with two points', () => {
-    expect(getStroke(twoPoints)).toMatchSnapshot('get-stroke-one-point')
+  it('gets stroke from a line with two points', () => {
+    expect(getStroke(twoPoints)).toMatchSnapshot('get-stroke-two-points')
   })
 
-  it('runs on a line with a many points', () => {
+  it('gets stroke from a line with two equal points', () => {
+    expect(getStroke(twoEqualPoints)).toMatchSnapshot(
+      'get-stroke-two-equal-points'
+    )
+  })
+
+  it('gets stroke from a line with a many points', () => {
     expect(getStroke(manyPoints)).toMatchSnapshot('get-stroke-many-points')
   })
 
-  it('runs on a line with withDuplicates', () => {
-    expect(getStroke(withDuplicates)).toMatchSnapshot('get-stroke-one-point')
+  it('gets stroke from a line with with duplicates', () => {
+    expect(getStroke(withDuplicates)).toMatchSnapshot(
+      'get-stroke-with-duplicates'
+    )
   })
 
   it('Caps points', () => {

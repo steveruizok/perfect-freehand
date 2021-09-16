@@ -35,22 +35,18 @@ export function getStrokePoints<
 
   let prev: StrokePoint = {
     point: [pts[0][0], pts[0][1]],
-    pressure: pts[0][2] || 0.5,
-    vector: [0, 0],
+    pressure: pts[0][2] || 0.25,
+    vector: [1, 1],
     distance: 0,
     runningLength: 0,
   }
 
   strokePoints.push(prev)
 
-  // Iterate through all of the points.
-  const len = pts.length
+  // Iterate through all of the points, skipping the second.
+  // This fixes a "ball" shape at the beginning of the line.
 
-  let curr: number[]
-
-  for (let i = 0; i < len; i++) {
-    curr = pts[i]
-
+  for (let i = 2; i < pts.length; i++) {
     // If we're at the last point, then add the actual input point.
     // Otherwise, using the streamline option, interpolate a new point
     // between the previous point the current point.
@@ -58,7 +54,9 @@ export function getStrokePoints<
     // less streamline = closer to the current point.
     // This takes a lot of the "noise" out of the input points.
     const point =
-      isComplete && i === len - 1 ? curr : lrp(prev.point, curr, 1 - streamline)
+      isComplete && i === pts.length - 1
+        ? pts[i]
+        : lrp(prev.point, pts[i], 1 - streamline)
 
     // If the new point is the same as the previous point, skip ahead.
     if (isEqual(prev.point, point)) continue
@@ -75,13 +73,19 @@ export function getStrokePoints<
     // Create a new strokepoint (it will be the new "previous" one)
     prev = {
       point,
-      pressure: curr[2] || 0.5,
+      pressure: pts[i][2] || 0.5,
       vector,
       distance,
       runningLength,
     }
 
     strokePoints.push(prev)
+  }
+
+  if (strokePoints.length > 1) {
+    strokePoints[0].vector = uni(
+      sub(strokePoints[0].point, strokePoints[1].point)
+    )
   }
 
   return strokePoints

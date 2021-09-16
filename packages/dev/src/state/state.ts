@@ -265,10 +265,7 @@ export class AppState extends StateManager<State> {
       id: Utils.uniqueId(),
       point: pt,
       style: state.appState.style,
-      points: [
-        [0, 0, 0.5, 0],
-        [0, 0, 0.5, 0],
-      ],
+      points: [[0, 0, 0.5, 0]],
     })
 
     this.currentStroke.startTime = Date.now()
@@ -393,8 +390,8 @@ export class AppState extends StateManager<State> {
 
     const topLeft = [bounds.minX, bounds.minY]
 
-    newShape.points = newShape.points.map((pt) =>
-      Vec.sub(pt, topLeft).concat(pt[2], pt[3])
+    newShape.points = newShape.points.map((pt, i) =>
+      Vec.sub(pt, topLeft).concat(pt[2] || 0.5, pt[3] || i * 10)
     )
 
     this.patchState({
@@ -404,6 +401,8 @@ export class AppState extends StateManager<State> {
         },
       },
     })
+
+    return newShape
   }
 
   erase = (point: number[]) => {

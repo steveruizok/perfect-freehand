@@ -2,50 +2,65 @@ import { getStrokePoints } from '../getStrokePoints'
 import inputs from './inputs.json'
 
 const {
-  numberPairs,
-  objectPairs,
   onePoint,
   twoPoints,
+  twoEqualPoints,
+  numberPairs,
+  objectPairs,
   manyPoints,
   withDuplicates,
 } = inputs
 
 describe('getStrokePoints', () => {
-  it('runs on a line with no points', () => {
+  for (const [key, value] of Object.entries(inputs)) {
+    it(`runs ${key} without generating NaN values`, () => {
+      expect(
+        getStrokePoints(value).find((t) => JSON.stringify(t).includes('null'))
+      ).toBeUndefined()
+    })
+  }
+
+  it('get stroke points from a line with no points', () => {
     expect(getStrokePoints([])).toMatchSnapshot('get-stroke-points-no-points')
   })
 
-  it('runs on a line with a single point', () => {
+  it('get stroke points from a line with a single point', () => {
     expect(getStrokePoints(onePoint)).toMatchSnapshot(
       'get-stroke-points-one-point'
     )
   })
 
-  it('runs on a line with two points', () => {
+  it('get stroke points from a line with two points', () => {
     expect(getStrokePoints(twoPoints)).toMatchSnapshot(
       'get-stroke-points-two-point'
     )
   })
 
-  it('runs on a line with a many points', () => {
+  it('get stroke points from a line with two equal points', () => {
+    expect(getStrokePoints(twoEqualPoints)).toMatchSnapshot(
+      'get-stroke-points-two-equal-points'
+    )
+  })
+
+  it('get stroke points from a line with a many points', () => {
     expect(getStrokePoints(manyPoints)).toMatchSnapshot(
       'get-stroke-points-many-points'
     )
   })
 
-  it('runs on a line with withDuplicates', () => {
+  it('get stroke points from a line with duplicates', () => {
     expect(getStrokePoints(withDuplicates)).toMatchSnapshot(
       'get-stroke-points-with-duplicates'
     )
   })
 
-  it('runs on array input points', () => {
+  it('get stroke points from a array input points', () => {
     expect(getStrokePoints(numberPairs)).toMatchSnapshot(
       'get-stroke-points-array-pairs'
     )
   })
 
-  it('runs on object input points', () => {
+  it('get stroke points from a object input points', () => {
     expect(getStrokePoints(objectPairs)).toMatchSnapshot(
       'get-stroke-points-object-pairs'
     )
