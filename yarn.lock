@@ -2316,15 +2316,6 @@
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^8.0.0"
 
-"@tldraw/core@^0.0.53":
-  version "0.0.53"
-  resolved "https://registry.yarnpkg.com/@tldraw/core/-/core-0.0.53.tgz#2db2b27df441169e452e0aa07570adca8b06b582"
-  integrity sha512-hxZIUR3Sm320tvGW5lWEKfw1QJhe6mJu7IrG5ka5G3slusqaY3cQY9EafFqH07yEXul2MU2RENIQus7fh+Gwcg==
-  dependencies:
-    deepmerge "^4.2.2"
-    ismobilejs "^1.1.1"
-    react-use-gesture "^9.1.3"
-
 "@tldraw/core@^0.0.94":
   version "0.0.94"
   resolved "https://registry.yarnpkg.com/@tldraw/core/-/core-0.0.94.tgz#ff86a38496c5fb59aabb53e8e3ed6e14c10e835c"
@@ -5539,11 +5530,6 @@ isexe@^2.0.0:
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
 
-ismobilejs@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/ismobilejs/-/ismobilejs-1.1.1.tgz#c56ca0ae8e52b24ca0f22ba5ef3215a2ddbbaa0e"
-  integrity sha512-VaFW53yt8QO61k2WJui0dHf4SlL8lxBofUuUmwBo0ljPk0Drz2TiuDW4jo3wDcv41qy/SxrJ+VAzJ/qYqsmzRw==
-
 isobject@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-2.1.0.tgz#f065561096a3f1da2ef46272f815c840d87e0c89"
@@ -7648,11 +7634,6 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-use-gesture@^9.1.3:
-  version "9.1.3"
-  resolved "https://registry.yarnpkg.com/react-use-gesture/-/react-use-gesture-9.1.3.tgz#92bd143e4f58e69bd424514a5bfccba2a1d62ec0"
-  integrity sha512-CdqA2SmS/fj3kkS2W8ZU8wjTbVBAIwDWaRprX7OKaj7HlGwBasGEFggmk5qNklknqk9zK/h8D355bEJFTpqEMg==
-
 react@^17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
@@ -8010,14 +7991,6 @@ rimraf@^2.5.4, rimraf@^2.6.2, rimraf@^2.6.3:
   integrity sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==
   dependencies:
     glob "^7.1.3"
-
-rko@^0.5.19:
-  version "0.5.19"
-  resolved "https://registry.yarnpkg.com/rko/-/rko-0.5.19.tgz#33577596167178abc30063b6dd0a8bbde0362c27"
-  integrity sha512-0KSdDnbhD11GCDvZFARvCJedJuwWIh5F1cCqTGljFF/wQi9PUVu019qH4ME4LdPF3HotMLcdQsxEXmIDeeD0zQ==
-  dependencies:
-    idb-keyval "^5.1.3"
-    zustand "^3.5.9"
 
 rko@^0.5.25:
   version "0.5.25"
