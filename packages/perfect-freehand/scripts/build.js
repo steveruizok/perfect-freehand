@@ -32,6 +32,22 @@ async function main() {
     esmSize += output.bytes
   })
 
+  for (const file of [
+    'README.md',
+    'perfect-freehand-card.png',
+    'perfect-freehand-logo.svg',
+  ]) {
+    if (fs.existsSync(`../../${file}`)) {
+      fs.rm(`../../${file}`, (err) => {
+        if (err) throw err
+      })
+    }
+
+    fs.copyFile(`./${file}`, `../../${file}`, (err) => {
+      if (err) throw err
+    })
+  }
+
   fs.readFile('./dist/esm/index.js', (_err, data) => {
     gzip(data, (_err, result) => {
       console.log(

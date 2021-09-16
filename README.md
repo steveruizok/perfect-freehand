@@ -1,6 +1,6 @@
-# ![Screenshot](perfect-freehand-logo.svg 'Perfect Freehand')
+# ![Screenshot](screenshot.svg 'Perfect Freehand')
 
-Draw perfect pressure-sensitive freehand lines.
+Draw perfect pressure-sensitive freehand strokes.
 
 🔗 Try out a [demo](https://perfect-freehand-example.vercel.app/).
 
@@ -117,7 +117,7 @@ function getSvgPathFromStroke(stroke) {
 
   const d = stroke.reduce(
     (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[i === arr.length - 1 ? 0 : i + 1]
+      const [x1, y1] = arr[(i + 1) % arr.length]
       acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
       return acc
     },

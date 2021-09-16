@@ -1,6 +1,6 @@
 import { getStroke } from './getStroke'
 
-export default { getStroke }
+export default getStroke
 
 export * from './getStrokeOutlinePoints'
 export * from './getStrokePoints'
