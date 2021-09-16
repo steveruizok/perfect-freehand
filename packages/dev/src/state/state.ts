@@ -87,6 +87,7 @@ export class AppState extends StateManager<State> {
 
   onPointerDown: TLPointerEventHandler = (info) => {
     const { state } = this
+
     switch (state.appState.tool) {
       case 'drawing': {
         this.currentStroke.points = [info.point]

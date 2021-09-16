@@ -65,7 +65,7 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
       isDone,
     } = shape
 
-    const simulatePressure = shape.points[1]?.[2] === 0.5
+    const simulatePressure = shape.points[2]?.[2] === 0.5
 
     // For very short lines, draw a point instead of a line
     const bounds = this.getBounds(shape)
