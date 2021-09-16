@@ -1,7 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { getStrokeRadius, clamp } from './utils'
+import { getStrokeRadius } from './getStrokeRadius'
 import type { StrokeOptions, StrokePoint } from './types'
-import * as vec from './vec'
+import {
+  add,
+  dist,
+  dist2,
+  dpr,
+  isEqual,
+  lrp,
+  med,
+  mul,
+  per,
+  prj,
+  rotAround,
+  sub,
+  uni,
+} from './vec'
 
 const RATE_OF_CHANGE = 0.3
 const { min, PI } = Math
@@ -25,8 +39,9 @@ export function getStrokeOutlinePoints(
   options: Partial<StrokeOptions> = {} as Partial<StrokeOptions>
 ): number[][] {
   const {
-    size = 8,
+    size = 16,
     smoothing = 0.5,
+    thinning = 0.5,
     simulatePressure = true,
     easing = (t) => t,
     start = {},
@@ -34,7 +49,7 @@ export function getStrokeOutlinePoints(
     last: isComplete = false,
   } = options
 
-  let { thinning = 0.5, streamline = 0.5 } = options
+  let { streamline = 0.5 } = options
 
   const {
     cap: capStart = true,
@@ -48,15 +63,11 @@ export function getStrokeOutlinePoints(
     easing: taperEndEase = (t) => --t * t * t + 1,
   } = end
 
+  // Halve the streaming property
   streamline /= 2
 
-  thinning = clamp(thinning, -1, 1)
-
-  // The number of points in the array
-  const len = points.length
-
   // We can't do anything with an empty array.
-  if (len === 0) return []
+  if (points.length === 0) return []
 
   // The total length of the line
   const totalLength = points.at(-1)!.runningLength
@@ -84,7 +95,12 @@ export function getStrokeOutlinePoints(
   }, points[0].pressure)
 
   // The current radius
-  let radius = getStrokeRadius(size, thinning, easing, points[len - 1].pressure)
+  let radius = getStrokeRadius(
+    size,
+    thinning,
+    points[points.length - 1].pressure,
+    easing
+  )
 
   // The radius of the first saved point
   let firstRadius: number | undefined = undefined
@@ -109,7 +125,7 @@ export function getStrokeOutlinePoints(
     skipping the first and last pointsm, which will get caps later on.
   */
 
-  for (let i = 0; i < len - 1; i++) {
+  for (let i = 0; i < points.length - 1; i++) {
     let { pressure } = points[i]
     const { point, vector, distance, runningLength } = points[i]
 
@@ -128,10 +144,10 @@ export function getStrokeOutlinePoints(
     */
 
     if (thinning) {
-      // If we're simulating pressure, then do so based on the distance
-      // between the current point and the previous point, and the size
-      // of the stroke.
       if (simulatePressure) {
+        // If we're simulating pressure, then do so based on the distance
+        // between the current point and the previous point, and the size
+        // of the stroke. Otherwise, use the input pressure.
         const sp = min(1, distance / size)
         const rp = min(1, 1 - sp)
         pressure = min(
@@ -140,7 +156,7 @@ export function getStrokeOutlinePoints(
         )
       }
 
-      radius = getStrokeRadius(size, thinning, easing, pressure)
+      radius = getStrokeRadius(size, thinning, pressure, easing)
     } else {
       radius = size / 2
     }
@@ -179,14 +195,14 @@ export function getStrokeOutlinePoints(
 
     const nextVector = points[i + 1].vector
 
-    const dpr = vec.dpr(vector, nextVector)
+    const nextDpr = dpr(vector, nextVector)
 
-    if (dpr < 0) {
-      const offset = vec.mul(vec.per(prevVector), radius)
+    if (nextDpr < 0) {
+      const offset = mul(per(prevVector), radius)
 
       for (let t = 0; t < 1; t += 0.2) {
-        tr = vec.rotAround(vec.add(point, offset), point, PI * -t)
-        tl = vec.rotAround(vec.sub(point, offset), point, PI * t)
+        tr = rotAround(add(point, offset), point, PI * -t)
+        tl = rotAround(sub(point, offset), point, PI * t)
 
         rightPts.push(tr)
         leftPts.push(tl)
@@ -195,6 +211,7 @@ export function getStrokeOutlinePoints(
       pl = tl
       pr = tr
 
+      // Once we've drawn the cap, don't do any more work for this point.
       continue
     }
 
@@ -208,25 +225,25 @@ export function getStrokeOutlinePoints(
       points array.
     */
 
-    const offset = vec.mul(vec.per(vec.lrp(nextVector, vector, dpr)), radius)
+    const offset = mul(per(lrp(nextVector, vector, nextDpr)), radius)
 
-    tl = vec.sub(point, offset)
-    tr = vec.add(point, offset)
+    tl = sub(point, offset)
+    tr = add(point, offset)
 
-    const alwaysAdd = i < 2 || dpr < 0.25
+    const alwaysAdd = i < 2 || nextDpr < 0.25
 
     const minDistance = Math.pow(
       Math.max((runningLength > size ? size : size / 2) * smoothing, 1),
       2
     )
 
-    if (alwaysAdd || vec.dist2(pl, tl) > minDistance) {
-      leftPts.push(vec.lrp(pl, tl, streamline))
+    if (alwaysAdd || dist2(pl, tl) > minDistance) {
+      leftPts.push(lrp(pl, tl, streamline))
       pl = tl
     }
 
-    if (alwaysAdd || vec.dist2(pr, tr) > minDistance) {
-      rightPts.push(vec.lrp(pr, tr, streamline))
+    if (alwaysAdd || dist2(pr, tr) > minDistance) {
+      rightPts.push(lrp(pr, tr, streamline))
       pr = tr
     }
 
@@ -245,7 +262,7 @@ export function getStrokeOutlinePoints(
   */
 
   const firstPoint = points[0]
-  const lastPoint = points[len - 1]
+  const lastPoint = points[points.length - 1]
   const isVeryShort = short || rightPts.length < 2 || leftPts.length < 2
 
   /* 
@@ -260,26 +277,24 @@ export function getStrokeOutlinePoints(
   if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
     let ir = 0
 
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < points.length; i++) {
       const { pressure, runningLength } = points[i]
       if (runningLength > size) {
-        ir = getStrokeRadius(size, thinning, easing, pressure)
+        ir = getStrokeRadius(size, thinning, pressure, easing)
         break
       }
     }
 
-    const start = vec.sub(
+    const start = prj(
       firstPoint.point,
-      vec.mul(
-        vec.per(vec.uni(vec.sub(firstPoint.point, lastPoint.point))),
-        ir || radius
-      )
+      per(uni(sub(firstPoint.point, lastPoint.point))),
+      -(ir || radius)
     )
 
     const dotPts: number[][] = []
 
     for (let t = 0, step = 0.1; t <= 1; t += step) {
-      dotPts.push(vec.rotAround(start, firstPoint.point, PI * 2 * t))
+      dotPts.push(rotAround(start, firstPoint.point, PI * 2 * t))
     }
 
     return dotPts
@@ -301,7 +316,7 @@ export function getStrokeOutlinePoints(
     tr = rightPts[1]
 
     for (let i = 1; i < leftPts.length; i++) {
-      if (!vec.isEqual(tr, leftPts[i])) {
+      if (!isEqual(tr, leftPts[i])) {
         tl = leftPts[i]
         break
       }
@@ -309,32 +324,33 @@ export function getStrokeOutlinePoints(
 
     if (capStart || taperStart) {
       if (!taperStart && !(taperEnd && isVeryShort)) {
-        if (!vec.isEqual(tr, tl)) {
-          const start = vec.sub(
+        if (!isEqual(tr, tl)) {
+          const start = prj(
             firstPoint.point,
-            vec.mul(vec.uni(vec.sub(tl, tr)), vec.dist(tr, tl) / 2)
+            uni(sub(tl, tr)),
+            -dist(tr, tl) / 2
           )
           for (let t = 0, step = 0.1; t <= 1; t += step) {
-            const pt = vec.rotAround(start, firstPoint.point, PI * t)
-            if (vec.dist(pt, tl) < 1) break
+            const pt = rotAround(start, firstPoint.point, PI * t)
+            if (dist(pt, tl) < 1) break
             startCap.push(pt)
           }
           leftPts.shift()
           rightPts.shift()
         }
       } else {
-        startCap.push(firstPoint.point, vec.add(firstPoint.point, [0.1, 0.1]))
+        startCap.push(firstPoint.point, add(firstPoint.point, [0.1, 0.1]))
       }
     } else {
-      if (!vec.isEqual(tr, tl)) {
-        const vector = vec.uni(vec.sub(tl, tr))
-        const dist = vec.dist(tr, tl) / 2
+      if (!isEqual(tr, tl)) {
+        const vector = uni(sub(tl, tr))
+        const ptDist = dist(tr, tl) / 2
 
         startCap.concat(
-          vec.sub(firstPoint.point, vec.mul(vector, dist * 0.95)),
-          vec.sub(firstPoint.point, vec.mul(vector, dist)),
-          vec.add(firstPoint.point, vec.mul(vector, dist)),
-          vec.add(firstPoint.point, vec.mul(vector, dist * 0.95))
+          prj(firstPoint.point, vector, ptDist * 0.95),
+          prj(firstPoint.point, vector, ptDist),
+          prj(firstPoint.point, vector, -ptDist),
+          prj(firstPoint.point, vector, -ptDist * 0.95)
         )
 
         leftPts.shift()
@@ -359,20 +375,21 @@ export function getStrokeOutlinePoints(
     const lr = rightPts.at(-1)!
 
     // The point between the two
-    const mid = vec.med(ll, lr)
+    const mid = med(ll, lr)
 
     // The last provided point
     const last = lastPoint.point
 
-    const vector = vec.uni(vec.sub(last, mid))
+    const direction = per(uni(sub(last, mid)))
 
     if (capEnd || taperEnd) {
       if (!taperEnd && !(taperStart && isVeryShort)) {
         // Draw the end cap
-        const start = vec.add(last, vec.mul(vec.per(vector), radius))
+        const start = prj(last, direction, radius)
         for (let t = 0, step = 0.1; t <= 1; t += step) {
-          const pt = vec.rotAround(start, last, PI * 3 * t)
-          if (vec.dist(pt, lr) < 1) break
+          const pt = rotAround(start, last, PI * 3 * t)
+          // Don't go past the other point
+          if (dist(pt, lr) < 1) break
           endCap.push(pt)
         }
       } else {
@@ -380,19 +397,20 @@ export function getStrokeOutlinePoints(
         endCap.push(last)
       }
     } else {
-      const justBefore = vec.lrp(mid, last, 0.95)
+      // Add a few more points almost at the last point
+      const justBefore = lrp(mid, last, 0.95)
       const r = radius * 0.95
       endCap.concat(
-        vec.add(justBefore, vec.mul(vec.per(vector), r)),
-        vec.add(last, vec.mul(vec.per(vector), r)),
-        vec.sub(last, vec.mul(vec.per(vector), r)),
-        vec.sub(justBefore, vec.mul(vec.per(vector), r))
+        prj(justBefore, direction, r),
+        prj(last, direction, r),
+        prj(last, direction, -r),
+        prj(justBefore, direction, -r)
       )
     }
   }
 
   /*
-    Return the points in the correct windind order: begin on the left side, then 
+    Return the points in the correct winding order: begin on the left side, then 
     continue around the end cap, then come back along the right side, and finally 
     complete the start cap.
   */

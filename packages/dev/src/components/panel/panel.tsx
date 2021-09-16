@@ -50,7 +50,7 @@ export function Panel() {
       >
         <button onClick={app.undo}>Undo</button>
         <button onClick={app.redo}>Redo</button>
-        <button onClick={app.deleteAll}>Clear</button>
+        <button onClick={app.resetDoc}>Clear</button>
       </div>
     </>
   )

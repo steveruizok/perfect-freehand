@@ -1,6 +1,5 @@
-import { toPointsArray } from './utils'
+import { add, dist, isEqual, lrp, sub, uni } from './vec'
 import type { StrokeOptions, StrokePoint } from './types'
-import * as vec from './vec'
 
 /**
  * ## getStrokePoints
@@ -23,10 +22,12 @@ export function getStrokePoints<
   streamline = streamline / (simulatePressure ? 3 : 2)
 
   // Whatever the input is, make sure that the points are in number[][].
-  const pts = toPointsArray(points)
+  const pts = Array.isArray(points[0])
+    ? (points as T[])
+    : (points as K[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
 
   // If there's only one point, add another point at a 1pt offset.
-  if (pts.length === 1) pts.push([...vec.add(pts[0], [1, 1]), pts[0][2] || 0.5])
+  if (pts.length === 1) pts.push([...add(pts[0], [1, 1]), pts[0][2] || 0.5])
 
   // The strokePoints array will hold the points for the stroke.
   // Start it out with the first point, which needs no adjustment.
@@ -57,18 +58,16 @@ export function getStrokePoints<
     // less streamline = closer to the current point.
     // This takes a lot of the "noise" out of the input points.
     const point =
-      isComplete && i === len - 1
-        ? curr
-        : vec.lrp(prev.point, curr, 1 - streamline)
+      isComplete && i === len - 1 ? curr : lrp(prev.point, curr, 1 - streamline)
 
     // If the new point is the same as the previous point, skip ahead.
-    if (vec.isEqual(prev.point, point)) continue
+    if (isEqual(prev.point, point)) continue
 
     // What's the vector from the current point to the previous point?
-    const vector = vec.uni(vec.sub(prev.point, point))
+    const vector = uni(sub(prev.point, point))
 
     // How far is the new point from the previous point?
-    const distance = vec.dist(point, prev.point)
+    const distance = dist(point, prev.point)
 
     // Add this distance to the total "running length" of the line.
     const runningLength = prev.runningLength + distance

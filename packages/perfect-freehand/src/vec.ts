@@ -67,6 +67,16 @@ export function dpr(A: number[], B: number[]) {
 }
 
 /**
+ * Get whether two vectors are equal.
+ * @param A
+ * @param B
+ * @internal
+ */
+export function isEqual(A: number[], B: number[]) {
+  return A[0] === B[0] && A[1] === B[1]
+}
+
+/**
  * Length of the vector
  * @param A
  * @internal
@@ -155,11 +165,12 @@ export function lrp(A: number[], B: number[], t: number) {
 }
 
 /**
- * Get whether two vectors are equal.
- * @param a
- * @param b
+ * Project a point A in the direction B by a scalar c
+ * @param A
+ * @param B
+ * @param c
  * @internal
  */
-export function isEqual(a: number[], b: number[]) {
-  return a[0] === b[0] && a[1] === b[1]
+export function prj(A: number[], B: number[], c: number) {
+  return add(A, mul(B, c))
 }
