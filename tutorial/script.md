@@ -1,6 +1,7 @@
 # Perfect Freehand Tutorial (Script)
 
 [Starter File](https://stackblitz.com/edit/js-vtm7xh)
+[Easing Functions](https://gist.github.com/steveruizok/c331cd1fb30563aec51f7223e25d0afd)
 
 Hey, this is Steve Ruiz, author of the perfect-freehand library for JavaScript.
 
@@ -8,74 +9,126 @@ Perfect-freehand makes it easy to create freehand lines like this one. The libra
 
 The library is free to use, MIT licensed, and you can find the full source code and docs on Github. Check the link in the video description.
 
-In this tutorial, I'll show you how to use perfect-freehand in a project.
+In this tutorial, I'll show you how to use perfect-freehand, what its different options are, and how you might use in a project.
 
 Let's get started!
 
 ## Setup
 
-For this tutorial, we're going to start from a little drawing app where a user can draw lines on the page. If you want to follow along, you can find a link to this project in the video description.
+To begin, let's take a look at our starter project.
 
-Before we begin, let's take a quick tour of the project.
+If you'd like to follow along, you can find a link to the project in the video description.
 
-In the project's HTML, we just have an `svg` element.
+In our HTML, we have an SVG element... with some inline styles that make it take up the whole window.
 
-...and in our CSS we're styling this element so that it takes up the whole window.
+```html
+<svg
+  id="svg"
+  style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;"
+></svg>
+```
 
-In our javascript file...
+We also have a JSON file that contains an array of points—all x and y positions—the same kind we would record from a user drawing with their mouse or trackpad.
 
-And we have two variables, `currentPath` and `currentPoints`.
+```json
+{
+  "points": [
+    [47.671875, 179.84375],
+    [48.1171875, 179.8515625]
+    //...
+  ]
+}
+```
 
-We're getting a reference to the `svg` element...
+In our JavaScript file, we're importing those points.
 
-...and we're setting three event listeners: one for when the user starts pointing on the svg element, one for when the user moves their pointer over the svg element, and one for when the user stops pointing.
+```js
+import points from './sample.json'
+```
 
-When the user starts pointing, we get the event's point and save that to the `currentPoints` array. Next, we create a new path element and set its properties, using our point for its path data. Then we append the path element to the svg element, and finally we capture the pointer id.
+And using them to create a string of SVG path data.
 
-When the user moves their pointer over the SVG, we first check if we've already captured the event's pointer id. If that's true, then we again get the event's `point` and push it to our `currentPoints` array, and then use the `currentPoints` array to set the `currentPath`'s path data.
+```js
+const pathData = ['M', points[0], 'L', points.slice(1)].join(' ')
+```
 
-Finally, when we the user stops pointing, we release the pointer capture.
+Next, we're creating an SVG path element...
 
-And that's all it takes to make a drawing app!
+```js
+const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+```
 
-## Setup
+...and assigning it this path data—along with some other basic attributes: fill, stroke, stroke width.
 
-Here's our starter project.
+```js
+path.setAttribute('d', pathData)
+path.setAttribute('fill', 'none')
+path.setAttribute('stroke', 'black')
+path.setAttribute('stroke-width', '2')
+```
 
-In our HTML, we have an SVG element...
+Finally, we're appending the path element to the page's SVG element.
 
-With some inline styles that make it take up the whole window.
-
-In our JavaScript, we're importing a JSON file that contains an array of points, all x and y positions, the same kind we would record from a user drawing with their mouse or trackpad.
-
-We turn those points into a string of SVG path data.
-
-And then we create an SVG path element and assign it this path data... along with some other basic attributes: fill, stroke, stroke width.
-
-Finally, we appending it to the page's SVG element.
+```js
+document.getElementById('svg').appendChild(path)
+```
 
 And in the browser, we see the path: a line that connects all of our input points.
 
 ```js
-import sample from './sample.json'
+import points from './sample.json'
 
-const stroke = getStroke(sample.points)
-
-const [first, ...rest] = sample.points
-
-const pathData = ['M', first, 'L', rest].join(' ')
+const pathData = ['M', points[0], 'L', points.slice(1)].join(' ')
 
 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 
 path.setAttribute('d', pathData)
 path.setAttribute('fill', 'none')
 path.setAttribute('stroke', 'black')
-path.setAttribute('stroke-width', '3')
+path.setAttribute('stroke-width', '4')
 
 document.getElementById('svg').appendChild(path)
 ```
 
-Not bad! Well, actually a little bad.
+Not bad!
+
+Well, maybe a little bad.
+
+### Standard Improvements
+
+If we wanted to improve this, we would normally do something like this. First, we'd simplify the points.
+
+```js
+import { simplify } from './helpers'
+
+points = simplify(points)
+```
+
+Next, we could apply a low pass filter to the points.
+
+```js
+import { simplify } from './helpers'
+
+points = lowPass(simplify(points))
+```
+
+And finally, instead of creating path data that connects each point by a line, we'd create path data that connects each point by a curve.
+
+```js
+const pathData = points
+  .slice(1)
+  .reduce(
+    (acc, [x0, y0], i, arr) => {
+      if (i === arr.length - 1) return acc
+      const [x1, y1] = arr[i + 1]
+      return acc.concat(` ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`)
+    },
+    ['M', points[0], 'Q']
+  )
+  .join(' ')
+```
+
+Now that's much better than what we had before, but it's still not quite perfect. For one, this kind of "simplify-and-curve" approach can only be applied _after_ a line is completed.
 
 Let's add perfect-freehand and see what it can do.
 
@@ -169,7 +222,7 @@ const stroke = getStroke(sample.points, {
 
 ### Easing
 
-For even finer control over the effect of thinning, we can pass an easing function that will adjust the pressure along a curve.
+For even finer control over the effect of thinning, we can pass an easing function that will adjust the pressure along a curve. For a list of easing functions, check the links in the video description.
 
 ```js
 const stroke = getStroke(sample.points, {
@@ -181,7 +234,7 @@ const stroke = getStroke(sample.points, {
 
 ### Streamline
 
-The perfect-freehand algorithm is also "streamlining" the points in our line, removing noise or irregularities. We can control this too through the `streamline` option.
+Often the input points recorded for a line are 'noisy', or full of irregularities. To fix this, the perfect-freehand algorithm applies a "low pass" filter that moves the points closer to a perfect curve. We can control the strength of this filter through the `streamline` option.
 
 At zero, the stroke will use the actual input points. As the number goes up, the line will become more evened out.
 
@@ -203,7 +256,7 @@ const stroke = getStroke(sample.points, {
 
 ### Smoothing
 
-Likewise, we can also control the density of points along the edges of our polygon using the option `smoothing`. At zero, the polygon will contain many points, and may appear jagged or bumpy. At higher values, the polygon will contain fewer points and lose definition.
+Likewise, we can also control the density of points along the edges of our polygon using the `smoothing` option. At zero, the polygon will contain many points, and may appear jagged or bumpy. At higher values, the polygon will contain fewer points and lose definition.
 
 ```js
 const stroke = getStroke(sample.points, {
@@ -244,3 +297,31 @@ const pathData = stroke
 Wow! That looks much better.
 
 And the higher smoothing actually makes it look better, too.
+
+<!-- ----------------- ScratchPad ------------------ -->
+
+## Setup
+
+For this tutorial, we're going to start from a little drawing app where a user can draw lines on the page. If you want to follow along, you can find a link to this project in the video description.
+
+Before we begin, let's take a quick tour of the project.
+
+In the project's HTML, we just have an `svg` element.
+
+...and in our CSS we're styling this element so that it takes up the whole window.
+
+In our javascript file...
+
+And we have two variables, `currentPath` and `currentPoints`.
+
+We're getting a reference to the `svg` element...
+
+...and we're setting three event listeners: one for when the user starts pointing on the svg element, one for when the user moves their pointer over the svg element, and one for when the user stops pointing.
+
+When the user starts pointing, we get the event's point and save that to the `currentPoints` array. Next, we create a new path element and set its properties, using our point for its path data. Then we append the path element to the svg element, and finally we capture the pointer id.
+
+When the user moves their pointer over the SVG, we first check if we've already captured the event's pointer id. If that's true, then we again get the event's `point` and push it to our `currentPoints` array, and then use the `currentPoints` array to set the `currentPath`'s path data.
+
+Finally, when we the user stops pointing, we release the pointer capture.
+
+And that's all it takes to make a drawing app!
