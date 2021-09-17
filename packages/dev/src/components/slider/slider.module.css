@@ -58,7 +58,7 @@
 }
 
 .numberInput {
-  font-family: 'Recursive', sans-serif;
+  font-family: inherit;
   font-size: 12px;
   border: none;
   width: 40px;

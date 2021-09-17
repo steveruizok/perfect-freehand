@@ -17,6 +17,7 @@ export interface DrawStyles {
   fill: string
   stroke: string
   strokeWidth: number
+  easing: Easing
   thinning: number
   streamline: number
   smoothing: number
@@ -59,3 +60,24 @@ export interface Data extends State {
   undo: () => void
   redo: () => void
 }
+
+export type Easing =
+  | 'linear'
+  | 'easeInQuad'
+  | 'easeOutQuad'
+  | 'easeInOutQuad'
+  | 'easeInCubic'
+  | 'easeOutCubic'
+  | 'easeInOutCubic'
+  | 'easeInQuart'
+  | 'easeOutQuart'
+  | 'easeInOutQuart'
+  | 'easeInQuint'
+  | 'easeOutQuint'
+  | 'easeInOutQuint'
+  | 'easeInSine'
+  | 'easeOutSine'
+  | 'easeInOutSine'
+  | 'easeInExpo'
+  | 'easeOutExpo'
+  | 'easeInOutExpo'

@@ -40,8 +40,7 @@ hr {
 
 .buttonsRow {
   display: flex;
-  height: 48px;
-  padding-top: 8px;
+  height: 40px;
 }
 
 .rowButton {

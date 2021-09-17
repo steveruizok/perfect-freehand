@@ -1,12 +1,13 @@
 import * as React from 'react'
+import { Colors } from 'components/colors'
 import { Checkbox } from 'components/checkbox'
+import { Select } from 'components/select'
 import { Slider } from 'components/slider'
 import styles from './controls.module.css'
 import { app, useAppState } from 'state'
-import type { State } from 'types'
-import { Colors } from 'components/colors'
+import type { Easing, State } from 'types'
 
-const colors = [
+const COLORS = [
   '#000000',
   '#ffc107',
   '#ff5722',
@@ -14,6 +15,28 @@ const colors = [
   '#673ab7',
   '#00bcd4',
   '#efefef',
+]
+
+const EASINGS = [
+  'linear',
+  'easeInQuad',
+  'easeOutQuad',
+  'easeInOutQuad',
+  'easeInCubic',
+  'easeOutCubic',
+  'easeInOutCubic',
+  'easeInQuart',
+  'easeOutQuart',
+  'easeInOutQuart',
+  'easeInQuint',
+  'easeOutQuint',
+  'easeInOutQuint',
+  'easeInSine',
+  'easeOutSine',
+  'easeInOutSine',
+  'easeInExpo',
+  'easeOutExpo',
+  'easeInOutExpo',
 ]
 
 const appStateSelector = (s: State) => s.appState
@@ -60,6 +83,10 @@ export function Controls() {
 
   const handleSmoothingChange = React.useCallback((v: number[]) => {
     app.patchStyleForAllShapes({ smoothing: v[0] })
+  }, [])
+
+  const handleEasingChange = React.useCallback((easing: string) => {
+    app.patchStyleForAllShapes({ easing: easing as Easing })
   }, [])
 
   const handleCapStartChange = React.useCallback(
@@ -129,6 +156,10 @@ export function Controls() {
     app.resetStyle('smoothing')
   }, [])
 
+  const handleResetEasing = React.useCallback(() => {
+    app.resetStyle('easing')
+  }, [])
+
   const handleResetTaperStart = React.useCallback(() => {
     app.resetStyle('taperStart')
   }, [])
@@ -193,6 +224,18 @@ export function Controls() {
           onPointerDown={handleSmoothingChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
+        <Select
+          name="Easing"
+          value={style.easing}
+          onValueChange={handleEasingChange}
+          onDoubleClick={handleResetEasing}
+        >
+          {EASINGS.map((easing) => (
+            <option key={easing} value={easing}>
+              {easing[0].toUpperCase() + easing.slice(1)}
+            </option>
+          ))}
+        </Select>
         <hr />
         <Checkbox
           name="Cap Start"
@@ -237,11 +280,12 @@ export function Controls() {
           <Colors
             name=""
             color={style.fill}
-            colors={colors}
+            colors={COLORS}
             onChange={handleFillColorChange}
           />
         )}
         <Slider
+          name="Stroke"
           value={[style.strokeWidth]}
           min={0}
           max={100}
@@ -255,7 +299,7 @@ export function Controls() {
           <Colors
             name=""
             color={style.stroke}
-            colors={colors}
+            colors={COLORS}
             onChange={handleStrokeColorChange}
           />
         )}
@@ -263,10 +307,16 @@ export function Controls() {
       <hr />
       <div className={styles.buttonsRow}>
         <button className={styles.rowButton} onClick={app.resetStyles}>
-          Reset
+          Reset Options
         </button>
         <button className={styles.rowButton} onClick={app.copyStyles}>
-          Copy
+          Copy Options
+        </button>
+      </div>
+      <hr />
+      <div className={styles.buttonsRow}>
+        <button className={styles.rowButton} onClick={app.copySvg}>
+          Copy to SVG
         </button>
       </div>
     </div>

@@ -34,12 +34,13 @@ export const initialDoc: Doc = {
   },
 }
 
-export const defaultStyle = {
+export const defaultStyle: DrawStyles = {
   size: 16,
   strokeWidth: 0,
   thinning: 0.5,
   streamline: 0.5,
   smoothing: 0.5,
+  easing: 'linear',
   taperStart: 0,
   taperEnd: 0,
   capStart: true,
@@ -735,6 +736,81 @@ export class AppState extends StateManager<State> {
         tool: 'erasing',
       },
     })
+  }
+
+  copySvg = () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+
+    const shapes = Object.values(this.state.page.shapes)
+
+    const bounds = Utils.getCommonBounds(shapes.map(Draw.getBounds))
+
+    const padding = 16
+
+    shapes.forEach((shape) => {
+      const fillElm = document.getElementById('path_' + shape.id)
+
+      if (!fillElm) return
+
+      const fillClone = fillElm.cloneNode(false) as SVGPathElement
+
+      const strokeElm = document.getElementById('path_stroke_' + shape.id)
+
+      if (strokeElm) {
+        // Create a new group
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+
+        // Translate the group to the shape's point
+        g.setAttribute(
+          'transform',
+          `translate(${shape.point[0]}, ${shape.point[1]})`
+        )
+
+        // Clone the stroke element
+        const strokeClone = strokeElm.cloneNode(false) as SVGPathElement
+
+        // Append both the stroke element and the fill element to the group
+        g.appendChild(strokeClone)
+        g.appendChild(fillClone)
+
+        // Append the group to the SVG
+        svg.appendChild(g)
+      } else {
+        // Translate the fill clone and append it to the SVG
+        fillClone.setAttribute(
+          'transform',
+          `translate(${shape.point[0]}, ${shape.point[1]})`
+        )
+
+        svg.appendChild(fillClone)
+      }
+    })
+
+    // Resize the element to the bounding box
+    svg.setAttribute(
+      'viewBox',
+      [
+        bounds.minX - padding,
+        bounds.minY - padding,
+        bounds.width + padding * 2,
+        bounds.height + padding * 2,
+      ].join(' ')
+    )
+
+    svg.setAttribute('width', String(bounds.width))
+
+    svg.setAttribute('height', String(bounds.height))
+
+    const s = new XMLSerializer()
+
+    const svgString = s
+      .serializeToString(svg)
+      .replaceAll('&#10;      ', '')
+      .replaceAll(/((\s|")[0-9]*\.[0-9]{2})([0-9]*)(\b|"|\))/g, '$1')
+
+    copyTextToClipboard(svgString)
+
+    return svgString
   }
 }
 

@@ -1,0 +1,25 @@
+.select {
+  grid-column: 2 / span 2;
+  padding: 0;
+}
+
+.select select {
+  position: relative;
+  display: flex;
+  height: 30px;
+  width: calc(100% + 6px);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: none;
+  padding: 0;
+  margin-left: -6px;
+  outline: none;
+  font: inherit;
+  border: 2px solid transparent;
+}
+
+.select select:focus {
+  outline: none;
+  border: 2px solid dodgerblue;
+}

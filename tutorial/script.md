@@ -1,5 +1,7 @@
 # Perfect Freehand Tutorial (Script)
 
+[Starter File](https://stackblitz.com/edit/js-vtm7xh)
+
 Hey, this is Steve Ruiz, author of the perfect-freehand library for JavaScript.
 
 Perfect-freehand makes it easy to create freehand lines like this one. The library can use real pressure to adjust the width of the line, or it can simulate pressure, too. And there are plenty of ways to customize how a line looks and feels.
@@ -120,14 +122,125 @@ path.setAttribute('d', pathData)
 path.setAttribute('fill', 'black')
 ```
 
-Now that we have the stroke turned off, we can see that the polygon isn't even: some parts are thinner and some parts are thicker. This is the effect of pressure: more pressure will cause the line to become thicker and less pressure will cause the line to become thinner.
+### Size
 
-We can adjust the rate of this thinning by passing an options object to `getStroke`.
+Now that we have the stroke turned off, our line is looking a little thin. To increase the line's thickness, we can pass an options object as the second parameter to `getStroke`...
+
+And here we can define our line's thickness under the property `size`.
 
 ```js
 const stroke = getStroke(sample.points, {
+  size: 16,
+})
+```
+
+That looks better!
+
+### Thinning
+
+You might notice that the polygon isn't even: some parts are thinner and some parts are thicker. This is the effect of pressure.
+
+More pressure will cause the line to become thicker and less pressure will cause the line to become thinner.
+
+We can adjust the rate of this thinning in the stroke's options.
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: 0.5,
+})
+```
+
+The `thinning` option takes a number between -1 and 1. At 0, pressure will have no effect on the width of the line. When positive, pressure will have a positive effect on the width of the line; and when negative, pressure will have a negative effect on the width of the line.
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
   thinning: 0.9,
 })
 ```
 
-The `thinning` option takes a number between -1 and 1. At 0, pressure has no effect on the width of the line. At 1, lower pressures will cause the line to become thinner; and at -1, lower pressures will cause the line to get thicker.
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: -0.9,
+})
+```
+
+### Easing
+
+For even finer control over the effect of thinning, we can pass an easing function that will adjust the pressure along a curve.
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: -0.9,
+  easing: (t) => 1 - Math.cos((t * Math.PI) / 2),
+})
+```
+
+### Streamline
+
+The perfect-freehand algorithm is also "streamlining" the points in our line, removing noise or irregularities. We can control this too through the `streamline` option.
+
+At zero, the stroke will use the actual input points. As the number goes up, the line will become more evened out.
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: 0.5,
+  streamline: 0,
+})
+```
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: 0.5,
+  streamline: 1,
+})
+```
+
+### Smoothing
+
+Likewise, we can also control the density of points along the edges of our polygon using the option `smoothing`. At zero, the polygon will contain many points, and may appear jagged or bumpy. At higher values, the polygon will contain fewer points and lose definition.
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: 0.5,
+  streamline: 0.5,
+  smoothing: 0,
+})
+```
+
+```js
+const stroke = getStroke(sample.points, {
+  size: 16,
+  thinning: 0.5,
+  streamline: 0.5,
+  smoothing: 1,
+})
+```
+
+In our demo, a smoother line looks more geometric. But there are lots of reasons why you might want to keep smoothing as high as possible, especially if you're storing points in some sort of state. To fix the low-poly look, we can update our SVG path.
+
+Curves can be a little verbose, so let's bring in a snippet to help us out.
+
+```js
+const pathData = stroke
+  .reduce(
+    (acc, [x0, y0], i, arr) => {
+      if (i === arr.length - 1) return acc
+      const [x1, y1] = arr[i + 1]
+      return acc.concat(` ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`)
+    },
+    ['M ', `${stroke[0][0]},${stroke[0][1]}`, ' Q']
+  )
+  .concat('Z')
+  .join('')
+```
+
+Wow! That looks much better.
+
+And the higher smoothing actually makes it look better, too.
