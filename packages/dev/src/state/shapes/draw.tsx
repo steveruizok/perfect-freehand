@@ -12,7 +12,8 @@ import {
 } from '@tldraw/intersect'
 import { Vec } from '@tldraw/vec'
 import { getStroke, getStrokePoints } from 'perfect-freehand'
-import type { DrawShape, Easing } from '../../types'
+import type { DrawShape } from '../../types'
+import { EASINGS } from 'state/easings'
 
 const pointsBoundsCache = new WeakMap<DrawShape['points'], TLBounds>([])
 const rotatedCache = new WeakMap<DrawShape, number[][]>([])
@@ -263,49 +264,4 @@ function getSvgPathFromStroke(stroke: number[][]): string {
     .concat('Z')
     .join('')
     .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, '$1')
-}
-
-const EASINGS: Record<Easing, (t: number) => number> = {
-  // no easing, no acceleration
-  linear: (t) => t,
-  // accelerating from zero velocity
-  easeInQuad: (t) => t * t,
-  // decelerating to zero velocity
-  easeOutQuad: (t) => t * (2 - t),
-  // acceleration until halfway, then deceleration
-  easeInOutQuad: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-  // accelerating from zero velocity
-  easeInCubic: (t) => t * t * t,
-  // decelerating to zero velocity
-  easeOutCubic: (t) => --t * t * t + 1,
-  // acceleration until halfway, then deceleration
-  easeInOutCubic: (t) =>
-    t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
-  // accelerating from zero velocity
-  easeInQuart: (t) => t * t * t * t,
-  // decelerating to zero velocity
-  easeOutQuart: (t) => 1 - --t * t * t * t,
-  // acceleration until halfway, then deceleration
-  easeInOutQuart: (t) =>
-    t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t,
-  // accelerating from zero velocity
-  easeInQuint: (t) => t * t * t * t * t,
-  // decelerating to zero velocity
-  easeOutQuint: (t) => 1 + --t * t * t * t * t,
-  // acceleration until halfway, then deceleration
-  easeInOutQuint: (t) =>
-    t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t,
-  easeInSine: (t) => 1 - Math.cos((t * Math.PI) / 2),
-  easeOutSine: (t) => Math.sin((t * Math.PI) / 2),
-  easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
-  easeInExpo: (t) => (t <= 0 ? 0 : Math.pow(2, 10 * t - 10)),
-  easeOutExpo: (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)),
-  easeInOutExpo: (t) =>
-    t <= 0
-      ? 0
-      : t >= 1
-      ? 1
-      : t < 0.5
-      ? Math.pow(2, 20 * t - 10) / 2
-      : (2 - Math.pow(2, -20 * t + 10)) / 2,
 }

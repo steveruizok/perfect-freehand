@@ -13,6 +13,7 @@ import { Draw } from './shapes'
 import * as sample from './sample.json'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
+import { EASING_STRINGS } from './easings'
 
 export const shapeUtils: TLShapeUtils<DrawShape> = {
   draw: Draw,
@@ -139,7 +140,7 @@ export class AppState extends StateManager<State> {
     }
   }
 
-  onPointerUp: TLPointerEventHandler = (info) => {
+  onPointerUp: TLPointerEventHandler = () => {
     const { state } = this
     switch (state.appState.tool) {
       case 'drawing': {
@@ -169,7 +170,7 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  onPinch: TLPinchEventHandler = ({ point, delta }, e) => {
+  onPinch: TLPinchEventHandler = ({ point, delta }) => {
     if (this.state.appState.status !== 'pinching') return
 
     const { camera } = this.state.pageState
@@ -676,6 +677,7 @@ export class AppState extends StateManager<State> {
   smoothing: ${style.smoothing},
   thinning: ${style.thinning},
   streamline: ${style.streamline},
+  easing: ${EASING_STRINGS[style.easing].toString()},
   start: {
     taper: ${style.taperStart},
     cap: ${style.capStart},
@@ -685,57 +687,6 @@ export class AppState extends StateManager<State> {
     cap: ${style.capEnd},
   },
 }`)
-  }
-
-  resetDoc = () => {
-    const { shapes } = this.state.page
-
-    return this.setState({
-      before: {
-        page: {
-          shapes,
-        },
-      },
-      after: {
-        page: {
-          shapes: {
-            ...Object.fromEntries(
-              Object.keys(shapes).map((key) => [key, undefined])
-            ),
-          },
-        },
-        pageState: {
-          camera: {
-            point: [0, 0],
-            zoom: 1,
-          },
-        },
-      },
-    })
-  }
-
-  onPinchStart: TLPinchEventHandler = () => {
-    if (this.state.appState.status !== 'idle') return
-
-    this.patchState({
-      appState: { status: 'pinching' },
-    })
-  }
-
-  selectDrawingTool = () => {
-    this.patchState({
-      appState: {
-        tool: 'drawing',
-      },
-    })
-  }
-
-  selectErasingTool = () => {
-    this.patchState({
-      appState: {
-        tool: 'erasing',
-      },
-    })
   }
 
   copySvg = () => {
@@ -812,6 +763,57 @@ export class AppState extends StateManager<State> {
 
     return svgString
   }
+
+  resetDoc = () => {
+    const { shapes } = this.state.page
+
+    return this.setState({
+      before: {
+        page: {
+          shapes,
+        },
+      },
+      after: {
+        page: {
+          shapes: {
+            ...Object.fromEntries(
+              Object.keys(shapes).map((key) => [key, undefined])
+            ),
+          },
+        },
+        pageState: {
+          camera: {
+            point: [0, 0],
+            zoom: 1,
+          },
+        },
+      },
+    })
+  }
+
+  onPinchStart: TLPinchEventHandler = () => {
+    if (this.state.appState.status !== 'idle') return
+
+    this.patchState({
+      appState: { status: 'pinching' },
+    })
+  }
+
+  selectDrawingTool = () => {
+    this.patchState({
+      appState: {
+        tool: 'drawing',
+      },
+    })
+  }
+
+  selectErasingTool = () => {
+    this.patchState({
+      appState: {
+        tool: 'erasing',
+      },
+    })
+  }
 }
 
 export const app = new AppState(
@@ -823,7 +825,7 @@ export const app = new AppState(
 
 export function useAppState(): State
 export function useAppState<K>(selector: StateSelector<State, K>): K
-export function useAppState(selector?: StateSelector<State, any>) {
+export function useAppState<K>(selector?: StateSelector<State, K>) {
   if (selector) {
     return app.useStore(selector)
   }
