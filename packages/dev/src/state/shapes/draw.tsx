@@ -11,7 +11,7 @@ import {
   intersectBoundsPolyline,
 } from '@tldraw/intersect'
 import { Vec } from '@tldraw/vec'
-import { getStroke, getStrokePoints } from 'perfect-freehand'
+import { getStroke } from 'perfect-freehand'
 import type { DrawShape } from '../../types'
 import { EASINGS } from 'state/easings'
 
@@ -114,14 +114,8 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
     )
   },
 
-  Indicator({ shape }) {
-    const { points } = shape
-
-    const path = Utils.getFromCache(this.simplePathCache, points, () =>
-      getSolidStrokePath(shape)
-    )
-
-    return <path d={path} />
+  Indicator() {
+    return null
   },
 
   getBounds(shape: DrawShape): TLBounds {
@@ -134,7 +128,8 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
   },
 
   shouldRender(prev: DrawShape, next: DrawShape): boolean {
-    return next.points !== prev.points || next.style !== prev.style
+    return true
+    // return next.points !== prev.points || next.style !== prev.style
   },
 
   hitTestBounds(shape: DrawShape, brushBounds: TLBounds): boolean {
@@ -209,42 +204,6 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
   },
 }))
 
-function getSolidStrokePath(shape: DrawShape) {
-  let { points } = shape
-
-  let len = points.length
-
-  if (len === 0) return 'M 0 0 L 0 0'
-  if (len < 3) return `M ${points[0][0]} ${points[0][1]}`
-
-  points = getStrokePoints(points).map((pt) => pt.point)
-
-  len = points.length
-
-  const d = points.reduce(
-    (acc, [x0, y0], i, arr) => {
-      if (i === len - 1) {
-        acc.push('L', x0, y0)
-        return acc
-      }
-
-      const [x1, y1] = arr[i + 1]
-      acc.push(
-        x0.toFixed(2),
-        y0.toFixed(2),
-        ((x0 + x1) / 2).toFixed(2),
-        ((y0 + y1) / 2).toFixed(2)
-      )
-      return acc
-    },
-    ['M', points[0][0], points[0][1], 'Q']
-  )
-
-  const path = d.join(' ').replaceAll(/(\s[0-9]*\.[0-9]{2})([0-9]*)\b/g, '$1')
-
-  return path
-}
-
 function getSvgPathFromStroke(points: number[][]): string {
   if (!points.length) {
     return ''
@@ -252,11 +211,13 @@ function getSvgPathFromStroke(points: number[][]): string {
 
   const max = points.length - 1
 
+  // return dots(points)
+
   return points
     .reduce(
       (acc, point, i, arr) => {
         if (i === max) {
-          acc.push('Z')
+          acc.push(point, Vec.med(point, arr[0]), 'L', arr[0], 'Z')
         } else {
           acc.push(point, Vec.med(point, arr[i + 1]))
         }
@@ -266,4 +227,12 @@ function getSvgPathFromStroke(points: number[][]): string {
     )
     .join(' ')
     .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, '$1')
+}
+
+export function dot([x, y]: number[]) {
+  return `M ${x - 0.5},${y} a .5,.5 0 1,0 1,0 a .5,.5 0 1,0 -1,0`
+}
+
+export function dots(points: number[][]) {
+  return points.map(dot).join(' ')
 }

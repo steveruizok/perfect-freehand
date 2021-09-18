@@ -46,7 +46,7 @@ export function copyTextToClipboard(string: string) {
 
       textarea.setSelectionRange(0, textarea.value.length)
     } catch (err) {
-      console.log('could not copy to clipboard')
+      console.warn('Could not copy to clipboard')
       null // Could not copy to clipboard
     } finally {
       document.body.removeChild(textarea)

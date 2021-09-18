@@ -239,7 +239,8 @@ export function Controls() {
         <hr />
         <Checkbox
           name="Cap Start"
-          checked={style.capStart}
+          disabled={style.taperStart > 0}
+          checked={style.taperStart === 0 && style.capStart}
           onCheckedChange={handleCapStartChange}
         />
         <Slider
@@ -256,7 +257,8 @@ export function Controls() {
         <hr />
         <Checkbox
           name="Cap End"
-          checked={style.capEnd}
+          disabled={style.taperEnd > 0}
+          checked={style.taperEnd === 0 && style.capEnd}
           onCheckedChange={handleCapEndChange}
         />
         <Slider

@@ -16,8 +16,13 @@ import {
   uni,
 } from './vec'
 
-const RATE_OF_CHANGE = 0.3
 const { min, PI } = Math
+
+// This is the rate of change for simulated pressure. It could be an option.
+const RATE_OF_PRESSURE_CHANGE = 0.275
+
+// Browser strokes seem to be off if PI is regular, a tiny offset seems to fix it
+const FIXED_PI = PI + 0.0001
 
 /**
  * ## getStrokeOutlinePoints
@@ -48,8 +53,6 @@ export function getStrokeOutlinePoints(
     last: isComplete = false,
   } = options
 
-  let { streamline = 0.5 } = options
-
   const {
     cap: capStart = true,
     taper: taperStart = 0,
@@ -62,14 +65,14 @@ export function getStrokeOutlinePoints(
     easing: taperEndEase = (t) => --t * t * t + 1,
   } = end
 
-  // Halve the streaming property
-  streamline /= 2
-
   // We can't do anything with an empty array.
   if (points.length === 0) return []
 
   // The total length of the line
   const totalLength = points[points.length - 1].runningLength
+
+  // The minimum allowed distance between points (squared)
+  const minDistance = Math.pow(size * smoothing, 2)
 
   // Our collected left and right points
   const leftPts: number[][] = []
@@ -87,7 +90,7 @@ export function getStrokeOutlinePoints(
       // Rate of change - how much of a change is there?
       const rp = min(1, 1 - sp)
       // Accelerate the pressure
-      pressure = min(1, acc + (rp - acc) * (sp * RATE_OF_CHANGE))
+      pressure = min(1, acc + (rp - acc) * (sp * RATE_OF_PRESSURE_CHANGE))
     }
 
     return (acc + pressure) / 2
@@ -151,7 +154,7 @@ export function getStrokeOutlinePoints(
         const rp = min(1, 1 - sp)
         pressure = min(
           1,
-          prevPressure + (rp - prevPressure) * (sp * RATE_OF_CHANGE)
+          prevPressure + (rp - prevPressure) * (sp * RATE_OF_PRESSURE_CHANGE)
         )
       }
 
@@ -184,6 +187,10 @@ export function getStrokeOutlinePoints(
 
     radius = Math.max(0.01, radius * Math.min(ts, te))
 
+    const nextVector = points[i + 1]?.vector || vector
+
+    const nextDpr = dpr(vector, nextVector)
+
     /*
       Handle sharp corners
 
@@ -192,16 +199,13 @@ export function getStrokeOutlinePoints(
       draw a cap at the current point.
     */
 
-    const nextVector = points[i + 1]?.vector || vector
-
-    const nextDpr = dpr(vector, nextVector)
-
     if (nextDpr < 0) {
+      // It's a sharp corner. Draw a rounded cap.
       const offset = mul(per(prevVector), radius)
 
-      for (let t = 0; t < 1; t += 0.2) {
-        tr = rotAround(add(point, offset), point, PI * -t)
-        tl = rotAround(sub(point, offset), point, PI * t)
+      for (let step = 1 / 13, t = 0; t <= 1; t += step) {
+        tr = rotAround(add(point, offset), point, FIXED_PI * -t)
+        tl = rotAround(sub(point, offset), point, FIXED_PI * t)
 
         rightPts.push(tr)
         leftPts.push(tl)
@@ -231,18 +235,13 @@ export function getStrokeOutlinePoints(
 
     const alwaysAdd = i < 2 || nextDpr < 0.25
 
-    const minDistance = Math.pow(
-      Math.max((runningLength > size ? size : size / 2) * smoothing, 1),
-      2
-    )
-
     if (alwaysAdd || dist2(pl, tl) > minDistance) {
-      leftPts.push(lrp(pl, tl, streamline))
+      leftPts.push(tl)
       pl = tl
     }
 
     if (alwaysAdd || dist2(pr, tr) > minDistance) {
-      rightPts.push(lrp(pr, tr, streamline))
+      rightPts.push(tr)
       pr = tr
     }
 
@@ -296,8 +295,8 @@ export function getStrokeOutlinePoints(
 
     const dotPts: number[][] = []
 
-    for (let t = 0, step = 0.1; t <= 1; t += step) {
-      dotPts.push(rotAround(start, firstPoint.point, PI * 2 * t))
+    for (let step = 1 / 13, t = step; t <= 1; t += step) {
+      dotPts.push(rotAround(start, firstPoint.point, FIXED_PI * 2 * t))
     }
 
     return dotPts
@@ -333,8 +332,8 @@ export function getStrokeOutlinePoints(
             uni(sub(tl, tr)),
             -dist(tr, tl) / 2
           )
-          for (let t = 0, step = 0.1; t <= 1; t += step) {
-            const pt = rotAround(start, firstPoint.point, PI * t)
+          for (let step = 1 / 13, t = step; t <= 1; t += step) {
+            const pt = rotAround(start, firstPoint.point, FIXED_PI * t)
             if (dist(pt, tl) < 1) break
             startCap.push(pt)
           }
@@ -342,18 +341,19 @@ export function getStrokeOutlinePoints(
           rightPts.shift()
         }
       } else {
-        startCap.push(firstPoint.point, add(firstPoint.point, [0.1, 0.1]))
+        startCap.push(firstPoint.point.slice(0, 2))
       }
     } else {
+      // Flat cap
       if (!isEqual(tr, tl)) {
         const vector = uni(sub(tl, tr))
         const ptDist = dist(tr, tl) / 2
 
         startCap.push(
-          prj(firstPoint.point, vector, ptDist * 0.95),
-          prj(firstPoint.point, vector, ptDist),
           prj(firstPoint.point, vector, -ptDist),
-          prj(firstPoint.point, vector, -ptDist * 0.95)
+          prj(firstPoint.point, vector, -ptDist * 0.95),
+          prj(firstPoint.point, vector, ptDist * 0.95),
+          prj(firstPoint.point, vector, ptDist)
         )
 
         leftPts.shift()
@@ -389,15 +389,13 @@ export function getStrokeOutlinePoints(
       if (!taperEnd && !(taperStart && isVeryShort)) {
         // Draw the end cap
         const start = prj(last, direction, radius)
-        for (let t = 0, step = 0.1; t <= 1; t += step) {
-          const pt = rotAround(start, last, PI * 3 * t)
-          // Don't go past the other point
-          if (dist(pt, lr) < 1) break
+        for (let step = 1 / 29, t = 0; t <= 1; t += step) {
+          const pt = rotAround(start, last, FIXED_PI * 3 * t)
           endCap.push(pt)
         }
       } else {
         // Just push the last point to the line
-        endCap.push(last)
+        endCap.push(last.slice(0, 2))
       }
     } else {
       // Add a few more points almost at the last point

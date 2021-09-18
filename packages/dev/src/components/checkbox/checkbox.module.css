@@ -10,6 +10,14 @@
   padding: 0;
 }
 
+.root:disabled {
+  opacity: 0.5;
+}
+.root:disabled::after {
+  background-color: gainsboro;
+  opacity: 1;
+}
+
 .root:focus {
   outline: none;
 }

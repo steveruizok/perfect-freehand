@@ -10,7 +10,8 @@ import {
 import { Vec } from '@tldraw/vec'
 import { StateManager } from 'rko'
 import { Draw } from './shapes'
-import * as sample from './sample.json'
+import sample from './sample.json'
+import flash from './flash.json'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
 import { EASING_STRINGS } from './easings'
@@ -73,8 +74,10 @@ export class AppState extends StateManager<State> {
   }
 
   onReady = () => {
-    this.addShape({ id: 'sample', points: sample.stroke })
-    this.centerShape('sample')
+    if (Object.values(this.state.page.shapes).length === 0) {
+      this.addShape({ id: 'sample', points: sample })
+      this.centerShape('sample')
+    }
   }
 
   cleanup = (state: State) => {
@@ -93,7 +96,7 @@ export class AppState extends StateManager<State> {
     switch (state.appState.tool) {
       case 'drawing': {
         this.currentStroke.points = [info.point]
-        this.createShape(info.point)
+        this.createDrawingShape(info.point)
         break
       }
       case 'erasing': {
@@ -118,7 +121,7 @@ export class AppState extends StateManager<State> {
       case 'drawing': {
         if (status === 'drawing') {
           this.currentStroke.points.push(info.point)
-          const nextShape = this.getNextShape(info.point, info.pressure)
+          const nextShape = this.updateDrawingShape(info.point, info.pressure)
           if (nextShape) {
             this.patchState({
               page: {
@@ -144,7 +147,7 @@ export class AppState extends StateManager<State> {
     const { state } = this
     switch (state.appState.tool) {
       case 'drawing': {
-        this.completeShape()
+        this.completeDrawingShape()
         break
       }
       case 'erasing': {
@@ -205,10 +208,7 @@ export class AppState extends StateManager<State> {
 
     if (state.appState.editingId && state.appState.status === 'drawing') {
       const shape = state.page.shapes[state.appState.editingId]
-      const camera = state.pageState.camera
-      const pt = Vec.sub(Vec.div(info.point, camera.zoom), point)
-
-      const nextShape = this.getNextShape(info.point, info.pressure)
+      const nextShape = this.updateDrawingShape(info.point, info.pressure)
 
       this.patchState({
         pageState: {
@@ -218,9 +218,7 @@ export class AppState extends StateManager<State> {
         },
         page: {
           shapes: {
-            [shape.id]: {
-              points: [...shape.points, [...Vec.sub(pt, shape.point), 0.5]],
-            },
+            [shape.id]: nextShape,
           },
         },
       })
@@ -256,7 +254,7 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  createShape = (point: number[]) => {
+  createDrawingShape = (point: number[]) => {
     const { state } = this
 
     const camera = state.pageState.camera
@@ -267,7 +265,8 @@ export class AppState extends StateManager<State> {
       id: Utils.uniqueId(),
       point: pt,
       style: state.appState.style,
-      points: [[0, 0, 0.5, 0]],
+      points: [[0, 0, 0.5, 0, 0]],
+      isDone: true,
     })
 
     this.currentStroke.startTime = Date.now()
@@ -285,7 +284,7 @@ export class AppState extends StateManager<State> {
     })
   }
 
-  getNextShape = (point: number[], pressure: number) => {
+  updateDrawingShape = (point: number[], pressure: number) => {
     const { state, currentStroke } = this
     if (state.appState.status !== 'drawing') return
     if (!state.appState.editingId) return
@@ -326,7 +325,7 @@ export class AppState extends StateManager<State> {
     }
   }
 
-  completeShape = () => {
+  completeDrawingShape = () => {
     const { state } = this
     const { shapes } = state.page
     if (!state.appState.editingId) return this // Don't erase while drawing
@@ -334,6 +333,7 @@ export class AppState extends StateManager<State> {
     let shape = shapes[state.appState.editingId]
 
     shape.isDone = true
+
     shape = {
       ...shape,
       ...shapeUtils.draw.onSessionComplete(shape),
@@ -381,6 +381,45 @@ export class AppState extends StateManager<State> {
     })
   }
 
+  replayShape = (points: number[][]) => {
+    this.eraseAll()
+
+    const newShape = Draw.create({
+      id: Utils.uniqueId(),
+      parentId: 'page',
+      childIndex: 1,
+      point: [0, 0],
+      points: [],
+      style: this.state.appState.style,
+    })
+
+    this.patchState({
+      page: {
+        shapes: {
+          [newShape.id]: newShape,
+        },
+      },
+    })
+
+    this.centerShape(newShape.id)
+
+    points
+      .map((pt, i) => [...Vec.sub(pt, newShape.point), pt[2], pt[3] || i * 10])
+      .forEach((pt, i) => {
+        setTimeout(() => {
+          this.patchState({
+            page: {
+              shapes: {
+                [newShape.id]: {
+                  points: points.slice(0, i),
+                },
+              },
+            },
+          })
+        }, pt[3] * 20)
+      })
+  }
+
   addShape = (shape: Partial<DrawShape>) => {
     const newShape = Draw.create({
       id: Utils.uniqueId(),
@@ -407,6 +446,8 @@ export class AppState extends StateManager<State> {
         },
       },
     })
+
+    this.persist()
 
     return newShape
   }
@@ -451,6 +492,7 @@ export class AppState extends StateManager<State> {
   eraseAll = () => {
     const { state } = this
     const { shapes } = state.page
+
     if (state.appState.editingId) return this // Don't erase while drawing
 
     return this.setState({
