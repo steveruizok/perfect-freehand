@@ -349,7 +349,7 @@ export function getStrokeOutlinePoints(
         const vector = uni(sub(tl, tr))
         const ptDist = dist(tr, tl) / 2
 
-        startCap.concat(
+        startCap.push(
           prj(firstPoint.point, vector, ptDist * 0.95),
           prj(firstPoint.point, vector, ptDist),
           prj(firstPoint.point, vector, -ptDist),
@@ -403,7 +403,7 @@ export function getStrokeOutlinePoints(
       // Add a few more points almost at the last point
       const justBefore = lrp(mid, last, 0.95)
       const r = radius * 0.95
-      endCap.concat(
+      endCap.push(
         prj(justBefore, direction, r),
         prj(last, direction, r),
         prj(last, direction, -r),

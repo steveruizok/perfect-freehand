@@ -118,10 +118,11 @@ And finally, instead of creating path data that connects each point by a line, w
 const pathData = points
   .slice(1)
   .reduce(
-    (acc, [x0, y0], i, arr) => {
-      if (i === arr.length - 1) return acc
-      const [x1, y1] = arr[i + 1]
-      return acc.concat(` ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`)
+    (acc, point, i, arr) => {
+      const next = arr[i + 1]
+      if (!next) return acc
+      acc.push(point, [(point[0] + next[0]) / 2, (point[1] + next[1]) / 2])
+      return acc
     },
     ['M', points[0], 'Q']
   )

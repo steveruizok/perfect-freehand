@@ -294,10 +294,14 @@ export class AppState extends StateManager<State> {
 
     const camera = state.pageState.camera
 
-    const newPoint = Vec.sub(
-      Vec.round(Vec.sub(Vec.div(point, camera.zoom), camera.point)),
-      shape.point
-    ).concat(pressure, Date.now() - currentStroke.startTime)
+    const newPoint = [
+      ...Vec.sub(
+        Vec.round(Vec.sub(Vec.div(point, camera.zoom), camera.point)),
+        shape.point
+      ),
+      pressure,
+      Date.now() - currentStroke.startTime,
+    ]
 
     let shapePoint = shape.point
     let shapePoints = [...shape.points, newPoint]
