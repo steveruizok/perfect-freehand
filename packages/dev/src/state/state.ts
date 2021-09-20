@@ -266,7 +266,7 @@ export class AppState extends StateManager<State> {
       point: pt,
       style: state.appState.style,
       points: [[0, 0, 0.5, 0, 0]],
-      isDone: true,
+      isDone: false,
     })
 
     this.currentStroke.startTime = Date.now()
