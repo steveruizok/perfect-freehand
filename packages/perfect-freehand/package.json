@@ -18,6 +18,9 @@
     "drawing",
     "painting"
   ],
+  "files": [
+    "dist/**/*"
+  ],
   "license": "MIT",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -41,8 +44,6 @@
     "@testing-library/react": "^12.0.0",
     "@types/jest": "^27.0.1",
     "@types/node": "^15.0.1",
-    "@types/react": "^17.0.19",
-    "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "babel-jest": "^27.1.0",
@@ -50,8 +51,6 @@
     "fake-indexeddb": "^3.1.3",
     "jest": "^27.1.0",
     "lerna": "^3.15.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "ts-jest": "^27.0.5",
     "tslib": "^2.3.0",
     "typedoc": "^0.21.9",
