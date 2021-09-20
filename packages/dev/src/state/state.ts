@@ -742,7 +742,7 @@ export class AppState extends StateManager<State> {
 
     const bounds = Utils.getCommonBounds(shapes.map(Draw.getBounds))
 
-    const padding = 16
+    const padding = 40
 
     shapes.forEach((shape) => {
       const fillElm = document.getElementById('path_' + shape.id)
