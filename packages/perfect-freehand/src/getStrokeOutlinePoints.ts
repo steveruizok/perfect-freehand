@@ -4,6 +4,7 @@ import {
   add,
   dist,
   dist2,
+  div,
   dpr,
   isEqual,
   lrp,
@@ -118,7 +119,7 @@ export function getStrokeOutlinePoints(
   let tl = pl
   let tr = pr
 
-  let short = true
+  // let short = true
 
   /*
     Find the outline's left and right points
@@ -131,11 +132,8 @@ export function getStrokeOutlinePoints(
     let { pressure } = points[i]
     const { point, vector, distance, runningLength } = points[i]
 
-    if (i > 0 && short && runningLength < size / 2) {
-      continue
-    } else if (short) {
-      short = false
-    }
+    // Removes noise from the end of the line
+    if (totalLength - runningLength < 3) continue
 
     /*
       Calculate the radius
@@ -187,7 +185,9 @@ export function getStrokeOutlinePoints(
 
     radius = Math.max(0.01, radius * Math.min(ts, te))
 
-    const nextVector = points[i + 1]?.vector || vector
+    /* Add points to left and right */
+
+    const nextVector = points[i + 1].vector
 
     const nextDpr = dpr(vector, nextVector)
 
@@ -200,21 +200,23 @@ export function getStrokeOutlinePoints(
     */
 
     if (nextDpr < 0) {
-      // It's a sharp corner. Draw a rounded cap.
+      // It's a sharp corner. Draw a rounded cap and move on to the next point
+      // Considering saving these and drawing them later? So that we can avoid
+      // crossing future points.
+
       const offset = mul(per(prevVector), radius)
 
       for (let step = 1 / 13, t = 0; t <= 1; t += step) {
-        tr = rotAround(add(point, offset), point, FIXED_PI * -t)
         tl = rotAround(sub(point, offset), point, FIXED_PI * t)
-
-        rightPts.push(tr)
         leftPts.push(tl)
+
+        tr = rotAround(add(point, offset), point, FIXED_PI * -t)
+        rightPts.push(tr)
       }
 
       pl = tl
       pr = tr
 
-      // Once we've drawn the cap, don't do any more work for this point.
       continue
     }
 
@@ -246,7 +248,6 @@ export function getStrokeOutlinePoints(
     }
 
     // Set variables for next iteration
-
     prevPressure = pressure
     prevVector = vector
   }
@@ -259,9 +260,14 @@ export function getStrokeOutlinePoints(
     may have dots for very short lines.
   */
 
-  const firstPoint = points[0]
-  const lastPoint = points[points.length - 1]
-  const isVeryShort = short || rightPts.length < 2 || leftPts.length < 2
+  const firstPoint = points[0].point.slice(0, 2)
+
+  const lastPoint =
+    points.length > 1
+      ? points[points.length - 1].point.slice(0, 2)
+      : add(points[0].point, [1, 1])
+
+  const isVeryShort = leftPts.length <= 1 || rightPts.length <= 1
 
   /* 
     Draw a dot for very short or completed strokes
@@ -273,30 +279,16 @@ export function getStrokeOutlinePoints(
   */
 
   if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
-    let ir = 0
-
-    const lastPt = isEqual(firstPoint.point, lastPoint.point)
-      ? add(firstPoint.point, [1, 1])
-      : lastPoint.point
-
-    for (let i = 0; i < points.length; i++) {
-      const { pressure, runningLength } = points[i]
-      if (runningLength > size) {
-        ir = getStrokeRadius(size, thinning, pressure, easing)
-        break
-      }
-    }
-
     const start = prj(
-      firstPoint.point,
-      per(uni(sub(firstPoint.point, lastPt))),
-      -(ir || radius)
+      firstPoint,
+      uni(per(sub(firstPoint, lastPoint))),
+      -(firstRadius || radius)
     )
 
     const dotPts: number[][] = []
 
     for (let step = 1 / 13, t = step; t <= 1; t += step) {
-      dotPts.push(rotAround(start, firstPoint.point, FIXED_PI * 2 * t))
+      dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
     }
 
     return dotPts
@@ -312,56 +304,31 @@ export function getStrokeOutlinePoints(
   */
 
   const startCap: number[][] = []
-  const endCap: number[][] = []
 
-  if (leftPts.length > 1 && rightPts.length > 1) {
-    tr = rightPts[1]
-
-    for (let i = 1; i < leftPts.length; i++) {
-      if (!isEqual(tr, leftPts[i])) {
-        tl = leftPts[i]
-        break
-      }
+  if (taperStart || (taperEnd && isVeryShort)) {
+    // The start point is tapered, noop
+    startCap.push(add(firstPoint, [0.1, 0]))
+  } else if (capStart) {
+    // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
+    for (let step = 1 / 13, t = step; t <= 1; t += step) {
+      const pt = rotAround(rightPts[0], firstPoint, FIXED_PI * t)
+      startCap.push(pt)
     }
+  } else {
+    // Draw the flat cap - add a point to the left and right of the start point
+    const cornersVector = sub(leftPts[0], rightPts[0])
+    const offsetA = mul(cornersVector, 0.5)
+    const offsetB = mul(cornersVector, 0.51)
 
-    if (capStart || taperStart) {
-      if (!taperStart && !(taperEnd && isVeryShort)) {
-        if (!isEqual(tr, tl)) {
-          const start = prj(
-            firstPoint.point,
-            uni(sub(tl, tr)),
-            -dist(tr, tl) / 2
-          )
-          for (let step = 1 / 13, t = step; t <= 1; t += step) {
-            const pt = rotAround(start, firstPoint.point, FIXED_PI * t)
-            if (dist(pt, tl) < 1) break
-            startCap.push(pt)
-          }
-          leftPts.shift()
-          rightPts.shift()
-        }
-      } else {
-        startCap.push(firstPoint.point.slice(0, 2))
-      }
-    } else {
-      // Flat cap
-      if (!isEqual(tr, tl)) {
-        const vector = uni(sub(tl, tr))
-        const ptDist = dist(tr, tl) / 2
+    startCap.push(
+      sub(firstPoint, offsetA),
+      sub(firstPoint, offsetB),
+      add(firstPoint, offsetB),
+      add(firstPoint, offsetA)
+    )
+  }
 
-        startCap.push(
-          prj(firstPoint.point, vector, -ptDist),
-          prj(firstPoint.point, vector, -ptDist * 0.95),
-          prj(firstPoint.point, vector, ptDist * 0.95),
-          prj(firstPoint.point, vector, ptDist)
-        )
-
-        leftPts.shift()
-        rightPts.shift()
-      }
-    }
-
-    /*
+  /*
     Draw an end cap
 
     If the line does not have a tapered end, and unless the line has a tapered
@@ -371,43 +338,32 @@ export function getStrokeOutlinePoints(
     sharp end turns.
   */
 
-    // The last left point
-    const ll = leftPts[leftPts.length - 1]
+  const endCap: number[][] = []
 
-    // The last right point
-    const lr = rightPts[rightPts.length - 1]
+  // The mid point between the last left and right points
+  const mid = med(leftPts[leftPts.length - 1], rightPts[rightPts.length - 1])
 
-    // The point between the two
-    const mid = med(ll, lr)
+  // The direction vector from the mid point to the last point
+  const direction = per(uni(sub(lastPoint, mid)))
 
-    // The last provided point
-    const last = lastPoint.point
-
-    const direction = per(uni(sub(last, mid)))
-
-    if (capEnd || taperEnd) {
-      if (!taperEnd && !(taperStart && isVeryShort)) {
-        // Draw the end cap
-        const start = prj(last, direction, radius)
-        for (let step = 1 / 29, t = 0; t <= 1; t += step) {
-          const pt = rotAround(start, last, FIXED_PI * 3 * t)
-          endCap.push(pt)
-        }
-      } else {
-        // Just push the last point to the line
-        endCap.push(last.slice(0, 2))
-      }
-    } else {
-      // Add a few more points almost at the last point
-      const justBefore = lrp(mid, last, 0.95)
-      const r = radius * 0.95
-      endCap.push(
-        prj(justBefore, direction, r),
-        prj(last, direction, r),
-        prj(last, direction, -r),
-        prj(justBefore, direction, -r)
-      )
+  if (taperEnd || (taperStart && isVeryShort)) {
+    // Tapered end - push the last point to the line
+    endCap.push(lastPoint)
+  } else if (capEnd) {
+    // Draw the round end cap
+    const start = prj(lastPoint, direction, radius)
+    for (let step = 1 / 29, t = 0; t <= 1; t += step) {
+      const pt = rotAround(start, lastPoint, FIXED_PI * 3 * t)
+      endCap.push(pt)
     }
+  } else {
+    // Draw the flat end cap
+    endCap.push(
+      add(lastPoint, mul(direction, radius)),
+      add(lastPoint, mul(direction, radius * 0.99)),
+      sub(lastPoint, mul(direction, radius * 0.99)),
+      sub(lastPoint, mul(direction, radius))
+    )
   }
 
   /*

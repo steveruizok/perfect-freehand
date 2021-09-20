@@ -76,8 +76,8 @@ export function getStrokePoints<
     if (i < max && !hasReachedMinimumLength) {
       if (runningLength < size) continue
       hasReachedMinimumLength = true
+      // TODO: Backfill the missing points so that tapering works correctly.
     }
-
     // Create a new strokepoint (it will be the new "previous" one).
     prev = {
       // The adjusted point

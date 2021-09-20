@@ -211,8 +211,6 @@ function getSvgPathFromStroke(points: number[][]): string {
 
   const max = points.length - 1
 
-  // return dots(points)
-
   return points
     .reduce(
       (acc, point, i, arr) => {
