@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.1.0
+## 1.0.8
+
+- Removes unused code
+- Improves start and end caps
+
+## 1.0.6
 
 - Fixes appearance of start caps
 - Fix appearance of tapered end cap
