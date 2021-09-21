@@ -274,7 +274,7 @@ export function Controls() {
         )}
         {style.taperStart > 0 && (
           <Select
-            name="Taper Easing"
+            name="Easing Start"
             value={style.easingStart}
             onValueChange={handleEasingStartChange}
             onDoubleClick={handleResetEasingStart}
@@ -298,7 +298,7 @@ export function Controls() {
           onPointerDown={handleTaperEndChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
-        {style.taperStart <= 0 && (
+        {style.taperEnd <= 0 && (
           <Checkbox
             name="Cap End"
             disabled={style.taperEnd > 0}
@@ -308,7 +308,7 @@ export function Controls() {
         )}
         {style.taperEnd > 0 && (
           <Select
-            name="Taper Easing"
+            name="Easing End"
             value={style.easingEnd}
             onValueChange={handleEasingEndChange}
             onDoubleClick={handleResetEasingEnd}
