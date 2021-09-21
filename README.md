@@ -87,16 +87,18 @@ getStroke(myPoints, {
   thinning: 0.5,
   smoothing: 0.5,
   streamline: 0.5,
-  easing: (t) => t * t * t,
+  easing: (t) => t,
   simulatePressure: true,
   last: true,
   start: {
-    taper: 20,
-    easing: (t) => t * t * t,
+    cap: true,
+    taper: 0,
+    easing: (t) => t,
   },
   end: {
-    taper: 20,
-    easing: (t) => t * t * t,
+    cap: true,
+    taper: 0,
+    easing: (t) => t,
   },
 })
 ```
