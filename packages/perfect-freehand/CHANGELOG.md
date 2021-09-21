@@ -2,6 +2,12 @@
 
 ## 1.0.8
 
+- Removes more unused
+- Fixes bug when size was negative
+- Adds a few thousand tests
+
+## 1.0.8
+
 - Removes unused code
 - Improves start and end caps
 

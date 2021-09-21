@@ -113,20 +113,14 @@ The function below will turn the points returned by `getStroke` into SVG path da
 
 ```js
 function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return ''
-  }
-
-  const max = points.length - 1
+  if (!points.length) return ''
 
   return points
     .reduce(
       (acc, point, i, arr) => {
-        if (i === max) {
+        if (i === points.length - 1)
           acc.push(point, Vec.med(point, arr[0]), 'L', arr[0], 'Z')
-        } else {
-          acc.push(point, Vec.med(point, arr[i + 1]))
-        }
+        else acc.push(point, Vec.med(point, arr[i + 1]))
         return acc
       },
       ['M', points[0], 'Q']
@@ -155,6 +149,7 @@ Or, if you are rendering with HTML Canvas, you can pass the result to a [`Path2D
 
 ```js
 const myPath = new Path2D(pathData)
+
 ctx.fill(myPath)
 ```
 
@@ -190,17 +185,26 @@ import { getStroke } from 'perfect-freehand'
 import { getSvgPathFromStroke } from './utils'
 
 export default function Example() {
-  const [points, setPoints] = React.useState()
+  const [points, setPoints] = React.useState([])
 
   function handlePointerDown(e) {
+    e.target.setPointerCapture(e.pointerId)
     setPoints([[e.pageX, e.pageY, e.pressure]])
   }
 
   function handlePointerMove(e) {
-    if (e.buttons === 1) {
-      setPoints([...points, [e.pageX, e.pageY, e.pressure]])
-    }
+    if (e.buttons !== 1) return
+    setPoints([...points, [e.pageX, e.pageY, e.pressure]])
   }
+
+  const stroke = getStroke(points, {
+    size: 16,
+    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+  })
+
+  const pathData = getSvgPathFromStroke(stroke)
 
   return (
     <svg
@@ -208,18 +212,7 @@ export default function Example() {
       onPointerMove={handlePointerMove}
       style={{ touchAction: 'none' }}
     >
-      {points && (
-        <path
-          d={getSvgPathFromStroke(
-            getStroke(points, {
-              size: 16,
-              thinning: 0.5,
-              smoothing: 0.5,
-              streamline: 0.5,
-            })
-          )}
-        />
-      )}
+      {points && <path d={pathData} />}
     </svg>
   )
 }
@@ -229,32 +222,43 @@ export default function Example() {
 
 ### Advanced Usage
 
-#### `StrokeOptions`
-
-A TypeScript type for the options object.
-
-```ts
-import { StrokeOptions } from 'perfect-freehand'
-```
-
 For advanced usage, the library also exports smaller functions that `getStroke` uses to generate its SVG data. While you can use `getStroke`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
 
 #### `getStrokePoints`
 
-```js
-import { strokePoints } from 'perfect-freehand'
-const strokePoints = getStrokePoints(rawInputPoints)
-```
+A function that accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of adjusted points as `{ point, pressure, vector, distance, runningLength }`. The path's total length will be the `runningLength` of the last point in the array.
 
-Accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of streamlined points as `[x, y, pressure, angle, distance, lengthAtPoint]`. The path's total length will be the length of the last point in the array.
+```js
+import { getStrokePoints } from 'perfect-freehand'
+import samplePoints from "./samplePoints.json'
+
+const strokePoints = getStrokePoints(samplePoints)
+```
 
 #### `getOutlinePoints`
 
-Accepts an array of points (formatted as `[x, y, pressure, angle, distance, length]`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
+A function that accepts an array of points (formatted as `{ point, pressure, vector, distance, runningLength }`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
 ```js
-import { getOutlinePoints } from 'perfect-freehand'
+import { getStrokePoints, getOutlinePoints } from 'perfect-freehand'
+import samplePoints from "./samplePoints.json'
+
+const strokePoints = getStrokePoints(samplePoints)
 const outlinePoints = getOutlinePoints(strokePoints)
+```
+
+#### `StrokeOptions`
+
+A TypeScript type for the options object. Useful if you're defining your options outside of the `getStroke` function.
+
+```ts
+import { StrokeOptions, getStroke } from 'perfect-freehand'
+
+const options: StrokeOptions = {
+  size: 16,
+}
+
+const stroke = getStroke(options)
 ```
 
 ## Support

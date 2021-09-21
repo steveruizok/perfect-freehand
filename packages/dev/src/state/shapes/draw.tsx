@@ -213,20 +213,14 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
 }))
 
 function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return ''
-  }
-
-  const max = points.length - 1
+  if (!points.length) return ''
 
   return points
     .reduce(
       (acc, point, i, arr) => {
-        if (i === max) {
+        if (i === points.length - 1)
           acc.push(point, Vec.med(point, arr[0]), 'L', arr[0], 'Z')
-        } else {
-          acc.push(point, Vec.med(point, arr[i + 1]))
-        }
+        else acc.push(point, Vec.med(point, arr[i + 1]))
         return acc
       },
       ['M', points[0], 'Q']
