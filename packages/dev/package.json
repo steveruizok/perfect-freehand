@@ -25,7 +25,6 @@
     "clean": "rm -rf dist"
   },
   "files": [
-    "README.md",
     "src"
   ],
   "dependencies": {

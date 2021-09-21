@@ -104,6 +104,10 @@ export function Controls() {
     app.patchStyleForAllShapes({ taperStart: v[0] })
   }, [])
 
+  const handleEasingStartChange = React.useCallback((easing: string) => {
+    app.patchStyleForAllShapes({ easingStart: easing as Easing })
+  }, [])
+
   const handleCapEndChange = React.useCallback(
     (v: boolean | 'indeterminate') => {
       app.setNextStyleForAllShapes({ capEnd: !!v })
@@ -117,6 +121,10 @@ export function Controls() {
 
   const handleTaperEndChange = React.useCallback((v: number[]) => {
     app.patchStyleForAllShapes({ taperEnd: v[0] })
+  }, [])
+
+  const handleEasingEndChange = React.useCallback((easing: string) => {
+    app.patchStyleForAllShapes({ easingEnd: easing as Easing })
   }, [])
 
   const handleIsFilledChange = React.useCallback(
@@ -164,8 +172,16 @@ export function Controls() {
     app.resetStyle('taperStart')
   }, [])
 
+  const handleResetEasingStart = React.useCallback(() => {
+    app.resetStyle('easingStart')
+  }, [])
+
   const handleResetTaperEnd = React.useCallback(() => {
     app.resetStyle('taperEnd')
+  }, [])
+
+  const handleResetEasingEnd = React.useCallback(() => {
+    app.resetStyle('easingEnd')
   }, [])
 
   const handleResetStrokeWidth = React.useCallback(() => {
@@ -183,7 +199,7 @@ export function Controls() {
         <Slider
           name="Size"
           value={[style.size]}
-          min={1}
+          min={0}
           max={100}
           step={1}
           onDoubleClick={handleResetSize}
@@ -237,12 +253,6 @@ export function Controls() {
           ))}
         </Select>
         <hr />
-        <Checkbox
-          name="Cap Start"
-          disabled={style.taperStart > 0}
-          checked={style.taperStart === 0 && style.capStart}
-          onCheckedChange={handleCapStartChange}
-        />
         <Slider
           name="Taper Start"
           value={[style.taperStart]}
@@ -254,13 +264,29 @@ export function Controls() {
           onPointerDown={handleTaperStartChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
+        {style.taperStart <= 0 && (
+          <Checkbox
+            name="Cap Start"
+            disabled={style.taperStart > 0}
+            checked={style.taperStart === 0 && style.capStart}
+            onCheckedChange={handleCapStartChange}
+          />
+        )}
+        {style.taperStart > 0 && (
+          <Select
+            name="Taper Easing"
+            value={style.easingStart}
+            onValueChange={handleEasingStartChange}
+            onDoubleClick={handleResetEasingStart}
+          >
+            {EASINGS.map((easing) => (
+              <option key={easing} value={easing}>
+                {easing[0].toUpperCase() + easing.slice(1)}
+              </option>
+            ))}
+          </Select>
+        )}
         <hr />
-        <Checkbox
-          name="Cap End"
-          disabled={style.taperEnd > 0}
-          checked={style.taperEnd === 0 && style.capEnd}
-          onCheckedChange={handleCapEndChange}
-        />
         <Slider
           name="Taper End"
           value={[style.taperEnd]}
@@ -272,6 +298,28 @@ export function Controls() {
           onPointerDown={handleTaperEndChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
+        {style.taperStart <= 0 && (
+          <Checkbox
+            name="Cap End"
+            disabled={style.taperEnd > 0}
+            checked={style.taperEnd === 0 && style.capEnd}
+            onCheckedChange={handleCapEndChange}
+          />
+        )}
+        {style.taperEnd > 0 && (
+          <Select
+            name="Taper Easing"
+            value={style.easingEnd}
+            onValueChange={handleEasingEndChange}
+            onDoubleClick={handleResetEasingEnd}
+          >
+            {EASINGS.map((easing) => (
+              <option key={easing} value={easing}>
+                {easing[0].toUpperCase() + easing.slice(1)}
+              </option>
+            ))}
+          </Select>
+        )}
         <hr />
         <Checkbox
           name="Fill"

@@ -25,6 +25,8 @@ export interface DrawStyles {
   taperEnd: number
   capStart: boolean
   capEnd: boolean
+  easingStart: Easing
+  easingEnd: Easing
   isFilled: boolean
 }
 

@@ -1,15 +1,95 @@
+import type { StrokeOptions } from '../types'
 import { getStroke } from '../getStroke'
 import inputs from './inputs.json'
+import { med } from '../vec'
 
 const { onePoint, twoPoints, twoEqualPoints, manyPoints, withDuplicates } =
   inputs
 
+function getRng(seed = ''): () => number {
+  let x = 0
+  let y = 0
+  let z = 0
+  let w = 0
+
+  function next() {
+    const t = x ^ (x << 11)
+    ;(x = y), (y = z), (z = w)
+    w ^= ((w >>> 19) ^ t ^ (t >>> 8)) >>> 0
+    return w / 0x100000000
+  }
+
+  for (let k = 0; k < seed.length + 64; k++) {
+    x ^= seed.charCodeAt(k) | 0
+    next()
+  }
+
+  return next
+}
+
+function getSvgPathFromStroke(points: number[][]): string {
+  if (!points.length) return ''
+
+  return points
+    .reduce(
+      (acc, point, i, arr) => {
+        if (arr[i + 1]) {
+          acc.push(point, med(point, arr[i + 1]))
+        } else {
+          acc.push(point, med(point, arr[0]), 'L', arr[0], 'Z')
+        }
+        return acc
+      },
+      ['M', points[0], 'Q']
+    )
+    .join(' ')
+}
+
 describe('getStroke', () => {
+  const rng = getRng('perfect')
+
   for (const [key, value] of Object.entries(inputs)) {
-    it(`runs ${key} without generating NaN values`, () => {
+    it(`creates a stroke for "${key}" with default values.`, () => {
+      const result = getStroke(value)
+
+      expect(result).toMatchSnapshot('default_' + key)
+
       expect(
-        getStroke(value).find((t) => JSON.stringify(t).includes('null'))
+        result.find((t) => JSON.stringify(t).includes('null'))
       ).toBeUndefined()
+    })
+
+    describe('when testing random combinations of options', () => {
+      for (let i = 0; i < 500; i++) {
+        const options: StrokeOptions = {
+          size: rng() * 100,
+          thinning: rng(),
+          streamline: rng(),
+          smoothing: rng(),
+          simulatePressure: rng() > -0.5,
+          last: rng() > 0.5,
+          start: {
+            cap: rng() > 0,
+            taper: rng() > 0 ? rng() * 100 : 0,
+          },
+          end: {
+            cap: rng() > 0,
+            taper: rng() > 0 ? rng() * 100 : 0,
+          },
+        }
+
+        const result = getStroke(value, options)
+
+        const optionsString = JSON.stringify(options, null, 2)
+
+        it(`creates a stroke for "${key}" with options: ${optionsString}`, () => {
+          expect(JSON.stringify(result).includes('null')).toBeFalsy()
+        })
+
+        it(`creates an SVG-pathable stroke for "${key}" with options: ${optionsString}`, () => {
+          expect(getSvgPathFromStroke(result).includes('null')).toBeFalsy()
+        })
+      }
     })
   }
 

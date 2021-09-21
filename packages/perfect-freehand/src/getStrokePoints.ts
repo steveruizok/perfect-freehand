@@ -21,12 +21,15 @@ export function getStrokePoints<
   const t = 0.15 + (1 - streamline) * 0.85
 
   // Whatever the input is, make sure that the points are in number[][].
-  const pts = Array.isArray(points[0])
+  let pts = Array.isArray(points[0])
     ? (points as T[])
     : (points as K[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
 
   // If there's only one point, add another point at a 1pt offset.
-  if (pts.length === 1) pts.push([...add(pts[0], [1, 1]), pts[0][2] || 0.5])
+  // Don't mutate the input array!
+  if (pts.length === 1) {
+    pts = [...pts, [...add(pts[0], [1, 1]), ...pts[0].slice(2)]]
+  }
 
   // The strokePoints array will hold the points for the stroke.
   // Start it out with the first point, which needs no adjustment.
@@ -56,10 +59,12 @@ export function getStrokePoints<
   for (let i = 1; i < pts.length; i++) {
     const point =
       isComplete && i === max
-        ? // If we're at the last point, and `options.last` is true, then add the actual input point.
+        ? // If we're at the last point, and `options.last` is true,
+          // then add the actual input point.
           pts[i]
-        : // Otherwise, using the t calculated from the streamline option,
-          // interpolate a new point between the previous point the current point.
+        : // Otherwise, using the t calculated from the streamline
+          // option, interpolate a new point between the previous
+          // point the current point.
           lrp(prev.point, pts[i], t)
 
     // If the new point is the same as the previous point, skip ahead.

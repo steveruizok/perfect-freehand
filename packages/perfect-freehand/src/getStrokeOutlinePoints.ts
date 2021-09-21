@@ -66,8 +66,8 @@ export function getStrokeOutlinePoints(
     easing: taperEndEase = (t) => --t * t * t + 1,
   } = end
 
-  // We can't do anything with an empty array.
-  if (points.length === 0) return []
+  // We can't do anything with an empty array or a stroke with negative size.
+  if (points.length === 0 || size <= 0) return []
 
   // The total length of the line
   const totalLength = points[points.length - 1].runningLength
@@ -233,16 +233,15 @@ export function getStrokeOutlinePoints(
     const offset = mul(per(lrp(nextVector, vector, nextDpr)), radius)
 
     tl = sub(point, offset)
-    tr = add(point, offset)
 
-    const alwaysAdd = i < 2 || nextDpr < 0.25
-
-    if (alwaysAdd || dist2(pl, tl) > minDistance) {
+    if (i === 0 || dist2(pl, tl) > minDistance) {
       leftPts.push(tl)
       pl = tl
     }
 
-    if (alwaysAdd || dist2(pr, tr) > minDistance) {
+    tr = add(point, offset)
+
+    if (i === 0 || dist2(pr, tr) > minDistance) {
       rightPts.push(tr)
       pr = tr
     }
@@ -269,6 +268,10 @@ export function getStrokeOutlinePoints(
 
   const isVeryShort = leftPts.length <= 1 || rightPts.length <= 1
 
+  const startCap: number[][] = []
+
+  const endCap: number[][] = []
+
   /* 
     Draw a dot for very short or completed strokes
     
@@ -278,23 +281,24 @@ export function getStrokeOutlinePoints(
     we can just return those points.
   */
 
-  if (isVeryShort && (!(taperStart || taperEnd) || isComplete)) {
-    const start = prj(
-      firstPoint,
-      uni(per(sub(firstPoint, lastPoint))),
-      -(firstRadius || radius)
-    )
+  if (isVeryShort) {
+    if (!(taperStart || taperEnd) || isComplete) {
+      const start = prj(
+        firstPoint,
+        uni(per(sub(firstPoint, lastPoint))),
+        -(firstRadius || radius)
+      )
 
-    const dotPts: number[][] = []
+      const dotPts: number[][] = []
 
-    for (let step = 1 / 13, t = step; t <= 1; t += step) {
-      dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
+      for (let step = 1 / 13, t = step; t <= 1; t += step) {
+        dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
+      }
+
+      return dotPts
     }
-
-    return dotPts
-  }
-
-  /*
+  } else {
+    /*
     Draw a start cap
 
     Unless the line has a tapered start, or unless the line has a tapered end
@@ -303,32 +307,30 @@ export function getStrokeOutlinePoints(
     Finally remove the first left and right points. :psyduck:
   */
 
-  const startCap: number[][] = []
+    if (taperStart || (taperEnd && isVeryShort)) {
+      // The start point is tapered, noop
+      startCap.push(add(firstPoint, [0.1, 0]))
+    } else if (capStart) {
+      // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
+      for (let step = 1 / 13, t = step; t <= 1; t += step) {
+        const pt = rotAround(rightPts[0], firstPoint, FIXED_PI * t)
+        startCap.push(pt)
+      }
+    } else {
+      // Draw the flat cap - add a point to the left and right of the start point
+      const cornersVector = sub(leftPts[0], rightPts[0])
+      const offsetA = mul(cornersVector, 0.5)
+      const offsetB = mul(cornersVector, 0.51)
 
-  if (taperStart || (taperEnd && isVeryShort)) {
-    // The start point is tapered, noop
-    startCap.push(add(firstPoint, [0.1, 0]))
-  } else if (capStart) {
-    // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
-    for (let step = 1 / 13, t = step; t <= 1; t += step) {
-      const pt = rotAround(rightPts[0], firstPoint, FIXED_PI * t)
-      startCap.push(pt)
+      startCap.push(
+        sub(firstPoint, offsetA),
+        sub(firstPoint, offsetB),
+        add(firstPoint, offsetB),
+        add(firstPoint, offsetA)
+      )
     }
-  } else {
-    // Draw the flat cap - add a point to the left and right of the start point
-    const cornersVector = sub(leftPts[0], rightPts[0])
-    const offsetA = mul(cornersVector, 0.5)
-    const offsetB = mul(cornersVector, 0.51)
 
-    startCap.push(
-      sub(firstPoint, offsetA),
-      sub(firstPoint, offsetB),
-      add(firstPoint, offsetB),
-      add(firstPoint, offsetA)
-    )
-  }
-
-  /*
+    /*
     Draw an end cap
 
     If the line does not have a tapered end, and unless the line has a tapered
@@ -338,32 +340,31 @@ export function getStrokeOutlinePoints(
     sharp end turns.
   */
 
-  const endCap: number[][] = []
+    // The mid point between the last left and right points
+    const mid = med(leftPts[leftPts.length - 1], rightPts[rightPts.length - 1])
 
-  // The mid point between the last left and right points
-  const mid = med(leftPts[leftPts.length - 1], rightPts[rightPts.length - 1])
+    // The direction vector from the mid point to the last point
+    const direction = per(uni(sub(lastPoint, mid)))
 
-  // The direction vector from the mid point to the last point
-  const direction = per(uni(sub(lastPoint, mid)))
-
-  if (taperEnd || (taperStart && isVeryShort)) {
-    // Tapered end - push the last point to the line
-    endCap.push(lastPoint)
-  } else if (capEnd) {
-    // Draw the round end cap
-    const start = prj(lastPoint, direction, radius)
-    for (let step = 1 / 29, t = 0; t <= 1; t += step) {
-      const pt = rotAround(start, lastPoint, FIXED_PI * 3 * t)
-      endCap.push(pt)
+    if (taperEnd || (taperStart && isVeryShort)) {
+      // Tapered end - push the last point to the line
+      endCap.push(lastPoint)
+    } else if (capEnd) {
+      // Draw the round end cap
+      const start = prj(lastPoint, direction, radius)
+      for (let step = 1 / 29, t = 0; t <= 1; t += step) {
+        const pt = rotAround(start, lastPoint, FIXED_PI * 3 * t)
+        endCap.push(pt)
+      }
+    } else {
+      // Draw the flat end cap
+      endCap.push(
+        add(lastPoint, mul(direction, radius)),
+        add(lastPoint, mul(direction, radius * 0.99)),
+        sub(lastPoint, mul(direction, radius * 0.99)),
+        sub(lastPoint, mul(direction, radius))
+      )
     }
-  } else {
-    // Draw the flat end cap
-    endCap.push(
-      add(lastPoint, mul(direction, radius)),
-      add(lastPoint, mul(direction, radius * 0.99)),
-      sub(lastPoint, mul(direction, radius * 0.99)),
-      sub(lastPoint, mul(direction, radius))
-    )
   }
 
   /*

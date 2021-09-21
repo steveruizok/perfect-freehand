@@ -112,20 +112,26 @@ While `getStroke` returns an array of points representing the outline of a strok
 The function below will turn the points returned by `getStroke` into SVG path data.
 
 ```js
-function getSvgPathFromStroke(stroke) {
-  if (!stroke.length) return ''
+function getSvgPathFromStroke(points: number[][]): string {
+  if (!points.length) {
+    return ''
+  }
 
-  const d = stroke.reduce(
-    (acc, [x0, y0], i, arr) => {
-      const [x1, y1] = arr[(i + 1) % arr.length]
-      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
-      return acc
-    },
-    ['M', ...stroke[0], 'Q']
-  )
+  const max = points.length - 1
 
-  d.push('Z')
-  return d.join(' ')
+  return points
+    .reduce(
+      (acc, point, i, arr) => {
+        if (i === max) {
+          acc.push(point, Vec.med(point, arr[0]), 'L', arr[0], 'Z')
+        } else {
+          acc.push(point, Vec.med(point, arr[i + 1]))
+        }
+        return acc
+      },
+      ['M', points[0], 'Q']
+    )
+    .join(' ')
 }
 ```
 
