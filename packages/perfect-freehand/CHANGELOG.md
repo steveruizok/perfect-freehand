@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.12
+
+- Fixes cusp at the end of tapered lines.
+
 ## 1.0.11
 
 - Adds correct license.
