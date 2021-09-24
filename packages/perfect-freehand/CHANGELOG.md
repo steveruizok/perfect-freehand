@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11
+
+- Adds correct license.
+
 ## 1.0.8
 
 - Removes more unused
