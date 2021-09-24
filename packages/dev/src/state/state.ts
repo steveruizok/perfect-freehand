@@ -198,9 +198,13 @@ export class AppState extends StateManager<State> {
     if (this.state.appState.status !== 'pinching') return
 
     const { camera } = this.state.pageState
-    const zoomDelta = delta[2] / 350
+    const zoomDelta = delta[2] / 2
     const nextPoint = Vec.add(camera.point, Vec.div(delta, camera.zoom))
-    const nextZoom = Utils.clamp(camera.zoom - zoomDelta * camera.zoom, 0.25, 5)
+    const nextZoom = Utils.clamp(
+      camera.zoom - zoomDelta * camera.zoom,
+      0.25,
+      25
+    )
     const p0 = Vec.sub(Vec.div(point, camera.zoom), nextPoint)
     const p1 = Vec.sub(Vec.div(point, nextZoom), nextPoint)
 

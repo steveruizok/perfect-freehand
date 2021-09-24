@@ -218,8 +218,7 @@ function getSvgPathFromStroke(points: number[][]): string {
   return points
     .reduce(
       (acc, point, i, arr) => {
-        if (i === points.length - 1)
-          acc.push(point, Vec.med(point, arr[0]), 'L', arr[0], 'Z')
+        if (i === points.length - 1) acc.push(point, Vec.med(point, arr[0]))
         else acc.push(point, Vec.med(point, arr[i + 1]))
         return acc
       },

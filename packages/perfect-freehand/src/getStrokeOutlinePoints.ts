@@ -309,7 +309,6 @@ export function getStrokeOutlinePoints(
 
     if (taperStart || (taperEnd && isVeryShort)) {
       // The start point is tapered, noop
-      startCap.push(firstPoint, add(firstPoint, [0.1, 0]))
     } else if (capStart) {
       // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
       for (let step = 1 / 13, t = step; t <= 1; t += step) {
@@ -348,7 +347,7 @@ export function getStrokeOutlinePoints(
 
     if (taperEnd || (taperStart && isVeryShort)) {
       // Tapered end - push the last point to the line
-      endCap.push(lastPoint, add(lastPoint, [1, 0]))
+      endCap.push(lastPoint)
     } else if (capEnd) {
       // Draw the round end cap
       const start = prj(lastPoint, direction, radius)
