@@ -38,12 +38,12 @@ export function Panel() {
         >
           Draw
         </button>
-        <button
+        {/* <button
           onClick={app.selectErasingTool}
           data-active={tool === 'erasing'}
         >
           Erase
-        </button>
+        </button> */}
       </div>
       <div
         className={[styles.container, styles.bottom, styles.right].join(' ')}
