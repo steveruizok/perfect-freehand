@@ -36,7 +36,7 @@ export function getStrokePoints<
   const strokePoints: StrokePoint[] = [
     {
       point: [pts[0][0], pts[0][1]],
-      pressure: pts[0][2] || 0.25,
+      pressure: pts[0][2] >= 0 ? pts[0][2] : 0.25,
       vector: [1, 1],
       distance: 0,
       runningLength: 0,
@@ -88,7 +88,7 @@ export function getStrokePoints<
       // The adjusted point
       point,
       // The input pressure (or .5 if not specified)
-      pressure: pts[i][2] || 0.5,
+      pressure: pts[i][2] >= 0 ? pts[i][2] : 0.5,
       // The vector from the current point to the previous point
       vector: uni(sub(prev.point, point)),
       // The distance between the current point and the previous point
