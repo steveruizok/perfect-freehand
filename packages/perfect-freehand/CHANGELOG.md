@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.13
+
+- Fixes an issue where default values were incorrectly being inserted for zero pressure points.
+
 ## 1.0.12
 
 - Fixes cusp at the end of tapered lines.
