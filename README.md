@@ -224,7 +224,7 @@ export default function Example() {
 
 ### Advanced Usage
 
-For advanced usage, the library also exports smaller functions that `getStroke` uses to generate its SVG data. While you can use `getStroke`'s data to render strokes with an HTML canvas (via the Path2D element) or with SVG paths, these new functions will allow you to create paths in other rendering technologies.
+For advanced usage, the library also exports smaller functions that `getStroke` uses to generate its outline points.
 
 #### `getStrokePoints`
 
