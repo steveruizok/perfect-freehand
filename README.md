@@ -228,7 +228,7 @@ For advanced usage, the library also exports smaller functions that `getStroke` 
 
 #### `getStrokePoints`
 
-A function that accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and a streamline value. Returns a set of adjusted points as `{ point, pressure, vector, distance, runningLength }`. The path's total length will be the `runningLength` of the last point in the array.
+A function that accepts an array of points (formatted either as `[x, y, pressure]` or `{ x: number, y: number, pressure: number}`) and (optionally) an options object. Returns a set of adjusted points as `{ point, pressure, vector, distance, runningLength }`. The path's total length will be the `runningLength` of the last point in the array.
 
 ```js
 import { getStrokePoints } from 'perfect-freehand'
@@ -239,15 +239,18 @@ const strokePoints = getStrokePoints(samplePoints)
 
 #### `getOutlinePoints`
 
-A function that accepts an array of points (formatted as `{ point, pressure, vector, distance, runningLength }`, i.e. the output of `getStrokePoints`) and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
+A function that accepts an array of points (formatted as `{ point, pressure, vector, distance, runningLength }`, i.e. the output of `getStrokePoints`) and (optionally) an options object, and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
 ```js
 import { getStrokePoints, getOutlinePoints } from 'perfect-freehand'
 import samplePoints from "./samplePoints.json'
 
 const strokePoints = getStrokePoints(samplePoints)
+
 const outlinePoints = getOutlinePoints(strokePoints)
 ```
+
+**Note:** Internally, the `getStroke` function passes the result of `getStrokePoints` to `getStrokeOutlinePoints`, just as shown in this example. This means that, in this example, the result of `myOutlinePoints` will be the same as if the `samplePoints` array had been passed to `getStroke`.
 
 #### `StrokeOptions`
 
