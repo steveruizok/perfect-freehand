@@ -1,6 +1,6 @@
 # Perfect Freehand Tutorial (Script)
 
-`WIP`
+`WIP, for a Tutorial Video`
 
 [Starter File](https://stackblitz.com/edit/js-vtm7xh)
 [Easing Functions](https://gist.github.com/steveruizok/c331cd1fb30563aec51f7223e25d0afd)

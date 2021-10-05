@@ -2,11 +2,8 @@ import { getStrokeRadius } from './getStrokeRadius'
 import type { StrokeOptions, StrokePoint } from './types'
 import {
   add,
-  dist,
   dist2,
-  div,
   dpr,
-  isEqual,
   lrp,
   med,
   mul,
