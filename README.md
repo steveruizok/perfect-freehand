@@ -350,6 +350,6 @@ Have an idea or casual question? Visit the [discussion page](https://github.com/
 - MIT
 - ...but if you're using `perfect-freehand` in a commercial product, consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok). 💰
 
-### Author
+## Author
 
 - [@steveruizok](https://twitter.com/steveruizok)
