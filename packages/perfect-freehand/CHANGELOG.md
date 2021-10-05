@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.14
+
+- Updates README and documentation.
+
 ## 1.0.13
 
 - Fixes an issue where default values were incorrectly being inserted for zero pressure points.

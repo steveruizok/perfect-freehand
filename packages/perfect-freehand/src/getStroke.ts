@@ -12,8 +12,8 @@ import { getStrokePoints } from './getStrokePoints'
  * @param options.smoothing	How much to soften the stroke's edges.
  * @param options.easing	An easing function to apply to each point's pressure.
  * @param options.simulatePressure Whether to simulate pressure based on velocity.
- * @param options.start Tapering and easing function for the start of the line.
- * @param options.end Tapering and easing function for the end of the line.
+ * @param options.start Cap, taper and easing for the start of the line.
+ * @param options.end Cap, taper and easing for the end of the line.
  * @param options.last Whether to handle the points as a completed stroke.
  */
 

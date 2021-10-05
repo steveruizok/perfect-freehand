@@ -6,10 +6,10 @@ import fs from 'fs'
 
 const files = [
   'README.md',
-  'process.gif',
-  'icons.png',
-  'perfect-freehand-card.png',
-  'perfect-freehand-logo.svg',
+  'assets/process.gif',
+  'assets/icons.png',
+  'assets/perfect-freehand-card.png',
+  'assets/perfect-freehand-logo.svg',
 ]
 
 for (const file of files) {
