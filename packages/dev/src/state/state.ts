@@ -84,23 +84,6 @@ export class AppState extends StateManager<State> {
       this.addShape({ id: 'sample', points: sample })
       this.centerShape('sample')
     }
-
-    // const result = getStroke(sample, {
-    //   size: -0.1795946853235364,
-    //   thinning: 0.12744471128098667,
-    //   streamline: 0.48121243389323354,
-    //   smoothing: 0.4285292432177812,
-    //   simulatePressure: true,
-    //   last: false,
-    //   start: {
-    //     cap: true,
-    //     taper: 0,
-    //   },
-    //   end: {
-    //     cap: false,
-    //     taper: 49.22944081481546,
-    //   },
-    // })
   }
 
   cleanup = (state: State) => {
@@ -368,8 +351,6 @@ export class AppState extends StateManager<State> {
       ...shape,
       ...shapeUtils.draw.onSessionComplete(shape),
     }
-
-    if (this.log) console.log(shape.points)
 
     return this.setState({
       before: {

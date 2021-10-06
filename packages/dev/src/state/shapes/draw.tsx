@@ -74,27 +74,27 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
 
     const simulatePressure = shape.points[2]?.[2] === 0.5
 
-    const drawPathData = getSvgPathFromStroke(
-      getStroke(shape.points, {
-        size,
-        thinning,
-        streamline,
-        easing: EASINGS[easing],
-        smoothing,
-        start: {
-          taper: taperStart,
-          cap: capStart,
-          easing: EASINGS[easingStart],
-        },
-        end: { taper: taperEnd, cap: capEnd, easing: EASINGS[easingEnd] },
-        simulatePressure,
-        last: isDone,
-      })
-    )
+    const outlinePoints = getStroke(shape.points, {
+      size,
+      thinning,
+      streamline,
+      easing: EASINGS[easing],
+      smoothing,
+      start: {
+        taper: taperStart,
+        cap: capStart,
+        easing: EASINGS[easingStart],
+      },
+      end: { taper: taperEnd, cap: capEnd, easing: EASINGS[easingEnd] },
+      simulatePressure,
+      last: isDone,
+    })
+
+    const drawPathData = getSvgPathFromStroke(outlinePoints)
 
     return (
       <SVGContainer ref={ref} {...events}>
-        {strokeWidth && (
+        {strokeWidth ? (
           <path
             d={drawPathData}
             id={'path_stroke_' + shape.id}
@@ -105,7 +105,7 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
             strokeLinecap="round"
             pointerEvents="all"
           />
-        )}
+        ) : null}
         {
           <path
             id={'path_' + shape.id}
@@ -127,17 +127,14 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
   },
 
   getBounds(shape: DrawShape): TLBounds {
-    return Utils.translateBounds(
+    const bounds = Utils.translateBounds(
       Utils.getFromCache(pointsBoundsCache, shape.points, () =>
         Utils.getBoundsFromPoints(shape.points)
       ),
       shape.point
     )
-  },
 
-  shouldRender(prev: DrawShape, next: DrawShape): boolean {
-    return true
-    // return next.points !== prev.points || next.style !== prev.style
+    return bounds
   },
 
   hitTestBounds(shape: DrawShape, brushBounds: TLBounds): boolean {
@@ -218,7 +215,8 @@ function getSvgPathFromStroke(points: number[][]): string {
   return points
     .reduce(
       (acc, point, i, arr) => {
-        if (i === points.length - 1) acc.push(point, Vec.med(point, arr[0]))
+        if (i === points.length - 1)
+          acc.push(point, Vec.med(point, arr[0]), 'Z')
         else acc.push(point, Vec.med(point, arr[i + 1]))
         return acc
       },

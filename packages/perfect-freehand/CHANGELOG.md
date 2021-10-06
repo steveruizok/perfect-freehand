@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.15
+
+- Bug fixes related to very short lines.
+
 ## 1.0.14
 
 - Updates README and documentation.

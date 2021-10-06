@@ -1499,13 +1499,52 @@ Array [
     ],
   },
   Object {
-    "distance": 114.99999999999999,
+    "distance": 28.75,
     "point": Array [
       10,
-      85.00000000000001,
+      171.25,
     ],
     "pressure": 0.5,
-    "runningLength": 114.99999999999999,
+    "runningLength": 28.75,
+    "vector": Array [
+      0,
+      1,
+    ],
+  },
+  Object {
+    "distance": 40.96875,
+    "point": Array [
+      10,
+      130.28125,
+    ],
+    "pressure": 0.5,
+    "runningLength": 69.71875,
+    "vector": Array [
+      0,
+      1,
+    ],
+  },
+  Object {
+    "distance": 46.161718750000006,
+    "point": Array [
+      10,
+      84.11953125,
+    ],
+    "pressure": 0.5,
+    "runningLength": 115.88046875,
+    "vector": Array [
+      0,
+      1,
+    ],
+  },
+  Object {
+    "distance": 48.368730468749995,
+    "point": Array [
+      10,
+      35.75080078125,
+    ],
+    "pressure": 0.5,
+    "runningLength": 164.24919921875,
     "vector": Array [
       0,
       1,

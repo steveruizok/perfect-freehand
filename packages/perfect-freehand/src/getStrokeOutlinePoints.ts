@@ -7,6 +7,7 @@ import {
   lrp,
   med,
   mul,
+  neg,
   per,
   prj,
   rotAround,
@@ -64,7 +65,9 @@ export function getStrokeOutlinePoints(
   } = end
 
   // We can't do anything with an empty array or a stroke with negative size.
-  if (points.length === 0 || size <= 0) return []
+  if (points.length === 0 || size <= 0) {
+    return []
+  }
 
   // The total length of the line
   const totalLength = points[points.length - 1].runningLength
@@ -125,12 +128,14 @@ export function getStrokeOutlinePoints(
     skipping the first and last pointsm, which will get caps later on.
   */
 
-  for (let i = 0; i < points.length - 1; i++) {
+  for (let i = 0; i < points.length; i++) {
     let { pressure } = points[i]
     const { point, vector, distance, runningLength } = points[i]
 
     // Removes noise from the end of the line
-    if (totalLength - runningLength < 3) continue
+    if (i < points.length - 1 && totalLength - runningLength < 3) {
+      continue
+    }
 
     /*
       Calculate the radius
@@ -184,6 +189,14 @@ export function getStrokeOutlinePoints(
 
     /* Add points to left and right */
 
+    // Handle the last point
+    if (i === points.length - 1) {
+      const offset = mul(per(vector), radius)
+      leftPts.push(sub(point, offset))
+      rightPts.push(add(point, offset))
+      continue
+    }
+
     const nextVector = points[i + 1].vector
 
     const nextDpr = dpr(vector, nextVector)
@@ -231,14 +244,14 @@ export function getStrokeOutlinePoints(
 
     tl = sub(point, offset)
 
-    if (i === 0 || dist2(pl, tl) > minDistance) {
+    if (i <= 1 || dist2(pl, tl) > minDistance) {
       leftPts.push(tl)
       pl = tl
     }
 
     tr = add(point, offset)
 
-    if (i === 0 || dist2(pr, tr) > minDistance) {
+    if (i <= 1 || dist2(pr, tr) > minDistance) {
       rightPts.push(tr)
       pr = tr
     }
@@ -263,8 +276,6 @@ export function getStrokeOutlinePoints(
       ? points[points.length - 1].point.slice(0, 2)
       : add(points[0].point, [1, 1])
 
-  const isVeryShort = leftPts.length <= 1 || rightPts.length <= 1
-
   const startCap: number[][] = []
 
   const endCap: number[][] = []
@@ -278,20 +289,17 @@ export function getStrokeOutlinePoints(
     we can just return those points.
   */
 
-  if (isVeryShort) {
+  if (points.length === 1) {
     if (!(taperStart || taperEnd) || isComplete) {
       const start = prj(
         firstPoint,
         uni(per(sub(firstPoint, lastPoint))),
         -(firstRadius || radius)
       )
-
       const dotPts: number[][] = []
-
       for (let step = 1 / 13, t = step; t <= 1; t += step) {
         dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
       }
-
       return dotPts
     }
   } else {
@@ -304,7 +312,7 @@ export function getStrokeOutlinePoints(
     Finally remove the first left and right points. :psyduck:
   */
 
-    if (taperStart || (taperEnd && isVeryShort)) {
+    if (taperStart || (taperEnd && points.length === 1)) {
       // The start point is tapered, noop
     } else if (capStart) {
       // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
@@ -330,30 +338,26 @@ export function getStrokeOutlinePoints(
     Draw an end cap
 
     If the line does not have a tapered end, and unless the line has a tapered
-    start and the line is very short, draw a cap around the last point. Finally, 
+    start and the line is very short, draw a cap around the last point. Finally,
     remove the last left and right points. Otherwise, add the last point. Note
-    that This cap is a full-turn-and-a-half: this prevents incorrect caps on 
+    that This cap is a full-turn-and-a-half: this prevents incorrect caps on
     sharp end turns.
   */
 
-    // The mid point between the last left and right points
-    const mid = med(leftPts[leftPts.length - 1], rightPts[rightPts.length - 1])
+    const direction = per(neg(points[points.length - 1].vector))
 
-    // The direction vector from the mid point to the last point
-    const direction = per(uni(sub(lastPoint, mid)))
-
-    if (taperEnd || (taperStart && isVeryShort)) {
+    if (taperEnd || (taperStart && points.length === 1)) {
       // Tapered end - push the last point to the line
       endCap.push(lastPoint)
     } else if (capEnd) {
       // Draw the round end cap
       const start = prj(lastPoint, direction, radius)
-      for (let step = 1 / 29, t = 0; t <= 1; t += step) {
-        const pt = rotAround(start, lastPoint, FIXED_PI * 3 * t)
-        endCap.push(pt)
+      for (let step = 1 / 29, t = step; t < 1; t += step) {
+        endCap.push(rotAround(start, lastPoint, FIXED_PI * 3 * t))
       }
     } else {
       // Draw the flat end cap
+
       endCap.push(
         add(lastPoint, mul(direction, radius)),
         add(lastPoint, mul(direction, radius * 0.99)),

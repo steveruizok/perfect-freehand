@@ -32,6 +32,17 @@ export function getStrokePoints<
     ? (points as T[])
     : (points as K[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
 
+  // Add extra points between the two, to help avoid "dash" lines
+  // for strokes with tapered start and ends. Don't mutate the
+  // input array!
+  if (pts.length === 2) {
+    const last = pts[1]
+    pts = pts.slice(0, -1)
+    for (let i = 1; i < 5; i++) {
+      pts.push(lrp(pts[0], last, i / 4))
+    }
+  }
+
   // If there's only one point, add another point at a 1pt offset.
   // Don't mutate the input array!
   if (pts.length === 1) {
@@ -68,7 +79,7 @@ export function getStrokePoints<
       isComplete && i === max
         ? // If we're at the last point, and `options.last` is true,
           // then add the actual input point.
-          pts[i]
+          pts[i].slice(0, 2)
         : // Otherwise, using the t calculated from the streamline
           // option, interpolate a new point between the previous
           // point the current point.
