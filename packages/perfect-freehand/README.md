@@ -34,7 +34,7 @@ yarn add perfect-freehand
 
 This package exports a function named `getStroke` that will generate the points for a polygon based on an array of points.
 
-![Screenshot](assets/process.gif "A GIF showing a stroke's input points, outline points, and a curved path connecting these points")
+![Screenshot](assets/process.gif 'A GIF showing a stroke with input points, outline points, and a curved path connecting these points')
 
 To do this work, `getStroke` first creates a set of spline points (red) based on the input points (grey) and then creates outline points (blue). You can render the result any way you like, using whichever technology you prefer.
 
@@ -350,6 +350,6 @@ Have an idea or casual question? Visit the [discussion page](https://github.com/
 - MIT
 - ...but if you're using `perfect-freehand` in a commercial product, consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok). 💰
 
-### Author
+## Author
 
 - [@steveruizok](https://twitter.com/steveruizok)
