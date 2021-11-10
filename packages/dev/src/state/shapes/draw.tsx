@@ -3,7 +3,7 @@ import {
   TLBounds,
   Utils,
   TLTransformInfo,
-  ShapeUtil,
+  TLShapeUtil,
   SVGContainer,
 } from '@tldraw/core'
 import {
@@ -15,42 +15,53 @@ import { getStroke } from 'perfect-freehand'
 import type { DrawShape } from '../../types'
 import { EASINGS } from 'state/easings'
 
-const pointsBoundsCache = new WeakMap<DrawShape['points'], TLBounds>([])
-const rotatedCache = new WeakMap<DrawShape, number[][]>([])
+type T = DrawShape
+type E = SVGSVGElement
 
-export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
-  type: 'draw',
+export class DrawUtil extends TLShapeUtil<T, E> {
+  type = 'draw' as const
 
-  defaultProps: {
-    id: 'id',
-    type: 'draw',
-    name: 'Draw',
-    parentId: 'page',
-    childIndex: 1,
-    point: [0, 0],
-    points: [[0, 0, 0.5]],
-    rotation: 0,
-    isDone: false,
-    style: {
-      size: 8,
-      strokeWidth: 0,
-      thinning: 0.75,
-      streamline: 0.5,
-      smoothing: 0.5,
-      easing: 'linear',
-      taperStart: 0,
-      taperEnd: 0,
-      capStart: true,
-      capEnd: true,
-      easingStart: 'linear',
-      easingEnd: 'linear',
-      isFilled: true,
-      stroke: 'black',
-      fill: 'black',
-    },
-  },
+  pointsBoundsCache = new WeakMap<T['points'], TLBounds>([])
 
-  Component({ shape, events }, ref) {
+  rotatedCache = new WeakMap<T, number[][]>([])
+
+  strokeCache = new WeakMap<T['points'], number[][]>([])
+
+  getShape = (props: Partial<T>): T => {
+    return Utils.deepMerge<T>(
+      {
+        id: 'id',
+        type: 'draw',
+        name: 'Draw',
+        parentId: 'page',
+        childIndex: 1,
+        point: [0, 0],
+        points: [[0, 0, 0.5]],
+        rotation: 0,
+        isDone: false,
+        style: {
+          size: 8,
+          strokeWidth: 0,
+          thinning: 0.75,
+          streamline: 0.5,
+          smoothing: 0.5,
+          easing: 'linear',
+          taperStart: 0,
+          taperEnd: 0,
+          capStart: true,
+          capEnd: true,
+          easingStart: 'linear',
+          easingEnd: 'linear',
+          isFilled: true,
+          stroke: 'black',
+          fill: 'black',
+        },
+      },
+      props
+    )
+  }
+
+  Component = TLShapeUtil.Component<T, E>(({ shape, events }, ref) => {
     const {
       style: {
         size,
@@ -74,26 +85,31 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
 
     const simulatePressure = shape.points[2]?.[2] === 0.5
 
-    const outlinePoints = getStroke(shape.points, {
-      size,
-      thinning,
-      streamline,
-      easing: EASINGS[easing],
-      smoothing,
-      start: {
-        taper: taperStart,
-        cap: capStart,
-        easing: EASINGS[easingStart],
-      },
-      end: { taper: taperEnd, cap: capEnd, easing: EASINGS[easingEnd] },
-      simulatePressure,
-      last: isDone,
-    })
+    const outlinePoints = Utils.getFromCache(
+      this.strokeCache,
+      shape.points,
+      () =>
+        getStroke(shape.points, {
+          size,
+          thinning,
+          streamline,
+          easing: EASINGS[easing],
+          smoothing,
+          start: {
+            taper: taperStart,
+            cap: capStart,
+            easing: EASINGS[easingStart],
+          },
+          end: { taper: taperEnd, cap: capEnd, easing: EASINGS[easingEnd] },
+          simulatePressure,
+          last: isDone,
+        })
+    )
 
     const drawPathData = getSvgPathFromStroke(outlinePoints)
 
     return (
-      <SVGContainer ref={ref} {...events}>
+      <SVGContainer ref={ref} fr="" {...events}>
         {strokeWidth ? (
           <path
             d={drawPathData}
@@ -120,24 +136,29 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
         }
       </SVGContainer>
     )
-  },
+  })
 
-  Indicator() {
-    return null
-  },
+  Indicator = TLShapeUtil.Indicator<T>(() => {
+    return <g />
+  })
 
-  getBounds(shape: DrawShape): TLBounds {
+  create = (props: { id: string } & Partial<T>) => {
+    this.refMap.set(props.id, React.createRef())
+    return this.getShape(props)
+  }
+
+  getBounds = (shape: DrawShape): TLBounds => {
     const bounds = Utils.translateBounds(
-      Utils.getFromCache(pointsBoundsCache, shape.points, () =>
+      Utils.getFromCache(this.pointsBoundsCache, shape.points, () =>
         Utils.getBoundsFromPoints(shape.points)
       ),
       shape.point
     )
 
     return bounds
-  },
+  }
 
-  hitTestBounds(shape: DrawShape, brushBounds: TLBounds): boolean {
+  hitTestBounds = (shape: DrawShape, brushBounds: TLBounds): boolean => {
     // Test axis-aligned shape
     if (!shape.rotation) {
       const bounds = this.getBounds(shape)
@@ -156,7 +177,7 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
     // Test rotated shape
     const rBounds = this.getRotatedBounds(shape)
 
-    const rotatedBounds = Utils.getFromCache(rotatedCache, shape, () => {
+    const rotatedBounds = Utils.getFromCache(this.rotatedCache, shape, () => {
       const c = Utils.getBoundsCenter(Utils.getBoundsFromPoints(shape.points))
       return shape.points.map((pt) => Vec.rotWith(pt, c, shape.rotation || 0))
     })
@@ -168,13 +189,13 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
         rotatedBounds
       ).length > 0
     )
-  },
+  }
 
-  transform(
+  transform = (
     shape: DrawShape,
     bounds: TLBounds,
     { initialShape, scaleX, scaleY }: TLTransformInfo<DrawShape>
-  ): Partial<DrawShape> {
+  ): Partial<DrawShape> => {
     const initialShapeBounds = Utils.getFromCache(
       this.boundsCache,
       initialShape,
@@ -206,8 +227,8 @@ export const Draw = new ShapeUtil<DrawShape, SVGSVGElement>(() => ({
       points,
       point,
     }
-  },
-}))
+  }
+}
 
 function getSvgPathFromStroke(points: number[][]): string {
   if (!points.length) return ''
@@ -233,3 +254,5 @@ export function dot([x, y]: number[]) {
 export function dots(points: number[][]) {
   return points.map(dot).join(' ')
 }
+
+export const draw = new DrawUtil()

@@ -39,7 +39,7 @@ esbuild
 
 if (isDevServer) {
   serve.start({
-    port: 5000,
+    port: 5420,
     root: './dist',
     live: true,
   })

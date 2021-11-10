@@ -3,20 +3,20 @@ import type { Doc, DrawShape, DrawStyles, State } from 'types'
 import {
   TLPinchEventHandler,
   TLPointerEventHandler,
-  TLShapeUtils,
+  TLShapeUtilsMap,
   TLWheelEventHandler,
   Utils,
 } from '@tldraw/core'
 import { Vec } from '@tldraw/vec'
 import { StateManager } from 'rko'
-import { Draw } from './shapes'
+import { draw, DrawUtil } from './shapes'
 import sample from './sample.json'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
 import { EASING_STRINGS } from './easings'
 
-export const shapeUtils: TLShapeUtils<DrawShape> = {
-  draw: Draw,
+export const shapeUtils: TLShapeUtilsMap<DrawShape> = {
+  draw: new DrawUtil(),
 }
 
 export const initialDoc: Doc = {
@@ -171,23 +171,10 @@ export class AppState extends StateManager<State> {
     }
   }
 
-  onPinchEnd: TLPinchEventHandler = () => {
-    this.patchState({
-      appState: { status: 'idle' },
-    })
-  }
-
-  onPinch: TLPinchEventHandler = ({ point, delta }) => {
-    if (this.state.appState.status !== 'pinching') return
-
+  pinchZoom = (point: number[], delta: number[], zoom: number): this => {
     const { camera } = this.state.pageState
-    const zoomDelta = delta[2] / 2
-    const nextPoint = Vec.add(camera.point, Vec.div(delta, camera.zoom))
-    const nextZoom = Utils.clamp(
-      camera.zoom - zoomDelta * camera.zoom,
-      0.25,
-      25
-    )
+    const nextPoint = Vec.sub(camera.point, Vec.div(delta, camera.zoom))
+    const nextZoom = zoom
     const p0 = Vec.sub(Vec.div(point, camera.zoom), nextPoint)
     const p1 = Vec.sub(Vec.div(point, nextZoom), nextPoint)
 
@@ -199,6 +186,18 @@ export class AppState extends StateManager<State> {
         },
       },
     })
+  }
+
+  onPinchEnd: TLPinchEventHandler = () => {
+    this.patchState({
+      appState: { status: 'idle' },
+    })
+  }
+
+  onPinch: TLPinchEventHandler = (info, e) => {
+    if (this.state.appState.status !== 'pinching') return
+    this.pinchZoom(info.point, info.delta, info.delta[2])
+    this.onPointerMove?.(info, e as unknown as React.PointerEvent)
   }
 
   onPan: TLWheelEventHandler = (info) => {
@@ -269,7 +268,7 @@ export class AppState extends StateManager<State> {
 
     const pt = Vec.sub(Vec.div(point, camera.zoom), camera.point)
 
-    const shape = shapeUtils.draw.create({
+    const shape = draw.create({
       id: Utils.uniqueId(),
       point: pt,
       style: state.appState.style,
@@ -349,7 +348,6 @@ export class AppState extends StateManager<State> {
 
     shape = {
       ...shape,
-      ...shapeUtils.draw.onSessionComplete(shape),
     }
 
     return this.setState({
@@ -397,7 +395,7 @@ export class AppState extends StateManager<State> {
   replayShape = (points: number[][]) => {
     this.eraseAll()
 
-    const newShape = Draw.create({
+    const newShape = draw.create({
       id: Utils.uniqueId(),
       parentId: 'page',
       childIndex: 1,
@@ -434,7 +432,7 @@ export class AppState extends StateManager<State> {
   }
 
   addShape = (shape: Partial<DrawShape>) => {
-    const newShape = Draw.create({
+    const newShape = draw.create({
       id: Utils.uniqueId(),
       parentId: 'page',
       childIndex: 1,
@@ -483,7 +481,7 @@ export class AppState extends StateManager<State> {
               }
 
               if (Utils.pointInBounds(pt, bounds)) {
-                const points = shapeUtils.draw.strokeCache.get(shape)
+                const points = draw.strokeCache.get(shape.points)
 
                 if (
                   (points &&
@@ -753,7 +751,7 @@ export class AppState extends StateManager<State> {
 
     const shapes = Object.values(this.state.page.shapes)
 
-    const bounds = Utils.getCommonBounds(shapes.map(Draw.getBounds))
+    const bounds = Utils.getCommonBounds(shapes.map(draw.getBounds))
 
     const padding = 40
 
