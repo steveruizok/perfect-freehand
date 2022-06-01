@@ -28,7 +28,11 @@
     "src"
   ],
   "dependencies": {
-    "@types/react-dom": "^17.0.11"
+    "@types/react": "^18.0.10",
+    "@types/react-dom": "^18.0.5",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
     "@modulz/radix-icons": "^4.0.0",
