@@ -169,11 +169,11 @@ The options object is optional, as are each of its properties.
 
 The `start` and `end` options accept an object:
 
-| Property | Type     | Default | Description                                 |
-| -------- | -------- | ------- | ------------------------------------------- |
-| `cap`    | boolean  | true    | Whether to draw a cap.                      |
-| `taper`  | number   | 0       | The distance to taper.                      |
-| `easing` | function | t => t  | An easing function for the tapering effect. |
+| Property | Type              | Default | Description                                                                              |
+| -------- | ----------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `cap`    | boolean           | true    | Whether to draw a cap.                                                                   |
+| `taper`  | number or boolean | 0       | The distance to taper. If set to true, the taper will be the total length of the stroke. |
+| `easing` | function          | t => t  | An easing function for the tapering effect.                                              |
 
 **Note:** The `cap` property has no effect when `taper` is more than zero.
 

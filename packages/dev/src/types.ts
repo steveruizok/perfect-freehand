@@ -21,8 +21,8 @@ export interface DrawStyles {
   thinning: number
   streamline: number
   smoothing: number
-  taperStart: number
-  taperEnd: number
+  taperStart: number | boolean
+  taperEnd: number | boolean
   capStart: boolean
   capEnd: boolean
   easingStart: Easing

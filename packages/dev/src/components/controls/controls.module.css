@@ -19,7 +19,7 @@
 
 .inputs {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 96px 1fr auto;
   grid-auto-rows: 32px;
   align-items: center;
   column-gap: 16px;

@@ -14,6 +14,7 @@ interface SliderProps extends SliderOwnProps {
   onPointerDown: () => void
   onPointerUp: () => void
   onDoubleClick: () => void
+  label?: string
 }
 
 export function Slider({
@@ -24,6 +25,7 @@ export function Slider({
   min,
   max,
   step,
+  label,
   value = [0],
   ...props
 }: SliderProps) {
@@ -60,15 +62,19 @@ export function Slider({
           </Thumb>
         ))}
       </Root>
-      <input
-        className={styles.numberInput}
-        type="number"
-        value={value[0]}
-        min={min}
-        max={max}
-        step={step}
-        onChange={handleValueChange}
-      />
+      {label ? (
+        <span style={{ textAlign: 'right' }}>{label}</span>
+      ) : (
+        <input
+          className={styles.numberInput}
+          type="number"
+          value={value[0]}
+          min={min}
+          max={max}
+          step={step}
+          onChange={handleValueChange}
+        />
+      )}
     </>
   )
 }

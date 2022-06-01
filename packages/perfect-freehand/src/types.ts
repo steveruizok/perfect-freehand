@@ -20,12 +20,12 @@ export interface StrokeOptions {
   simulatePressure?: boolean
   start?: {
     cap?: boolean
-    taper?: number
+    taper?: number | boolean
     easing?: (distance: number) => number
   }
   end?: {
     cap?: boolean
-    taper?: number
+    taper?: number | boolean
     easing?: (distance: number) => number
   }
   // Whether to handle the points as a completed stroke.
