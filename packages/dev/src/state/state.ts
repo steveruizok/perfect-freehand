@@ -481,7 +481,7 @@ export class AppState extends StateManager<State> {
               }
 
               if (Utils.pointInBounds(pt, bounds)) {
-                const points = draw.strokeCache.get(shape.points)
+                const points = draw.strokeCache.get(shape)
 
                 if (
                   (points &&

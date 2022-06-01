@@ -25,7 +25,7 @@ export class DrawUtil extends TLShapeUtil<T, E> {
 
   rotatedCache = new WeakMap<T, number[][]>([])
 
-  strokeCache = new WeakMap<T['points'], number[][]>([])
+  strokeCache = new WeakMap<T, number[][]>([])
 
   getShape = (props: Partial<T>): T => {
     return Utils.deepMerge<T>(
@@ -85,25 +85,26 @@ export class DrawUtil extends TLShapeUtil<T, E> {
 
     const simulatePressure = shape.points[2]?.[2] === 0.5
 
-    const outlinePoints = Utils.getFromCache(
-      this.strokeCache,
-      shape.points,
-      () =>
-        getStroke(shape.points, {
-          size,
-          thinning,
-          streamline,
-          easing: EASINGS[easing],
-          smoothing,
-          start: {
-            taper: taperStart,
-            cap: capStart,
-            easing: EASINGS[easingStart],
-          },
-          end: { taper: taperEnd, cap: capEnd, easing: EASINGS[easingEnd] },
-          simulatePressure,
-          last: isDone,
-        })
+    const outlinePoints = Utils.getFromCache(this.strokeCache, shape, () =>
+      getStroke(shape.points, {
+        size,
+        thinning,
+        streamline,
+        easing: EASINGS[easing],
+        smoothing,
+        start: {
+          taper: taperStart,
+          cap: capStart,
+          easing: EASINGS[easingStart],
+        },
+        end: {
+          taper: taperEnd,
+          cap: capEnd,
+          easing: EASINGS[easingEnd],
+        },
+        simulatePressure,
+        last: isDone,
+      })
     )
 
     const drawPathData = getSvgPathFromStroke(outlinePoints)

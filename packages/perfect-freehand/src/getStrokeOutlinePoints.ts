@@ -52,17 +52,11 @@ export function getStrokeOutlinePoints(
     last: isComplete = false,
   } = options
 
-  const {
-    cap: capStart = true,
-    taper: taperStart = 0,
-    easing: taperStartEase = (t) => t * (2 - t),
-  } = start
+  let { cap: capStart = true, easing: taperStartEase = (t) => t * (2 - t) } =
+    start
 
-  const {
-    cap: capEnd = true,
-    taper: taperEnd = 0,
-    easing: taperEndEase = (t) => --t * t * t + 1,
-  } = end
+  let { cap: capEnd = true, easing: taperEndEase = (t) => --t * t * t + 1 } =
+    end
 
   // We can't do anything with an empty array or a stroke with negative size.
   if (points.length === 0 || size <= 0) {
@@ -71,6 +65,20 @@ export function getStrokeOutlinePoints(
 
   // The total length of the line
   const totalLength = points[points.length - 1].runningLength
+
+  const taperStart =
+    start.taper === false
+      ? 0
+      : start.taper === true
+      ? Math.max(size, totalLength)
+      : (start.taper as number)
+
+  const taperEnd =
+    end.taper === false
+      ? 0
+      : end.taper === true
+      ? Math.max(size, totalLength)
+      : (end.taper as number)
 
   // The minimum allowed distance between points (squared)
   const minDistance = Math.pow(size * smoothing, 2)
