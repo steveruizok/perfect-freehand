@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Add `taper: true` for full-length tapers.
+
 ## 1.0.15
 
 - Bug fixes related to very short lines.
