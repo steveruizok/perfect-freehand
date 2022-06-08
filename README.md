@@ -163,7 +163,7 @@ The options object is optional, as are each of its properties.
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
 | `start`            | { }      |         | Tapering options for the start of the line.           |
 | `end`              | { }      |         | Tapering options for the end of the line.             |
-| `last`             | boolean  | true    | Whether the stroke is complete.                       |
+| `last`             | boolean  | false   | Whether the stroke is complete.                       |
 
 **Note:** When the `last` property is `true`, the line's end will be drawn at the last input point, rather than slightly behind it.
 
