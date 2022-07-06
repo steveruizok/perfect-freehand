@@ -38,7 +38,7 @@ This package exports a function named `getStroke` that will generate the points 
 
 To do this work, `getStroke` first creates a set of spline points (red) based on the input points (grey) and then creates outline points (blue). You can render the result any way you like, using whichever technology you prefer.
 
-[![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
+[![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-28js16?fontsize=14&hidenavigation=1&theme=dark)
 
 ## Usage
 
@@ -119,7 +119,15 @@ export default function Example() {
 
   function handlePointerMove(e) {
     if (e.buttons !== 1) return
-    setPoints([...points, [e.pageX, e.pageY, e.pressure]])
+
+    if (typeof e.getCoalescedEvents === 'function') {
+      const events = e.nativeEvent.getCoalescedEvents()
+      events.forEach((evt) => {
+        setPoints([...points, [evt.pageX, evt.pageY, evt.pressure]])
+      })
+    } else {
+      setPoints([...points, [e.pageX, e.pageY, e.pressure]])
+    }
   }
 
   const stroke = getStroke(points, {
@@ -145,7 +153,7 @@ export default function Example() {
 
 > **Tip:** For implementations in Typescript, see the example project included in this repository.
 
-[![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-biwyi?fontsize=14&hidenavigation=1&theme=dark)
+[![Edit perfect-freehand-example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/perfect-freehand-example-28js16?fontsize=14&hidenavigation=1&theme=dark)
 
 ## Documentation
 
