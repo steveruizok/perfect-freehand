@@ -127,6 +127,10 @@ export function getStrokeOutlinePoints(
   let tl = pl
   let tr = pr
 
+  // Keep track of whether the previous point is a sharp corner
+  // ... so that we don't detect the same corner twice
+  let isPrevPointSharpCorner = false
+  
   // let short = true
 
   /*
@@ -197,18 +201,6 @@ export function getStrokeOutlinePoints(
 
     /* Add points to left and right */
 
-    // Handle the last point
-    if (i === points.length - 1) {
-      const offset = mul(per(vector), radius)
-      leftPts.push(sub(point, offset))
-      rightPts.push(add(point, offset))
-      continue
-    }
-
-    const nextVector = points[i + 1].vector
-
-    const nextDpr = dpr(vector, nextVector)
-
     /*
       Handle sharp corners
 
@@ -217,7 +209,14 @@ export function getStrokeOutlinePoints(
       draw a cap at the current point.
     */
 
-    if (nextDpr < 0) {
+    const nextVector = (i < points.length - 1? points[i + 1] : points[i]).vector
+    const nextDpr = (i < points.length - 1? dpr(vector, nextVector) : 1.0)
+    const prevDpr = dpr(vector, prevVector)
+
+    const isPointSharpCorner = prevDpr < 0 && !isPrevPointSharpCorner
+    const isNextPointSharpCorner = nextDpr !== null && nextDpr < 0
+
+    if (isPointSharpCorner || isNextPointSharpCorner) {
       // It's a sharp corner. Draw a rounded cap and move on to the next point
       // Considering saving these and drawing them later? So that we can avoid
       // crossing future points.
@@ -235,6 +234,19 @@ export function getStrokeOutlinePoints(
       pl = tl
       pr = tr
 
+      if (isNextPointSharpCorner) {
+        isPrevPointSharpCorner = true
+      }
+      continue
+    }
+    
+    isPrevPointSharpCorner = false
+    
+    // Handle the last point
+    if (i === points.length - 1) {
+      const offset = mul(per(vector), radius)
+      leftPts.push(sub(point, offset))
+      rightPts.push(add(point, offset))
       continue
     }
 
