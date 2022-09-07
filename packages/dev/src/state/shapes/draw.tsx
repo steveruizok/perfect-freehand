@@ -231,21 +231,30 @@ export class DrawUtil extends TLShapeUtil<T, E> {
   }
 }
 
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) return ''
+const average = (a: number, b: number) => (a + b) / 2
 
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === points.length - 1)
-          acc.push(point, Vec.med(point, arr[0]), 'Z')
-        else acc.push(point, Vec.med(point, arr[i + 1]))
-        return acc
-      },
-      ['M', points[0], 'Q']
-    )
-    .join(' ')
-    .replaceAll(/(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g, '$1')
+function getSvgPathFromStroke(points: number[][]): string {
+  const len = points.length
+
+  if (!len) {
+    return ''
+  }
+
+  const first = points[0]
+  let result = `M${first[0].toFixed(3)},${first[1].toFixed(3)}Q`
+
+  for (let i = 0, max = len - 1; i < max; i++) {
+    const a = points[i]
+    const b = points[i + 1]
+    result += `${a[0].toFixed(3)},${a[1].toFixed(3)} ${average(
+      a[0],
+      b[0]
+    ).toFixed(3)},${average(a[1], b[1]).toFixed(3)} `
+  }
+
+  result += 'Z'
+
+  return result
 }
 
 export function dot([x, y]: number[]) {
