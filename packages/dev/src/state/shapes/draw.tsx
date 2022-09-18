@@ -240,10 +240,10 @@ function getSvgPathFromStroke(points: {xs: number[], ys: number[]}): string {
     return ''
   }
 
-  let result = `M${xs[0].toFixed(3)},${ys[0].toFixed(3)}Q`
+  let result = `M${xs[0].toFixed(2)},${ys[0].toFixed(2)}Q`
 
   for (let i = 0, max = len - 1; i < max; i++) {
-    result += `${xs[i].toFixed(3)},${ys[i].toFixed(3)} ${average(xs[i], xs[i + 1]).toFixed(3)},${average(ys[i], ys[i + 1]).toFixed(3)} `
+    result += `${xs[i].toFixed(2)},${ys[i].toFixed(2)} ${average(xs[i], xs[i + 1]).toFixed(2)},${average(ys[i], ys[i + 1]).toFixed(2)} `
   }
 
   result += 'Z'
