@@ -25,6 +25,7 @@ async function main() {
     target: 'es6',
     tsconfig: './tsconfig.build.json',
     metafile: true,
+    outExtension: { '.js': '.mjs' },
   })
 
   let esmSize = 0
@@ -32,7 +33,7 @@ async function main() {
     esmSize += output.bytes
   })
 
-  fs.readFile('./dist/esm/index.js', (_err, data) => {
+  fs.readFile('./dist/esm/index.mjs', (_err, data) => {
     gzip(data, (_err, result) => {
       console.log(
         `✔ ${name}: Built package. ${(esmSize / 1000).toFixed(2)}kb (${(
