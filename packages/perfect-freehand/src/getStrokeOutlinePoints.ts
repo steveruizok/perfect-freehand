@@ -5,7 +5,6 @@ import {
   dist2,
   dpr,
   lrp,
-  med,
   mul,
   neg,
   per,
@@ -52,10 +51,10 @@ export function getStrokeOutlinePoints(
     last: isComplete = false,
   } = options
 
-  let { cap: capStart = true, easing: taperStartEase = (t) => t * (2 - t) } =
+  const { cap: capStart = true, easing: taperStartEase = (t) => t * (2 - t) } =
     start
 
-  let { cap: capEnd = true, easing: taperEndEase = (t) => --t * t * t + 1 } =
+  const { cap: capEnd = true, easing: taperEndEase = (t) => --t * t * t + 1 } =
     end
 
   // We can't do anything with an empty array or a stroke with negative size.
@@ -130,7 +129,7 @@ export function getStrokeOutlinePoints(
   // Keep track of whether the previous point is a sharp corner
   // ... so that we don't detect the same corner twice
   let isPrevPointSharpCorner = false
-  
+
   // let short = true
 
   /*
@@ -209,8 +208,9 @@ export function getStrokeOutlinePoints(
       draw a cap at the current point.
     */
 
-    const nextVector = (i < points.length - 1? points[i + 1] : points[i]).vector
-    const nextDpr = (i < points.length - 1? dpr(vector, nextVector) : 1.0)
+    const nextVector = (i < points.length - 1 ? points[i + 1] : points[i])
+      .vector
+    const nextDpr = i < points.length - 1 ? dpr(vector, nextVector) : 1.0
     const prevDpr = dpr(vector, prevVector)
 
     const isPointSharpCorner = prevDpr < 0 && !isPrevPointSharpCorner
@@ -239,9 +239,9 @@ export function getStrokeOutlinePoints(
       }
       continue
     }
-    
+
     isPrevPointSharpCorner = false
-    
+
     // Handle the last point
     if (i === points.length - 1) {
       const offset = mul(per(vector), radius)
