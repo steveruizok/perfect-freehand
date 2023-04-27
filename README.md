@@ -6,9 +6,11 @@ Draw perfect pressure-sensitive freehand lines.
 
 💅 Designer? Check out the [Figma Plugin](https://www.figma.com/community/plugin/950892731860805817).
 
-🕊 Flutterer? There's now a [dart version](https://pub.dev/packages/perfect_freehand) of this library, too.
-
 💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok).
+
+Also available in:
+- 🎯 [Flutter / Dart](https://pub.dev/packages/perfect_freehand)
+- 🐍 [Python](https://github.com/bigbluebutton/perfect-freehand-python)
 
 ## Table of Contents
 
