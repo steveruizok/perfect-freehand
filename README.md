@@ -233,7 +233,7 @@ const strokePoints = getStrokePoints(samplePoints)
 const outlinePoints = getOutlinePoints(strokePoints)
 ```
 
-**Note:** Internally, the `getStroke` function passes the result of `getStrokePoints` to `getStrokeOutlinePoints`, just as shown in this example. This means that, in this example, the result of `myOutlinePoints` will be the same as if the `samplePoints` array had been passed to `getStroke`.
+**Note:** Internally, the `getStroke` function passes the result of `getStrokePoints` to `getStrokeOutlinePoints`, just as shown in this example. This means that, in this example, the result of `outlinePoints` will be the same as if the `samplePoints` array had been passed to `getStroke`.
 
 #### `StrokeOptions`
 
