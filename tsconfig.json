@@ -2,6 +2,10 @@
   "extends": "./tsconfig.base.json",
   "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"],
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "perfect-freehand": ["./packages/perfect-freehand/dist"],
+      "+*": ["./packages/perfect-freehand/src/*"]
+    }
   }
 }

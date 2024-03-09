@@ -1,4 +1,5 @@
 import * as React from 'react'
+import type { Doc, DrawShape, DrawStyles, State } from 'types'
 import {
   TLPinchEventHandler,
   TLPointerEventHandler,
@@ -13,7 +14,6 @@ import sample from './sample.json'
 import type { StateSelector } from 'zustand'
 import { copyTextToClipboard, pointInPolygon } from './utils'
 import { EASING_STRINGS } from './easings'
-import { Doc, DrawShape, DrawStyles, State } from '../types'
 
 export const shapeUtils: TLShapeUtilsMap<DrawShape> = {
   draw: new DrawUtil(),

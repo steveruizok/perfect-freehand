@@ -13,7 +13,7 @@ import {
 import { Vec } from '@tldraw/vec'
 import { getStroke } from 'perfect-freehand'
 import type { DrawShape } from '../../types'
-import { EASINGS } from '../easings'
+import { EASINGS } from 'state/easings'
 
 type T = DrawShape
 type E = SVGSVGElement
