@@ -4,5 +4,10 @@
   "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "dist"],
   "compilerOptions": {
     "baseUrl": "./src"
-  }
+  },
+  "references": [
+    {
+      "path": "../perfect-freehand"
+    }
+  ]
 }
