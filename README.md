@@ -6,11 +6,9 @@ Draw perfect pressure-sensitive freehand lines.
 
 💅 Designer? Check out the [Figma Plugin](https://www.figma.com/community/plugin/950892731860805817).
 
-💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok).
+🕊 Flutterer? There's now a [dart version](https://pub.dev/packages/perfect_freehand) of this library, too.
 
-Also available in:
-- 🎯 [Flutter / Dart](https://pub.dev/packages/perfect_freehand)
-- 🐍 [Python](https://github.com/bigbluebutton/perfect-freehand-python)
+💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok).
 
 ## Table of Contents
 
@@ -165,7 +163,7 @@ The options object is optional, as are each of its properties.
 | `easing`           | function | t => t  | An easing function to apply to each point's pressure. |
 | `start`            | { }      |         | Tapering options for the start of the line.           |
 | `end`              | { }      |         | Tapering options for the end of the line.             |
-| `last`             | boolean  | false    | Whether the stroke is complete.                       |
+| `last`             | boolean  | true    | Whether the stroke is complete.                       |
 
 **Note:** When the `last` property is `true`, the line's end will be drawn at the last input point, rather than slightly behind it.
 
@@ -277,14 +275,19 @@ function getSvgPathFromStroke(points, closed = true) {
   let b = points[1]
   const c = points[2]
 
-  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(2)},${b[1].toFixed(
+  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
     2
-  )} ${average(b[0], c[0]).toFixed(2)},${average(b[1], c[1]).toFixed(2)} T`
+  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
+    b[1],
+    c[1]
+  ).toFixed(2)} T`
 
   for (let i = 2, max = len - 1; i < max; i++) {
     a = points[i]
     b = points[i + 1]
-    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(2)} `
+    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
+      2
+    )} `
   }
 
   if (closed) {
