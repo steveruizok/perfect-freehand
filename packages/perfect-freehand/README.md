@@ -218,17 +218,17 @@ import samplePoints from "./samplePoints.json'
 const strokePoints = getStrokePoints(samplePoints)
 ```
 
-#### `getOutlinePoints`
+#### `getStrokeOutlinePoints`
 
 A function that accepts an array of points (formatted as `{ point, pressure, vector, distance, runningLength }`, i.e. the output of `getStrokePoints`) and (optionally) an options object, and returns an array of points (`[x, y]`) defining the outline of a pressure-sensitive stroke.
 
 ```js
-import { getStrokePoints, getOutlinePoints } from 'perfect-freehand'
+import { getStrokePoints, getStrokeOutlinePoints } from 'perfect-freehand'
 import samplePoints from "./samplePoints.json'
 
 const strokePoints = getStrokePoints(samplePoints)
 
-const outlinePoints = getOutlinePoints(strokePoints)
+const outlinePoints = getStrokeOutlinePoints(strokePoints)
 ```
 
 **Note:** Internally, the `getStroke` function passes the result of `getStrokePoints` to `getStrokeOutlinePoints`, just as shown in this example. This means that, in this example, the result of `outlinePoints` will be the same as if the `samplePoints` array had been passed to `getStroke`.
