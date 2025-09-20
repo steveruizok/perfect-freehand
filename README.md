@@ -6,9 +6,14 @@ Draw perfect pressure-sensitive freehand lines.
 
 💅 Designer? Check out the [Figma Plugin](https://www.figma.com/community/plugin/950892731860805817).
 
-🕊 Flutterer? There's now a [dart version](https://pub.dev/packages/perfect_freehand) of this library, too.
+💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok) or check out [tldraw](https://github.com/tldraw/tldraw).
 
-💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok).
+🕊 This library is written in TypeScript, but are community ports in:
+- [dart version](https://pub.dev/packages/perfect_freehand)
+- [odin](https://github.com/sibaiper/odin-freehand)
+- [python](https://github.com/bigbluebutton/perfect-freehand-python)
+- [rust](https://crates.io/crates/freedraw/1.0.0)
+- ...and probably more. Make a pull request!
 
 ## Table of Contents
 
