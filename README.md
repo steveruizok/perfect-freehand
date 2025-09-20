@@ -8,7 +8,7 @@ Draw perfect pressure-sensitive freehand lines.
 
 💕 Love this library? Consider [becoming a sponsor](https://github.com/sponsors/steveruizok?frequency=recurring&sponsor=steveruizok) or check out [tldraw](https://github.com/tldraw/tldraw).
 
-🕊 This library is written in TypeScript, but are community ports in:
+🕊 This library is written in TypeScript but are community ports in:
 - [dart version](https://pub.dev/packages/perfect_freehand)
 - [odin](https://github.com/sibaiper/odin-freehand)
 - [python](https://github.com/bigbluebutton/perfect-freehand-python)
