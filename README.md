@@ -12,7 +12,7 @@ Draw perfect pressure-sensitive freehand lines.
 - [dart version](https://pub.dev/packages/perfect_freehand)
 - [odin](https://github.com/sibaiper/odin-freehand)
 - [python](https://github.com/bigbluebutton/perfect-freehand-python)
-- [rust](https://crates.io/crates/freedraw/1.0.0)
+- [rust](https://crates.io/crates/perfect_freehand)
 - ...and probably more. Make a pull request!
 
 ## Table of Contents
