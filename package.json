@@ -2,6 +2,9 @@
   "private": true,
   "version": "1.1.0",
   "name": "perfect-freehand-repo",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "author": {
     "name": "Steve Ruiz",
     "url": "https://twitter.com/steveruizok"

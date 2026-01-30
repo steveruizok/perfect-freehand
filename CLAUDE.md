@@ -80,9 +80,12 @@ The `StrokeOptions` interface controls stroke appearance:
 | `packages/dev/vite.config.ts` | Vite config for dev app |
 | `.prettierrc` | Prettier formatting configuration |
 | `.prettierignore` | Files/directories to exclude from Prettier |
-| `package.json` | Workspace definitions and scripts |
+| `.editorconfig` | Editor settings for consistent formatting |
+| `.nvmrc` | Pins Node.js version (20.x LTS) |
+| `package.json` | Workspace definitions, scripts, and engines field |
 | `.github/workflows/main.yml` | CI pipeline (build + test on Node 18/20/22) |
 | `.github/workflows/publish.yml` | Automated npm publish on GitHub release |
+| `.github/dependabot.yml` | Automated dependency updates via Dependabot |
 | `.husky/pre-commit` | Git pre-commit hook |
 
 ### Build System
@@ -124,3 +127,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Modernize CI/CD pipeline (actions v4, Node matrix, caching, publish workflow)~~ Done
 - ~~Extract Prettier config, add format scripts, integrate into CI~~ Done
 - ~~Upgrade TypeDoc to 0.28.x with modern config and CI integration~~ Done
+- ~~Add missing configuration files (.editorconfig, .nvmrc, engines, Dependabot)~~ Done
