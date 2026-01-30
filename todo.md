@@ -90,11 +90,11 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 - [x] Add `format` and `format:check` scripts
 - [x] Integrate Prettier check into CI pipeline
 
-### 10. Upgrade TypeDoc (0.21.9 → 0.25.x)
+### 10. Upgrade TypeDoc (0.21.9 → 0.28.x)
 
-- [ ] Update `typedoc` to latest version
-- [ ] Review TypeDoc configuration options
-- [ ] Consider adding a docs generation step to CI
+- [x] Update `typedoc` to latest version (0.28.x)
+- [x] Review TypeDoc configuration options (added `typedoc.json` with modern options)
+- [x] Consider adding a docs generation step to CI (added to `main.yml`)
 
 ---
 
@@ -170,6 +170,6 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | Vitest      | 3.0.0              | 3.x    | Up to date |
 | Rolldown    | 1.0.0-rc.2         | 1.x RC | Up to date |
 | Vite        | 6.0.0+             | 6.x    | Up to date |
-| TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
+| TypeDoc     | 0.28.x             | 0.28.x | Up to date |
 | Husky       | 7.0.0              | 9.x    | 2 major    |
 | @types/node | 20.11.0            | 20.x   | Up to date |

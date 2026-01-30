@@ -29,6 +29,9 @@ yarn format
 
 # Check formatting without making changes
 yarn format:check
+
+# Generate API documentation
+cd packages/perfect-freehand && yarn docs
 ```
 
 ## Architecture
@@ -73,6 +76,7 @@ The `StrokeOptions` interface controls stroke appearance:
 | `lazy.config.js` | lazyrepo task orchestration config |
 | `vitest.config.ts` | Vitest test runner configuration |
 | `packages/perfect-freehand/rolldown.config.mjs` | Rolldown bundler config for library |
+| `packages/perfect-freehand/typedoc.json` | TypeDoc API documentation config |
 | `packages/dev/vite.config.ts` | Vite config for dev app |
 | `.prettierrc` | Prettier formatting configuration |
 | `.prettierignore` | Files/directories to exclude from Prettier |
@@ -104,6 +108,7 @@ The `StrokeOptions` interface controls stroke appearance:
 | Vitest | 3.x | Native ESM and TypeScript support |
 | Rolldown | 1.0.0-rc.2 | Rust-based bundler for library builds |
 | Vite | 6.x | Dev server and build tool for dev app |
+| TypeDoc | 0.28.x | API documentation generator |
 | Husky | 7.0.0 | Pre-commit hook only |
 | @types/node | 20.11.0 | Updated |
 
@@ -118,3 +123,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Upgrade ESLint to 9.x with flat config~~ Done
 - ~~Modernize CI/CD pipeline (actions v4, Node matrix, caching, publish workflow)~~ Done
 - ~~Extract Prettier config, add format scripts, integrate into CI~~ Done
+- ~~Upgrade TypeDoc to 0.28.x with modern config and CI integration~~ Done

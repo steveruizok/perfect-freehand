@@ -34,3 +34,7 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Generate docs
+        if: matrix.node-version == '20.x'
+        run: cd packages/perfect-freehand && yarn docs

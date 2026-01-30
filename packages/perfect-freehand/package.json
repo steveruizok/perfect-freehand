@@ -38,7 +38,7 @@
     "lint": "eslint src/",
     "clean": "rm -rf dist",
     "ts-node": "ts-node",
-    "docs": "typedoc --entryPoints src/index.ts"
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -47,7 +47,7 @@
     "eslint-config-prettier": "^10.0.1",
     "rolldown": "^1.0.0-beta.1",
     "tslib": "^2.3.0",
-    "typedoc": "^0.21.9",
+    "typedoc": "^0.28.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.23.0"
   }

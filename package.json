@@ -46,7 +46,7 @@
     "lazyrepo": "0.0.0-alpha.27",
     "prettier": "^3.4.0",
     "tslib": "^2.3.0",
-    "typedoc": "^0.21.9",
+    "typedoc": "^0.28.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.23.0",
     "vitest": "^3.0.0"
