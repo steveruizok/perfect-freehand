@@ -85,7 +85,7 @@ The `StrokeOptions` interface controls stroke appearance:
 | `.editorconfig`                                 | Editor settings for consistent formatting         |
 | `.nvmrc`                                        | Pins Node.js version (20.x LTS)                   |
 | `package.json`                                  | Workspace definitions, scripts, and engines field |
-| `.github/workflows/main.yml`                    | CI pipeline (build + test on Node 18/20/22)       |
+| `.github/workflows/main.yml`                    | CI pipeline (audit, build, test on Node 18/20/22) |
 | `.github/workflows/publish.yml`                 | Automated npm publish on GitHub release           |
 | `.github/dependabot.yml`                        | Automated dependency updates via Dependabot       |
 | `.husky/pre-commit`                             | Git pre-commit hook (runs lint-staged)            |

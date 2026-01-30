@@ -139,9 +139,11 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 16. Security & Auditing
 
-- [ ] Add `npm audit` or `yarn audit` to CI pipeline
-- [ ] Consider adding `socket.dev` or similar for supply chain security
-- [ ] Review and update any dependencies with known vulnerabilities
+- [x] Add `npm audit` or `yarn audit` to CI pipeline
+- [x] Consider adding `socket.dev` or similar for supply chain security
+  - Note: Dependabot is already configured (`.github/dependabot.yml`) for automated dependency updates, which provides similar supply chain security benefits
+- [x] Review and update any dependencies with known vulnerabilities
+  - Audit run on 2026-01-30: No vulnerabilities found
 
 ---
 
