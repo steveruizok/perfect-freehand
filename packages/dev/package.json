@@ -45,7 +45,6 @@
     "esbuild": "^0.12.21",
     "esbuild-css-modules-plugin": "^2.0.8",
     "husky": "^7.0.0",
-    "jest": "^27.0.6",
     "perfect-freehand": "^1.2.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",

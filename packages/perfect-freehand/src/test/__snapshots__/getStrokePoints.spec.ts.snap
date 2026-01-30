@@ -1,55 +1,55 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`getStrokePoints get stroke points from a array input points: get-stroke-points-array-pairs 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a array input points > get-stroke-points-array-pairs 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       0,
       0,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       -1,
       0,
     ],
   },
-  Object {
+  {
     "distance": 11.5,
-    "point": Array [
+    "point": [
       11.5,
       0,
     ],
     "pressure": 0.5,
     "runningLength": 17.25,
-    "vector": Array [
+    "vector": [
       -1,
       0,
     ],
   },
-  Object {
+  {
     "distance": 8.277803528110582,
-    "point": Array [
+    "point": [
       19.2625,
       2.875,
     ],
     "pressure": 0.5,
     "runningLength": 25.52780352811058,
-    "vector": Array [
+    "vector": [
       -0.9377487607237036,
       -0.347314355823594,
     ],
   },
-  Object {
+  {
     "distance": 6.293808566323833,
-    "point": Array [
+    "point": [
       25.4365625,
       4.096875,
     ],
     "pressure": 0.5,
     "runningLength": 31.821612094434414,
-    "vector": Array [
+    "vector": [
       -0.9809739897453262,
       -0.19413920635239276,
     ],
@@ -57,1200 +57,1200 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a line with a many points: get-stroke-points-many-points 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a line with a many points > get-stroke-points-many-points 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       -0.20210597826090293,
       0.08050271739131176,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       -0.6056813096883387,
       0.7957073275358338,
     ],
   },
-  Object {
+  {
     "distance": 9.156236158669106,
-    "point": Array [
+    "point": [
       5.343655130137524,
       -7.205181486710251,
     ],
     "pressure": 0.5,
     "runningLength": 21.193707811223355,
-    "vector": Array [
+    "vector": [
       -0.6056813096883387,
       0.7957073275358338,
     ],
   },
-  Object {
+  {
     "distance": 7.885009905218172,
-    "point": Array [
+    "point": [
       10.04461757825764,
       -13.535610640152631,
     ],
     "pressure": 0.5,
     "runningLength": 29.078717716441528,
-    "vector": Array [
+    "vector": [
       -0.5961897961610797,
       0.8028435258214457,
     ],
   },
-  Object {
+  {
     "distance": 10.365866532164418,
-    "point": Array [
+    "point": [
       15.802033607234073,
       -22.155549713715253,
     ],
     "pressure": 0.5,
     "runningLength": 39.44458424860595,
-    "vector": Array [
+    "vector": [
       -0.5554206212391074,
       0.8315695602307507,
     ],
   },
-  Object {
+  {
     "distance": 10.949800699695052,
-    "point": Array [
+    "point": [
       22.14118891381176,
       -31.083777161654186,
     ],
     "pressure": 0.5,
     "runningLength": 50.394384948301,
-    "vector": Array [
+    "vector": [
       -0.5789288298876737,
       0.81537807790306,
     ],
   },
-  Object {
+  {
     "distance": 11.90848208913695,
-    "point": Array [
+    "point": [
       28.793956666238635,
       -40.96065049786563,
     ],
     "pressure": 0.5,
     "runningLength": 62.30286703743795,
-    "vector": Array [
+    "vector": [
       -0.5586579131269471,
       0.8293981770540879,
     ],
   },
-  Object {
+  {
     "distance": 12.678870104856667,
-    "point": Array [
+    "point": [
       35.61319633458572,
       -51.649510001174185,
     ],
     "pressure": 0.5,
     "runningLength": 74.98173714229462,
-    "vector": Array [
+    "vector": [
       -0.5378428528686451,
       0.843045114817776,
     ],
   },
-  Object {
+  {
     "distance": 13.831496654939157,
-    "point": Array [
+    "point": [
       42.807279880416075,
       -63.46286945778965,
     ],
     "pressure": 0.5,
     "runningLength": 88.81323379723378,
-    "vector": Array [
+    "vector": [
       -0.5201232900028488,
       0.8540911913821687,
     ],
   },
-  Object {
+  {
     "distance": 14.243814077559213,
-    "point": Array [
+    "point": [
       50.31271873078539,
       -75.56884431070591,
     ],
     "pressure": 0.5,
     "runningLength": 103.05704787479299,
-    "vector": Array [
+    "vector": [
       -0.52692620175336,
       0.8499110411718259,
     ],
   },
-  Object {
+  {
     "distance": 14.869934788613202,
-    "point": Array [
+    "point": [
       58.02650691388807,
       -88.28153216512264,
     ],
     "pressure": 0.5,
     "runningLength": 117.92698266340619,
-    "vector": Array [
+    "vector": [
       -0.5187506396470271,
       0.854925595514487,
     ],
   },
-  Object {
+  {
     "distance": 14.231321976797217,
-    "point": Array [
+    "point": [
       65.57935522755456,
       -100.34324877421344,
     ],
     "pressure": 0.5,
     "runningLength": 132.1583046402034,
-    "vector": Array [
+    "vector": [
       -0.5307200782879251,
       0.8475471659453877,
     ],
   },
-  Object {
+  {
     "distance": 11.28454079187292,
-    "point": Array [
+    "point": [
       71.50155992878673,
       -109.94889046855887,
     ],
     "pressure": 0.5,
     "runningLength": 143.44284543207633,
-    "vector": Array [
+    "vector": [
       -0.524806884964014,
       0.8512213187499291,
     ],
   },
-  Object {
+  {
     "distance": 10.522324132132322,
-    "point": Array [
+    "point": [
       77.09961901077237,
       -118.8584942563966,
     ],
     "pressure": 0.5,
     "runningLength": 153.96516956420865,
-    "vector": Array [
+    "vector": [
       -0.5320173577328496,
       0.8467334474738535,
     ],
   },
-  Object {
+  {
     "distance": 9.651446197643674,
-    "point": Array [
+    "point": [
       82.16935516259726,
       -127.07117890009809,
     ],
     "pressure": 0.5,
     "runningLength": 163.61661576185233,
-    "vector": Array [
+    "vector": [
       -0.5252825377675131,
       0.8509278791510599,
     ],
   },
-  Object {
+  {
     "distance": 8.763760541385777,
-    "point": Array [
+    "point": [
       86.81927354811332,
       -134.49962139060645,
     ],
     "pressure": 0.5,
     "runningLength": 172.3803763032381,
-    "vector": Array [
+    "vector": [
       -0.5305848286882549,
       0.8476318419961908,
     ],
   },
-  Object {
+  {
     "distance": 8.05041999701069,
-    "point": Array [
+    "point": [
       91.4806291224529,
       -141.06323520754015,
     ],
     "pressure": 0.5,
     "runningLength": 180.4307963002488,
-    "vector": Array [
+    "vector": [
       -0.5790201723724292,
       0.815313215878292,
     ],
   },
-  Object {
+  {
     "distance": 7.4956548569269,
-    "point": Array [
+    "point": [
       95.66677537179484,
       -147.28103395897077,
     ],
     "pressure": 0.5,
     "runningLength": 187.9264511571757,
-    "vector": Array [
+    "vector": [
       -0.5584763878867015,
       0.8295204181772878,
     ],
   },
-  Object {
+  {
     "distance": 7.935151740329139,
-    "point": Array [
+    "point": [
       99.98592259288898,
       -153.93772986794568,
     ],
     "pressure": 0.5,
     "runningLength": 195.86160289750484,
-    "vector": Array [
+    "vector": [
       -0.5443055611832559,
       0.8388870341499985,
     ],
   },
-  Object {
+  {
     "distance": 7.4232798202342725,
-    "point": Array [
+    "point": [
       103.95407769441589,
       -160.21139134906844,
     ],
     "pressure": 0.5,
     "runningLength": 203.28488271773912,
-    "vector": Array [
+    "vector": [
       -0.534555506140367,
       0.8451333686791787,
     ],
   },
-  Object {
+  {
     "distance": 7.012458404486258,
-    "point": Array [
+    "point": [
       107.8568023788458,
       -166.03748033844985,
     ],
     "pressure": 0.5,
     "runningLength": 210.2973411222254,
-    "vector": Array [
+    "vector": [
       -0.556541580615027,
       0.8308197572557644,
     ],
   },
-  Object {
+  {
     "distance": 5.71082407986615,
-    "point": Array [
+    "point": [
       111.19858975286897,
       -170.66845958888905,
     ],
     "pressure": 0.5,
     "runningLength": 216.00816520209153,
-    "vector": Array [
+    "vector": [
       -0.585167276611591,
       0.8109126083512167,
     ],
   },
-  Object {
+  {
     "distance": 5.2311147642179385,
-    "point": Array [
+    "point": [
       114.32291407839905,
       -174.86407148530176,
     ],
     "pressure": 0.5,
     "runningLength": 221.23927996630948,
-    "vector": Array [
+    "vector": [
       -0.5972578439496682,
       0.8020492926501425,
     ],
   },
-  Object {
+  {
     "distance": 4.895545802379959,
-    "point": Array [
+    "point": [
       117.07778426253444,
       -178.91092939876523,
     ],
     "pressure": 0.5,
     "runningLength": 226.13482576868944,
-    "vector": Array [
+    "vector": [
       -0.5627299376498756,
       0.8266408030532771,
     ],
   },
-  Object {
+  {
     "distance": 4.217953011633133,
-    "point": Array [
+    "point": [
       119.53712026368454,
       -182.3377054407312,
     ],
     "pressure": 0.5,
     "runningLength": 230.35277878032258,
-    "vector": Array [
+    "vector": [
       -0.5830638687456324,
       0.8124263197135947,
     ],
   },
-  Object {
+  {
     "distance": 3.497222535707202,
-    "point": Array [
+    "point": [
       121.51409615061961,
       -185.22251597293877,
     ],
     "pressure": 0.5,
     "runningLength": 233.8500013160298,
-    "vector": Array [
+    "vector": [
       -0.565298852660883,
       0.8248861783181296,
     ],
   },
-  Object {
+  {
     "distance": 2.739060981285646,
-    "point": Array [
+    "point": [
       123.10768994579016,
       -187.45027580631296,
     ],
     "pressure": 0.5,
     "runningLength": 236.58906229731542,
-    "vector": Array [
+    "vector": [
       -0.5818029631536555,
       0.8133297683385419,
     ],
   },
-  Object {
+  {
     "distance": 2.0301751591789534,
-    "point": Array [
+    "point": [
       124.16165683034923,
       -189.18543141409,
     ],
     "pressure": 0.5,
     "runningLength": 238.61923745649437,
-    "vector": Array [
+    "vector": [
       -0.5191507145547584,
       0.8546827104705486,
     ],
   },
-  Object {
+  {
     "distance": 1.4607992742301301,
-    "point": Array [
+    "point": [
       125.08543751709261,
       -190.31705138669176,
     ],
     "pressure": 0.5,
     "runningLength": 240.08003673072452,
-    "vector": Array [
+    "vector": [
       -0.6323803023726413,
       0.7746580879143306,
     ],
   },
-  Object {
+  {
     "distance": 0.9258989583719713,
-    "point": Array [
+    "point": [
       125.71596668936145,
       -190.99507929469576,
     ],
     "pressure": 0.5,
     "runningLength": 241.00593568909648,
-    "vector": Array [
+    "vector": [
       -0.6809913398947008,
       0.7322914686027825,
     ],
   },
-  Object {
+  {
     "distance": 0.5470479945680538,
-    "point": Array [
+    "point": [
       126.10290277777715,
       -191.38178586542153,
     ],
     "pressure": 0.5,
     "runningLength": 241.55298368366454,
-    "vector": Array [
+    "vector": [
       -0.707316528454176,
       0.7068969716836627,
     ],
   },
-  Object {
+  {
     "distance": 0.962780602884918,
-    "point": Array [
+    "point": [
       126.32683121045456,
       -190.44540851289207,
     ],
     "pressure": 0.5,
     "runningLength": 242.51576428654946,
-    "vector": Array [
+    "vector": [
       -0.2325851102592036,
       -0.9725760466337395,
     ],
   },
-  Object {
+  {
     "distance": 2.102038752198736,
-    "point": Array [
+    "point": [
       126.45174109189281,
       -188.34708431552306,
     ],
     "pressure": 0.5,
     "runningLength": 244.61780303874818,
-    "vector": Array [
+    "vector": [
       -0.05942320583176708,
       -0.998232879947698,
     ],
   },
-  Object {
+  {
     "distance": 3.180195854918988,
-    "point": Array [
+    "point": [
       126.51969794027924,
       -185.16761462036928,
     ],
     "pressure": 0.5,
     "runningLength": 247.79799889366717,
-    "vector": Array [
+    "vector": [
       -0.02136876201549582,
       -0.9997716619358269,
     ],
   },
-  Object {
+  {
     "distance": 4.507761871142225,
-    "point": Array [
+    "point": [
       126.55601467523107,
       -180.65999904429293,
     ],
     "pressure": 0.5,
     "runningLength": 252.3057607648094,
-    "vector": Array [
+    "vector": [
       -0.008056489226797298,
       -0.999967545964037,
     ],
   },
-  Object {
+  {
     "distance": 6.081437255467316,
-    "point": Array [
+    "point": [
       126.57516682477937,
       -174.57859194664246,
     ],
     "pressure": 0.5,
     "runningLength": 258.38719802027674,
-    "vector": Array [
+    "vector": [
       -0.0031492801362188443,
       -0.9999950410050158,
     ],
   },
-  Object {
+  {
     "distance": 7.82993963915608,
-    "point": Array [
+    "point": [
       126.5851652569343,
       -166.74865869123204,
     ],
     "pressure": 0.5,
     "runningLength": 266.2171376594328,
-    "vector": Array [
+    "vector": [
       -0.001276948816428891,
       -0.9999991847005277,
     ],
   },
-  Object {
+  {
     "distance": 9.70463262941624,
-    "point": Array [
+    "point": [
       126.01534397489863,
       -157.06076943822808,
     ],
     "pressure": 0.5,
     "runningLength": 275.9217702888491,
-    "vector": Array [
+    "vector": [
       0.05871641965183304,
       -0.9982747027062592,
     ],
   },
-  Object {
+  {
     "distance": 14.902779371041962,
-    "point": Array [
+    "point": [
       124.04863462218268,
       -142.28833269597416,
     ],
     "pressure": 0.5,
     "runningLength": 290.82454965989103,
-    "vector": Array [
+    "vector": [
       0.1319692994004544,
       -0.991253804035956,
     ],
   },
-  Object {
+  {
     "distance": 14.374199688085874,
-    "point": Array [
+    "point": [
       121.77551549335298,
       -128.09500517565263,
     ],
     "pressure": 0.5,
     "runningLength": 305.1987493479769,
-    "vector": Array [
+    "vector": [
       0.15813883055442574,
       -0.9874168877788543,
     ],
   },
-  Object {
+  {
     "distance": 15.14484122230329,
-    "point": Array [
+    "point": [
       118.94080603663768,
       -113.21782002708417,
     ],
     "pressure": 0.5,
     "runningLength": 320.3435905702802,
-    "vector": Array [
+    "vector": [
       0.1871732700994397,
       -0.9823269145046787,
     ],
   },
-  Object {
+  {
     "distance": 16.200796775076686,
-    "point": Array [
+    "point": [
       115.93923760405234,
       -97.29750586272667,
     ],
     "pressure": 0.5,
     "runningLength": 336.5443873453569,
-    "vector": Array [
+    "vector": [
       0.18527288961509342,
       -0.9826871101086414,
     ],
   },
-  Object {
+  {
     "distance": 17.63107618882056,
-    "point": Array [
+    "point": [
       112.61516256346292,
       -79.98261710476677,
     ],
     "pressure": 0.5,
     "runningLength": 354.1754635341774,
-    "vector": Array [
+    "vector": [
       0.18853500518006586,
       -0.9820664701646995,
     ],
   },
-  Object {
+  {
     "distance": 17.88410541196038,
-    "point": Array [
+    "point": [
       109.02822644284207,
       -62.46191176357985,
     ],
     "pressure": 0.5,
     "runningLength": 372.0595689461378,
-    "vector": Array [
+    "vector": [
       0.20056558815751596,
       -0.9796802768490492,
     ],
   },
-  Object {
+  {
     "distance": 18.097472444217743,
-    "point": Array [
+    "point": [
       105.26667647739305,
       -44.75967318404842,
     ],
     "pressure": 0.5,
     "runningLength": 390.1570413903555,
-    "vector": Array [
+    "vector": [
       0.2078494650036536,
       -0.9781608251702247,
     ],
   },
-  Object {
+  {
     "distance": 17.337500717884573,
-    "point": Array [
+    "point": [
       101.68696668498461,
       -27.79575238298408,
     ],
     "pressure": 0.5,
     "runningLength": 407.49454210824007,
-    "vector": Array [
+    "vector": [
       0.2064720775305158,
       -0.978452493072726,
     ],
   },
-  Object {
+  {
     "distance": 15.915530404613184,
-    "point": Array [
+    "point": [
       98.88756449466473,
       -12.128351340149981,
     ],
     "pressure": 0.5,
     "runningLength": 423.4100725128533,
-    "vector": Array [
+    "vector": [
       0.17589122819987593,
       -0.9844096077560089,
     ],
   },
-  Object {
+  {
     "distance": 14.821236625220607,
-    "point": Array [
+    "point": [
       96.48380579950563,
       2.4966614542453716,
     ],
     "pressure": 0.5,
     "runningLength": 438.23130913807387,
-    "vector": Array [
+    "vector": [
       0.16218340992334837,
       -0.9867606303180296,
     ],
   },
-  Object {
+  {
     "distance": 14.109455017507758,
-    "point": Array [
+    "point": [
       94.28020197192643,
       16.432975567458847,
     ],
     "pressure": 0.5,
     "runningLength": 452.3407641555816,
-    "vector": Array [
+    "vector": [
       0.15617923051208235,
       -0.9877287319687799,
     ],
   },
-  Object {
+  {
     "distance": 13.072392682203668,
-    "point": Array [
+    "point": [
       92.46516715413699,
       29.37875090337226,
     ],
     "pressure": 0.5,
     "runningLength": 465.41315683778527,
-    "vector": Array [
+    "vector": [
       0.13884488187540206,
       -0.9903141414606809,
     ],
   },
-  Object {
+  {
     "distance": 11.663874291144595,
-    "point": Array [
+    "point": [
       91.25452576104234,
       40.97962634003434,
     ],
     "pressure": 0.5,
     "runningLength": 477.0770311289299,
-    "vector": Array [
+    "vector": [
       0.10379410501824306,
       -0.9945988054303413,
     ],
   },
-  Object {
+  {
     "distance": 10.616604071987766,
-    "point": Array [
+    "point": [
       90.23287737121004,
       51.54695886006513,
     ],
     "pressure": 0.5,
     "runningLength": 487.69363520091764,
-    "vector": Array [
+    "vector": [
       0.09623118493492266,
       -0.9953590101295214,
     ],
   },
-  Object {
+  {
     "distance": 9.92096460621714,
-    "point": Array [
+    "point": [
       89.54511390664776,
       61.44405541080295,
     ],
     "pressure": 0.5,
     "runningLength": 497.61459980713477,
-    "vector": Array [
+    "vector": [
       0.06932425342302723,
       -0.9975941799586341,
     ],
   },
-  Object {
+  {
     "distance": 8.070144886746771,
-    "point": Array [
+    "point": [
       89.12603298476704,
       69.5033115597289,
     ],
     "pressure": 0.5,
     "runningLength": 505.68474469388156,
-    "vector": Array [
+    "vector": [
       0.051929789088292294,
       -0.9986507382489865,
     ],
   },
-  Object {
+  {
     "distance": 6.793472802911069,
-    "point": Array [
+    "point": [
       88.88453286824685,
       76.29249048045364,
     ],
     "pressure": 0.5,
     "runningLength": 512.4782174967926,
-    "vector": Array [
+    "vector": [
       0.035548845712122475,
       -0.9993679400343678,
     ],
   },
-  Object {
+  {
     "distance": 6.293832305936466,
-    "point": Array [
+    "point": [
       88.75019995636531,
       82.58488905047723,
     ],
     "pressure": 0.5,
     "runningLength": 518.772049802729,
-    "vector": Array [
+    "vector": [
       0.02134357977012477,
       -0.9997721998548452,
     ],
   },
-  Object {
+  {
     "distance": 5.815725565714784,
-    "point": Array [
+    "point": [
       88.67726078763545,
       88.40015720709508,
     ],
     "pressure": 0.5,
     "runningLength": 524.5877753684438,
-    "vector": Array [
+    "vector": [
       0.012541714340830585,
       -0.9999213496077544,
     ],
   },
-  Object {
+  {
     "distance": 4.904642796563393,
-    "point": Array [
+    "point": [
       88.63833780033514,
       93.30464555583654,
     ],
     "pressure": 0.5,
     "runningLength": 529.4924181650072,
-    "vector": Array [
+    "vector": [
       0.00793594741039715,
       -0.9999685098735356,
     ],
   },
-  Object {
+  {
     "distance": 4.163457729111344,
-    "point": Array [
+    "point": [
       88.61783361043746,
       97.4680527951411,
     ],
     "pressure": 0.5,
     "runningLength": 533.6558758941185,
-    "vector": Array [
+    "vector": [
       0.004924798384360017,
       -0.999987873106906,
     ],
   },
-  Object {
+  {
     "distance": 3.0964663930645253,
-    "point": Array [
+    "point": [
       88.60713836958341,
       100.56450071739026,
     ],
     "pressure": 0.5,
     "runningLength": 536.752342287183,
-    "vector": Array [
+    "vector": [
       0.003454014833812881,
       -0.9999940348729727,
     ],
   },
-  Object {
+  {
     "distance": 2.554496288339574,
-    "point": Array [
+    "point": [
       88.60160241214668,
       103.11899100711851,
     ],
     "pressure": 0.5,
     "runningLength": 539.3068385755225,
-    "vector": Array [
+    "vector": [
       0.002167142485978238,
       -0.9999976517439655,
     ],
   },
-  Object {
+  {
     "distance": 1.7049107133064463,
-    "point": Array [
+    "point": [
       88.59875439019919,
       104.82389934163919,
     ],
     "pressure": 0.5,
     "runningLength": 541.0117492888289,
-    "vector": Array [
+    "vector": [
       0.0016704815831454498,
       -0.9999986047446668,
     ],
   },
-  Object {
+  {
     "distance": 1.0342120506278043,
-    "point": Array [
+    "point": [
       88.59729636085305,
       105.85811036450357,
     ],
     "pressure": 0.5,
     "runningLength": 542.0459613394568,
-    "vector": Array [
+    "vector": [
       0.0014097972898828425,
       -0.9999990062353069,
     ],
   },
-  Object {
+  {
     "distance": 0.8818524884675063,
-    "point": Array [
+    "point": [
       88.59655288837173,
       106.73996253956751,
     ],
     "pressure": 0.5,
     "runningLength": 542.9278138279243,
-    "vector": Array [
+    "vector": [
       0.0008430803235697883,
       -0.9999996446077208,
     ],
   },
-  Object {
+  {
     "distance": 0.5959435393803407,
-    "point": Array [
+    "point": [
       88.59617500756256,
       107.33590595914295,
     ],
     "pressure": 0.5,
     "runningLength": 543.5237573673046,
-    "vector": Array [
+    "vector": [
       0.0006340882721222839,
       -0.9999997989660114,
     ],
   },
-  Object {
+  {
     "distance": 0.07635431618184173,
-    "point": Array [
+    "point": [
       88.59598345571636,
       107.41226003504913,
     ],
     "pressure": 0.5,
     "runningLength": 543.6001116834865,
-    "vector": Array [
+    "vector": [
       0.0025087232232387413,
       -0.999996853148943,
     ],
   },
-  Object {
+  {
     "distance": 1.4935104595891049,
-    "point": Array [
+    "point": [
       88.59588656993058,
       105.91874957860257,
     ],
     "pressure": 0.5,
     "runningLength": 545.0936221430755,
-    "vector": Array [
+    "vector": [
       0.00006487117994914303,
       0.9999999978958652,
     ],
   },
-  Object {
+  {
     "distance": 3.4583664008650974,
-    "point": Array [
+    "point": [
       88.02083765534607,
       102.50852716525945,
     ],
     "pressure": 0.5,
     "runningLength": 548.5519885439406,
-    "vector": Array [
+    "vector": [
       0.16627761432122037,
       0.9860789800901565,
     ],
   },
-  Object {
+  {
     "distance": 5.3229681795553585,
-    "point": Array [
+    "point": [
       86.62643799758486,
       97.37144240491197,
     ],
     "pressure": 0.5,
     "runningLength": 553.874956723496,
-    "vector": Array [
+    "vector": [
       0.2619590444137674,
       0.9650789910933849,
     ],
   },
-  Object {
+  {
     "distance": 6.919157434484671,
-    "point": Array [
+    "point": [
       84.59631620850494,
       90.75681126442595,
     ],
     "pressure": 0.5,
     "runningLength": 560.7941141579806,
-    "vector": Array [
+    "vector": [
       0.29340592525932524,
       0.9559879512957887,
     ],
   },
-  Object {
+  {
     "distance": 7.997032652776918,
-    "point": Array [
+    "point": [
       82.1522634808803,
       83.14240797105025,
     ],
     "pressure": 0.5,
     "runningLength": 568.7911468107576,
-    "vector": Array [
+    "vector": [
       0.3056199510172026,
       0.9521535829582551,
     ],
   },
-  Object {
+  {
     "distance": 9.387015518879041,
-    "point": Array [
+    "point": [
       78.88541558800695,
       74.34219404203097,
     ],
     "pressure": 0.5,
     "runningLength": 578.1781623296366,
-    "vector": Array [
+    "vector": [
       0.34801773644702116,
       0.9374879493189721,
     ],
   },
-  Object {
+  {
     "distance": 10.890395533528189,
-    "point": Array [
+    "point": [
       75.23294249171936,
       64.08255685753043,
     ],
     "pressure": 0.5,
     "runningLength": 589.0685578631648,
-    "vector": Array [
+    "vector": [
       0.3353847970941688,
       0.9420812267942203,
     ],
   },
-  Object {
+  {
     "distance": 12.55663290724631,
-    "point": Array [
+    "point": [
       70.53611005488891,
       52.43743792178408,
     ],
     "pressure": 0.5,
     "runningLength": 601.6251907704111,
-    "vector": Array [
+    "vector": [
       0.3740519032072644,
       0.9274077709977544,
     ],
   },
-  Object {
+  {
     "distance": 12.775648943504379,
-    "point": Array [
+    "point": [
       65.53019058378187,
       40.68337580792506,
     ],
     "pressure": 0.5,
     "runningLength": 614.4008397139155,
-    "vector": Array [
+    "vector": [
       0.3918328918745245,
       0.9200364040869509,
     ],
   },
-  Object {
+  {
     "distance": 12.623279098873876,
-    "point": Array [
+    "point": [
       60.46029196583433,
       29.12295612645157,
     ],
     "pressure": 0.5,
     "runningLength": 627.0241188127894,
-    "vector": Array [
+    "vector": [
       0.4016308740571085,
       0.915801638458964,
     ],
   },
-  Object {
+  {
     "distance": 12.816133467113609,
-    "point": Array [
+    "point": [
       55.1093936318431,
       17.47730612028363,
     ],
     "pressure": 0.5,
     "runningLength": 639.840252279903,
-    "vector": Array [
+    "vector": [
       0.41751268802885966,
       0.9086710930446265,
     ],
   },
-  Object {
+  {
     "distance": 12.528782852445586,
-    "point": Array [
+    "point": [
       50.087166129215056,
       5.999169046891403,
     ],
     "pressure": 0.5,
     "runningLength": 652.3690351323486,
-    "vector": Array [
+    "vector": [
       0.40085517977093166,
       0.9161414327770653,
     ],
   },
-  Object {
+  {
     "distance": 11.69769660901797,
-    "point": Array [
+    "point": [
       45.42867158525726,
       -4.7309071196857015,
     ],
     "pressure": 0.5,
     "runningLength": 664.0667317413665,
-    "vector": Array [
+    "vector": [
       0.39824032881537325,
       0.9172811131300063,
     ],
   },
-  Object {
+  {
     "distance": 10.726540728707697,
-    "point": Array [
+    "point": [
       41.036787476404754,
       -14.517123445673692,
     ],
     "pressure": 0.5,
     "runningLength": 674.7932724700743,
-    "vector": Array [
+    "vector": [
       0.4094408644809789,
       0.9123366585274697,
     ],
   },
-  Object {
+  {
     "distance": 10.268023904521122,
-    "point": Array [
+    "point": [
       36.81422476630722,
       -23.876732361814952,
     ],
     "pressure": 0.5,
     "runningLength": 685.0612963745954,
-    "vector": Array [
+    "vector": [
       0.411234211116152,
       0.9115297162504776,
     ],
   },
-  Object {
+  {
     "distance": 9.407752167503217,
-    "point": Array [
+    "point": [
       32.97912963259816,
       -32.46729963997316,
     ],
     "pressure": 0.5,
     "runningLength": 694.4690485420986,
-    "vector": Array [
+    "vector": [
       0.4076526534102865,
       0.9131370730441039,
     ],
   },
-  Object {
+  {
     "distance": 7.804886084194762,
-    "point": Array [
+    "point": [
       29.753961209813,
       -39.57465747758951,
     ],
     "pressure": 0.5,
     "runningLength": 702.2739346262933,
-    "vector": Array [
+    "vector": [
       0.41322427873947676,
       0.9106292854176387,
     ],
   },
-  Object {
+  {
     "distance": 6.5055196761937815,
-    "point": Array [
+    "point": [
       27.010638134649906,
       -45.473467930775996,
     ],
     "pressure": 0.5,
     "runningLength": 708.7794543024871,
-    "vector": Array [
+    "vector": [
       0.4216916113868622,
       0.9067393147349195,
     ],
   },
-  Object {
+  {
     "distance": 5.9054570947967875,
-    "point": Array [
+    "point": [
       24.58341257996588,
       -50.857054059480035,
     ],
     "pressure": 0.5,
     "runningLength": 714.6849113972839,
-    "vector": Array [
+    "vector": [
       0.41101400208675093,
       0.9116290309597607,
     ],
   },
-  Object {
+  {
     "distance": 5.8799370641164606,
-    "point": Array [
+    "point": [
       21.771185095355325,
       -56.02087400722913,
     ],
     "pressure": 0.5,
     "runningLength": 720.5648484614004,
-    "vector": Array [
+    "vector": [
       0.4782750995368232,
       0.8782100712033778,
     ],
   },
-  Object {
+  {
     "distance": 4.830578013304732,
-    "point": Array [
+    "point": [
       19.398160102460913,
       -60.22839540654745,
     ],
     "pressure": 0.5,
     "runningLength": 725.3954264747051,
-    "vector": Array [
+    "vector": [
       0.4912507336303134,
       0.8710182068749648,
     ],
   },
-  Object {
+  {
     "distance": 4.0092454660723496,
-    "point": Array [
+    "point": [
       17.225710324513337,
       -63.59804096202019,
     ],
     "pressure": 0.5,
     "runningLength": 729.4046719407775,
-    "vector": Array [
+    "vector": [
       0.5418600074082801,
       0.8404687575225498,
     ],
   },
-  Object {
+  {
     "distance": 2.927028874777048,
-    "point": Array [
+    "point": [
       15.720462090901881,
       -66.10836480347734,
     ],
     "pressure": 0.5,
     "runningLength": 732.3317008155545,
-    "vector": Array [
+    "vector": [
       0.5142580746580815,
       0.8576354893828515,
     ],
   },
-  Object {
+  {
     "distance": 2.251527265939797,
-    "point": Array [
+    "point": [
       14.502253052625145,
       -68.00186467628727,
     ],
     "pressure": 0.5,
     "runningLength": 734.5832280814943,
-    "vector": Array [
+    "vector": [
       0.5410589765912742,
       0.8409846513759943,
     ],
   },
-  Object {
+  {
     "distance": 1.7081788842198193,
-    "point": Array [
+    "point": [
       13.695274941861591,
       -69.50740824232678,
     ],
     "pressure": 0.5,
     "runningLength": 736.2914069657141,
-    "vector": Array [
+    "vector": [
       0.4724201418355121,
       0.8813734790587443,
     ],
   },
-  Object {
+  {
     "distance": 1.1037900582290139,
-    "point": Array [
+    "point": [
       13.207689610039116,
       -70.49766731794122,
     ],
     "pressure": 0.5,
     "runningLength": 737.3951970239432,
-    "vector": Array [
+    "vector": [
       0.4417373831077853,
       0.8971444055251563,
     ],
   },
-  Object {
+  {
     "distance": 0.8226886166682859,
-    "point": Array [
+    "point": [
       12.640656026640585,
       -71.09372895510117,
     ],
     "pressure": 0.5,
     "runningLength": 738.2178856406115,
-    "vector": Array [
+    "vector": [
       0.6892444746529947,
       0.724528849777783,
     ],
@@ -1258,30 +1258,30 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a line with a single point: get-stroke-points-one-point 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a line with a single point > get-stroke-points-one-point 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       464.91,
       286.51,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 0.8131727983645136,
-    "point": Array [
+    "point": [
       465.485,
       287.085,
     ],
     "pressure": 0.5,
     "runningLength": 0.8131727983645136,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
@@ -1289,173 +1289,173 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a line with duplicates: get-stroke-points-with-duplicates 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a line with duplicates > get-stroke-points-with-duplicates 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       0,
       0,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       -0.7071067811865476,
       -0.7071067811865476,
     ],
   },
-  Object {
+  {
     "distance": 8.131727983645296,
-    "point": Array [
+    "point": [
       5.75,
       5.75,
     ],
     "pressure": 0.5,
     "runningLength": 16.263455967290593,
-    "vector": Array [
+    "vector": [
       -0.7071067811865476,
       -0.7071067811865476,
     ],
   },
-  Object {
+  {
     "distance": 3.455984393049251,
-    "point": Array [
+    "point": [
       8.19375,
       8.19375,
     ],
     "pressure": 0.5,
     "runningLength": 19.719440360339846,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 1.4687933670459323,
-    "point": Array [
+    "point": [
       9.23234375,
       9.23234375,
     ],
     "pressure": 0.5,
     "runningLength": 21.18823372738578,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 0.6242371809945199,
-    "point": Array [
+    "point": [
       9.67374609375,
       9.67374609375,
     ],
     "pressure": 0.5,
     "runningLength": 21.8124709083803,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 73.45085265473034,
-    "point": Array [
+    "point": [
       61.611342089843745,
       61.611342089843745,
     ],
     "pressure": 0.5,
     "runningLength": 95.26332356311065,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 31.216612378260407,
-    "point": Array [
+    "point": [
       83.6848203881836,
       83.6848203881836,
     ],
     "pressure": 0.5,
     "runningLength": 126.47993594137105,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 13.267060260760665,
-    "point": Array [
+    "point": [
       93.06604866497803,
       93.06604866497803,
     ],
     "pressure": 0.5,
     "runningLength": 139.74699620213173,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 5.638500610823275,
-    "point": Array [
+    "point": [
       97.05307068261565,
       97.05307068261565,
     ],
     "pressure": 0.5,
     "runningLength": 145.385496812955,
-    "vector": Array [
+    "vector": [
       -0.7071067811865475,
       -0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 2.3963627595998958,
-    "point": Array [
+    "point": [
       98.74755504011165,
       98.74755504011165,
     ],
     "pressure": 0.5,
     "runningLength": 147.7818595725549,
-    "vector": Array [
+    "vector": [
       -0.7071067811865476,
       -0.7071067811865476,
     ],
   },
-  Object {
+  {
     "distance": 1.0184541728299592,
-    "point": Array [
+    "point": [
       99.46771089204745,
       99.46771089204745,
     ],
     "pressure": 0.5,
     "runningLength": 148.80031374538487,
-    "vector": Array [
+    "vector": [
       -0.7071067811865476,
       -0.7071067811865476,
     ],
   },
-  Object {
+  {
     "distance": 80.88443681300024,
-    "point": Array [
+    "point": [
       42.27377712912017,
       42.27377712912017,
     ],
     "pressure": 0.5,
     "runningLength": 229.6847505583851,
-    "vector": Array [
+    "vector": [
       0.7071067811865475,
       0.7071067811865475,
     ],
   },
-  Object {
+  {
     "distance": 34.3758856455251,
-    "point": Array [
+    "point": [
       17.966355279876073,
       17.966355279876073,
     ],
     "pressure": 0.5,
     "runningLength": 264.06063620391024,
-    "vector": Array [
+    "vector": [
       0.7071067811865475,
       0.7071067811865475,
     ],
@@ -1463,19 +1463,19 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a line with no points: get-stroke-points-no-points 1`] = `Array []`;
+exports[`getStrokePoints > get stroke points from a line with no points > get-stroke-points-no-points 1`] = `[]`;
 
-exports[`getStrokePoints get stroke points from a line with two equal points: get-stroke-points-two-equal-points 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a line with two equal points > get-stroke-points-two-equal-points 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       1,
       1,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       0,
       0,
     ],
@@ -1483,69 +1483,69 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a line with two points: get-stroke-points-two-point 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a line with two points > get-stroke-points-two-point 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       10,
       200,
     ],
     "pressure": 0.25,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       0,
       1,
     ],
   },
-  Object {
+  {
     "distance": 28.75,
-    "point": Array [
+    "point": [
       10,
       171.25,
     ],
     "pressure": 0.5,
     "runningLength": 28.75,
-    "vector": Array [
+    "vector": [
       0,
       1,
     ],
   },
-  Object {
+  {
     "distance": 40.96875,
-    "point": Array [
+    "point": [
       10,
       130.28125,
     ],
     "pressure": 0.5,
     "runningLength": 69.71875,
-    "vector": Array [
+    "vector": [
       0,
       1,
     ],
   },
-  Object {
+  {
     "distance": 46.161718750000006,
-    "point": Array [
+    "point": [
       10,
       84.11953125,
     ],
     "pressure": 0.5,
     "runningLength": 115.88046875,
-    "vector": Array [
+    "vector": [
       0,
       1,
     ],
   },
-  Object {
+  {
     "distance": 48.368730468749995,
-    "point": Array [
+    "point": [
       10,
       35.75080078125,
     ],
     "pressure": 0.5,
     "runningLength": 164.24919921875,
-    "vector": Array [
+    "vector": [
       0,
       1,
     ],
@@ -1553,56 +1553,56 @@ Array [
 ]
 `;
 
-exports[`getStrokePoints get stroke points from a object input points: get-stroke-points-object-pairs 1`] = `
-Array [
-  Object {
+exports[`getStrokePoints > get stroke points from a object input points > get-stroke-points-object-pairs 1`] = `
+[
+  {
     "distance": 0,
-    "point": Array [
+    "point": [
       0,
       0,
     ],
     "pressure": 0.5,
     "runningLength": 0,
-    "vector": Array [
+    "vector": [
       -1,
       0,
     ],
   },
-  Object {
+  {
     "distance": 11.5,
-    "point": Array [
+    "point": [
       11.5,
       0,
     ],
     "pressure": 0.5,
     "runningLength": 17.25,
-    "vector": Array [
+    "vector": [
       -1,
       0,
     ],
   },
-  Object {
+  {
     "distance": 8.277803528110582,
-    "point": Array [
+    "point": [
       19.2625,
       2.875,
     ],
     "pressure": 0.5,
     "runningLength": 25.52780352811058,
-    "vector": Array [
+    "vector": [
       -0.9377487607237036,
       -0.347314355823594,
     ],
   },
-  Object {
+  {
     "distance": 6.293808566323833,
-    "point": Array [
+    "point": [
       25.4365625,
       4.096875,
     ],
     "pressure": 0.5,
     "runningLength": 31.821612094434414,
-    "vector": Array [
+    "vector": [
       -0.9809739897453262,
       -0.19413920635239276,
     ],

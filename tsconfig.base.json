@@ -19,8 +19,8 @@
     "sourceMap": true,
     "strict": true,
     "target": "ES2020",
-    "typeRoots": ["node_modules/@types", "node_modules/jest"],
-    "types": ["node", "jest"],
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"],
     "jsx": "preserve",
     "lib": ["dom", "ES2021"],
     "module": "ESNext"

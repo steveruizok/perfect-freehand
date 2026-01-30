@@ -34,15 +34,15 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 4. Migrate to Vitest
 
-- [ ] Replace Jest with **Vitest**
+- [x] Replace Jest with **Vitest**
   - Native ESM and TypeScript support (no ts-jest needed)
   - Compatible with Jest syntax (minimal test changes)
   - Integrates with Vite for fast HMR in watch mode
-- [ ] Remove Jest dependencies: `jest`, `ts-jest`, `@types/jest`
-- [ ] Remove `@testing-library/jest-dom` (use `@testing-library/jest-dom/vitest`)
-- [ ] Create `vitest.config.ts`
-- [ ] Update test scripts in `package.json`
-- [ ] Remove Babel dependencies if no longer needed (Vitest handles TS natively)
+- [x] Remove Jest dependencies: `jest`, `ts-jest`, `@types/jest`
+- [x] Remove `@testing-library/jest-dom` (use `@testing-library/jest-dom/vitest`)
+- [x] Create `vitest.config.ts`
+- [x] Update test scripts in `package.json`
+- [x] Remove Babel dependencies if no longer needed (Vitest handles TS natively)
 
 ### 5. Migrate to Rolldown (Library Build)
 
@@ -68,11 +68,12 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ## Medium Priority
 
-### 7. Update Babel Dependencies (if still needed)
+### 7. ~~Update Babel Dependencies~~ (No longer needed)
 
-- [ ] Update all `@babel/*` packages from `^7.15.0` to `^7.23.x`
-- [ ] Consider if Babel is still needed (esbuild handles transpilation)
-- [ ] If only used for Jest, Vitest would eliminate this dependency
+- [x] ~~Update all `@babel/*` packages from `^7.15.0` to `^7.23.x`~~
+- [x] ~~Consider if Babel is still needed (esbuild handles transpilation)~~
+- [x] ~~If only used for Jest, Vitest would eliminate this dependency~~
+- Note: Babel dependencies were only used for Jest/ts-jest. With Vitest migration complete, Babel has been removed.
 
 ### 8. Modernize CI/CD Pipeline
 
@@ -166,8 +167,7 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | TypeScript  | 5.7.0              | 5.7+   | Up to date |
 | lazyrepo    | 0.0.0-alpha.27     | alpha  | Up to date |
 | ESLint      | 9.x                | 9.x    | Up to date |
-| Jest        | 27.1.0             | 29.x   | 2 major    |
+| Vitest      | 3.0.0              | 3.x    | Up to date |
 | TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
 | Husky       | 7.0.0              | 9.x    | 2 major    |
 | @types/node | 20.11.0            | 20.x   | Up to date |
-| Babel       | 7.15.0             | 7.23.x | 8 minor    |
