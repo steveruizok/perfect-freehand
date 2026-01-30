@@ -67,6 +67,7 @@ The `StrokeOptions` interface controls stroke appearance:
 | `lazy.config.js` | lazyrepo task orchestration config |
 | `vitest.config.ts` | Vitest test runner configuration |
 | `packages/perfect-freehand/rolldown.config.mjs` | Rolldown bundler config for library |
+| `packages/dev/vite.config.ts` | Vite config for dev app |
 | `package.json` | Contains Prettier config, workspace definitions |
 | `.github/workflows/main.yml` | CI pipeline (build + test) |
 | `.husky/pre-commit` | Git pre-commit hook |
@@ -79,8 +80,10 @@ The `StrokeOptions` interface controls stroke appearance:
 - Outputs to `dist/` directory (cjs/, esm/, types/)
 
 **Dev App (`packages/dev/`):**
-- Uses esbuild via `esbuild.config.mjs`
-- Includes `esbuild-css-modules-plugin` for CSS modules
+- Uses **Vite** (`vite.config.ts`) - Fast dev server with HMR
+- Built-in CSS modules support (files ending in `.module.css`)
+- React plugin via `@vitejs/plugin-react`
+- Dev server runs on port 5420
 
 ### Current Dependency Versions (as of last audit)
 
@@ -91,6 +94,7 @@ The `StrokeOptions` interface controls stroke appearance:
 | ESLint | 9.x | Flat config `eslint.config.mjs` with typescript-eslint |
 | Vitest | 3.x | Native ESM and TypeScript support |
 | Rolldown | 1.0.0-rc.2 | Rust-based bundler for library builds |
+| Vite | 6.x | Dev server and build tool for dev app |
 | Husky | 7.0.0 | Pre-commit hook only |
 | @types/node | 20.11.0 | Updated |
 
@@ -100,6 +104,6 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Replace Lerna with lazyrepo (keep yarn workspaces)~~ Done
 - ~~Migrate Jest → Vitest~~ Done
 - ~~Migrate esbuild scripts → Rolldown (library)~~ Done
-- Migrate dev app esbuild → Vite (pending)
+- ~~Migrate dev app esbuild → Vite~~ Done
 - ~~Upgrade TypeScript to 5.x with `strict: true`~~ Done
 - ~~Upgrade ESLint to 9.x with flat config~~ Done

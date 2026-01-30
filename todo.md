@@ -56,13 +56,13 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 6. Migrate Dev App to Vite
 
-- [ ] Replace custom esbuild dev server with **Vite**
+- [x] Replace custom esbuild dev server with **Vite**
   - Fast HMR, native ESM, excellent DX
   - Vite 6+ uses Rolldown under the hood
-- [ ] Create `packages/dev/vite.config.ts`
-- [ ] Remove `packages/dev/esbuild.config.mjs`
-- [ ] Remove `esbuild` and `esbuild-css-modules-plugin` dependencies
-- [ ] Vite has built-in CSS modules support
+- [x] Create `packages/dev/vite.config.ts`
+- [x] Remove `packages/dev/esbuild.config.mjs`
+- [x] Remove `esbuild` and `esbuild-css-modules-plugin` dependencies
+- [x] Vite has built-in CSS modules support
 
 ---
 
@@ -154,7 +154,7 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | ESLint upgrade      | 4     | Medium     | Medium |
 | Vitest migration    | 6     | Medium     | High   |
 | Rolldown (library)  | 4     | Medium     | High   |
-| Vite (dev app)      | 5     | Medium     | Medium |
+| Vite (dev app)      | 5     | Done       | Medium |
 | CI/CD improvements  | 5     | Low        | Medium |
 | Configuration files | 4     | Low        | Low    |
 
@@ -169,6 +169,7 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | ESLint      | 9.x                | 9.x    | Up to date |
 | Vitest      | 3.0.0              | 3.x    | Up to date |
 | Rolldown    | 1.0.0-rc.2         | 1.x RC | Up to date |
+| Vite        | 6.0.0+             | 6.x    | Up to date |
 | TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
 | Husky       | 7.0.0              | 9.x    | 2 major    |
 | @types/node | 20.11.0            | 20.x   | Up to date |
