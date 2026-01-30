@@ -116,9 +116,9 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 13. Dev App Dependencies
 
-- [ ] Update `zustand` from `^4.0.0-rc.1` to stable `^4.x` or `^5.x`
-- [ ] Update `@testing-library/react` from `^12.0.0` to `^16.x`
-- [ ] Update Radix UI components to latest versions
+- [x] Update `zustand` from `^4.0.0-rc.1` to stable `^4.x` or `^5.x`
+- [x] Update `@testing-library/react` from `^12.0.0` to `^16.x`
+- [x] Update Radix UI components to latest versions
 
 ### 14. Package.json Cleanup
 

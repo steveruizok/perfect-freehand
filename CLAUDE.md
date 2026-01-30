@@ -139,3 +139,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Upgrade TypeDoc to 0.28.x with modern config and CI integration~~ Done
 - ~~Add missing configuration files (.editorconfig, .nvmrc, engines, Dependabot)~~ Done
 - ~~Improve Git Hooks (Husky 9.x, lint-staged, pre-push tests, commitlint)~~ Done
+- ~~Update dev app dependencies (zustand 5.x, Radix UI latest, @testing-library/react 16.x)~~ Done
