@@ -1,20 +1,33 @@
 name: CI
-on: push
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
     steps:
-      - uses: actions/checkout@v2
-      # install modules
-      - name: Install modules
-        run: yarn
-      # build
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Build
         run: yarn build:packages
-      # run unit tests
-      - name: Jest Annotations & Coverage
-        uses: mattallty/jest-github-action@v1.0.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          test-command: 'yarn test'
+
+      - name: Test
+        run: yarn test

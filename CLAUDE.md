@@ -69,7 +69,8 @@ The `StrokeOptions` interface controls stroke appearance:
 | `packages/perfect-freehand/rolldown.config.mjs` | Rolldown bundler config for library |
 | `packages/dev/vite.config.ts` | Vite config for dev app |
 | `package.json` | Contains Prettier config, workspace definitions |
-| `.github/workflows/main.yml` | CI pipeline (build + test) |
+| `.github/workflows/main.yml` | CI pipeline (build + test on Node 18/20/22) |
+| `.github/workflows/publish.yml` | Automated npm publish on GitHub release |
 | `.husky/pre-commit` | Git pre-commit hook |
 
 ### Build System
@@ -107,3 +108,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Migrate dev app esbuild → Vite~~ Done
 - ~~Upgrade TypeScript to 5.x with `strict: true`~~ Done
 - ~~Upgrade ESLint to 9.x with flat config~~ Done
+- ~~Modernize CI/CD pipeline (actions v4, Node matrix, caching, publish workflow)~~ Done

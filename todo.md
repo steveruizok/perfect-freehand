@@ -77,11 +77,11 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 8. Modernize CI/CD Pipeline
 
-- [ ] Update `actions/checkout` and `actions/setup-node` to v4
-- [ ] Replace `mattallty/jest-github-action@v1.0.3` with Vitest (native GitHub Actions reporter)
-- [ ] Add Node.js version matrix testing (18.x, 20.x, 22.x)
-- [ ] Add caching for `node_modules` to speed up CI
-- [ ] Consider adding a publish workflow for automated npm releases
+- [x] Update `actions/checkout` and `actions/setup-node` to v4
+- [x] Replace `mattallty/jest-github-action@v1.0.3` with Vitest (native GitHub Actions reporter)
+- [x] Add Node.js version matrix testing (18.x, 20.x, 22.x)
+- [x] Add caching for `node_modules` to speed up CI
+- [x] Consider adding a publish workflow for automated npm releases
 
 ### 9. Prettier Configuration
 
