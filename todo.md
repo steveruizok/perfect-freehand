@@ -46,13 +46,13 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 5. Migrate to Rolldown (Library Build)
 
-- [ ] Replace custom esbuild scripts with **Rolldown** (https://rolldown.rs/)
+- [x] Replace custom esbuild scripts with **Rolldown** (https://rolldown.rs/)
   - Rust-based bundler with Rollup-compatible API
   - Built-in transforms, minification, and source maps
   - Significantly faster than Rollup (1.6s vs 40s in benchmarks)
-- [ ] Create `rolldown.config.js` for library builds
-- [ ] Configure dual CJS/ESM output formats
-- [ ] Remove `packages/perfect-freehand/scripts/build.js` and `dev.js`
+- [x] Create `rolldown.config.mjs` for library builds
+- [x] Configure dual CJS/ESM output formats
+- [x] Remove `packages/perfect-freehand/scripts/build.js` and `dev.js`
 
 ### 6. Migrate Dev App to Vite
 
@@ -168,6 +168,7 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | lazyrepo    | 0.0.0-alpha.27     | alpha  | Up to date |
 | ESLint      | 9.x                | 9.x    | Up to date |
 | Vitest      | 3.0.0              | 3.x    | Up to date |
+| Rolldown    | 1.0.0-rc.2         | 1.x RC | Up to date |
 | TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
 | Husky       | 7.0.0              | 9.x    | 2 major    |
 | @types/node | 20.11.0            | 20.x   | Up to date |

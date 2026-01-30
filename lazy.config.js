@@ -4,7 +4,7 @@ export default {
     // Build the library packages
     build: {
       cache: {
-        inputs: ['src/**/*', 'scripts/**/*', 'package.json', 'tsconfig.json', 'tsconfig.build.json'],
+        inputs: ['src/**/*', 'rolldown.config.mjs', 'package.json', 'tsconfig.json', 'tsconfig.build.json'],
         outputs: ['dist/**/*'],
       },
     },
