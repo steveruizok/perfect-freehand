@@ -1,0 +1,173 @@
+# Modernization Todo List
+
+This document outlines infrastructure and tooling improvements for the perfect-freehand repository. These changes do not affect the core algorithm source code.
+
+---
+
+## High Priority
+
+### 1. Upgrade TypeScript (4.4.2 → 5.x)
+
+- [ ] Update `typescript` to `^5.3.0` or later
+- [ ] Enable `strict: true` in `tsconfig.base.json` (currently disabled)
+- [ ] Review and update any deprecated compiler options
+- [ ] Update `@types/node` from `^15.0.1` to `^20.x`
+
+### 2. Replace Lerna with Lazyrepo
+
+- [ ] Remove Lerna (it's 4+ major versions behind)
+- [ ] Keep **Yarn workspaces** for dependency management (already configured)
+- [ ] Add **lazyrepo** for task orchestration and caching
+  - Simpler than Turborepo/Nx
+  - Works well with yarn workspaces
+  - Reference: tldraw/tldraw uses this setup
+- [ ] Create `lazy.config.js` for build/test task definitions
+- [ ] Remove `lerna.json`
+- [ ] Remove `lerna` dependency
+
+### 3. Upgrade ESLint (7.32.0 → 9.x)
+
+- [ ] Upgrade `eslint` to `^9.x`
+- [ ] Upgrade `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to `^7.x` or `^8.x`
+- [ ] Migrate from `.eslintrc.js` to **flat config** (`eslint.config.js`)
+- [ ] Consider adding `eslint-config-prettier` to avoid conflicts
+
+### 4. Migrate to Vitest
+
+- [ ] Replace Jest with **Vitest**
+  - Native ESM and TypeScript support (no ts-jest needed)
+  - Compatible with Jest syntax (minimal test changes)
+  - Integrates with Vite for fast HMR in watch mode
+- [ ] Remove Jest dependencies: `jest`, `ts-jest`, `@types/jest`
+- [ ] Remove `@testing-library/jest-dom` (use `@testing-library/jest-dom/vitest`)
+- [ ] Create `vitest.config.ts`
+- [ ] Update test scripts in `package.json`
+- [ ] Remove Babel dependencies if no longer needed (Vitest handles TS natively)
+
+### 5. Migrate to Rolldown (Library Build)
+
+- [ ] Replace custom esbuild scripts with **Rolldown** (https://rolldown.rs/)
+  - Rust-based bundler with Rollup-compatible API
+  - Built-in transforms, minification, and source maps
+  - Significantly faster than Rollup (1.6s vs 40s in benchmarks)
+- [ ] Create `rolldown.config.js` for library builds
+- [ ] Configure dual CJS/ESM output formats
+- [ ] Remove `packages/perfect-freehand/scripts/build.js` and `dev.js`
+
+### 6. Migrate Dev App to Vite
+
+- [ ] Replace custom esbuild dev server with **Vite**
+  - Fast HMR, native ESM, excellent DX
+  - Vite 6+ uses Rolldown under the hood
+- [ ] Create `packages/dev/vite.config.ts`
+- [ ] Remove `packages/dev/esbuild.config.mjs`
+- [ ] Remove `esbuild` and `esbuild-css-modules-plugin` dependencies
+- [ ] Vite has built-in CSS modules support
+
+---
+
+## Medium Priority
+
+### 7. Update Babel Dependencies (if still needed)
+
+- [ ] Update all `@babel/*` packages from `^7.15.0` to `^7.23.x`
+- [ ] Consider if Babel is still needed (esbuild handles transpilation)
+- [ ] If only used for Jest, Vitest would eliminate this dependency
+
+### 8. Modernize CI/CD Pipeline
+
+- [ ] Update `actions/checkout` and `actions/setup-node` to v4
+- [ ] Replace `mattallty/jest-github-action@v1.0.3` with Vitest (native GitHub Actions reporter)
+- [ ] Add Node.js version matrix testing (18.x, 20.x, 22.x)
+- [ ] Add caching for `node_modules` to speed up CI
+- [ ] Consider adding a publish workflow for automated npm releases
+
+### 9. Prettier Configuration
+
+- [ ] Extract Prettier config from `package.json` to `.prettierrc`
+- [ ] Add `.prettierignore` file
+- [ ] Add `format` and `format:check` scripts
+- [ ] Integrate Prettier check into CI pipeline
+
+### 10. Upgrade TypeDoc (0.21.9 → 0.25.x)
+
+- [ ] Update `typedoc` to latest version
+- [ ] Review TypeDoc configuration options
+- [ ] Consider adding a docs generation step to CI
+
+---
+
+## Lower Priority
+
+### 11. Add Missing Configuration Files
+
+- [ ] Add `.editorconfig` for consistent editor settings
+- [ ] Add `.nvmrc` or `.node-version` to pin Node.js version
+- [ ] Add `engines` field to `package.json` to specify supported Node versions
+- [ ] Consider adding `renovate.json` or Dependabot for automated dependency updates
+
+### 12. Improve Git Hooks (Husky)
+
+- [ ] Update `husky` to `^9.x`
+- [ ] Add `lint-staged` for faster pre-commit checks (only lint changed files)
+- [ ] Add a pre-push hook for running tests before push
+- [ ] Consider adding commit message linting with `commitlint`
+
+### 13. Dev App Dependencies
+
+- [ ] Update `zustand` from `^4.0.0-rc.1` to stable `^4.x` or `^5.x`
+- [ ] Update `@testing-library/react` from `^12.0.0` to `^16.x`
+- [ ] Update Radix UI components to latest versions
+
+### 14. Package.json Cleanup
+
+- [ ] Audit and remove unused dependencies
+- [ ] Standardize version specifiers (prefer `^` for flexibility)
+- [ ] Add `packageManager` field for Corepack support
+- [ ] Review and update `peerDependencies` if any
+
+---
+
+## Optional / Consider
+
+### 15. Yarn Workspaces Improvements
+
+- [ ] Consider upgrading to **Yarn 4.x** (Berry) with PnP or node_modules linker
+- [ ] Add `packageManager` field to root `package.json` for Corepack
+- [ ] Configure `.yarnrc.yml` if using Yarn 4
+
+### 16. Security & Auditing
+
+- [ ] Add `npm audit` or `yarn audit` to CI pipeline
+- [ ] Consider adding `socket.dev` or similar for supply chain security
+- [ ] Review and update any dependencies with known vulnerabilities
+
+---
+
+## Summary by Impact
+
+| Category            | Items | Effort     | Impact |
+| ------------------- | ----- | ---------- | ------ |
+| TypeScript upgrade  | 4     | Medium     | High   |
+| Lerna → Lazyrepo    | 6     | Low-Medium | High   |
+| ESLint upgrade      | 4     | Medium     | Medium |
+| Vitest migration    | 6     | Medium     | High   |
+| Rolldown (library)  | 4     | Medium     | High   |
+| Vite (dev app)      | 5     | Medium     | Medium |
+| CI/CD improvements  | 5     | Low        | Medium |
+| Configuration files | 4     | Low        | Low    |
+
+---
+
+## Current Versions Reference
+
+| Tool        | Current | Latest | Gap     |
+| ----------- | ------- | ------ | ------- |
+| TypeScript  | 4.4.2   | 5.3+   | 1 major |
+| Lerna       | 3.15.0  | 8.x    | 5 major |
+| ESLint      | 7.32.0  | 9.x    | 2 major |
+| Jest        | 27.1.0  | 29.x   | 2 major |
+| TypeDoc     | 0.21.9  | 0.25.x | 4 minor |
+| Husky       | 7.0.0   | 9.x    | 2 major |
+| @types/node | 15.0.1  | 20.x   | 5 major |
+| Babel       | 7.15.0  | 7.23.x | 8 minor |
