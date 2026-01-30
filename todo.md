@@ -122,10 +122,10 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 14. Package.json Cleanup
 
-- [ ] Audit and remove unused dependencies
-- [ ] Standardize version specifiers (prefer `^` for flexibility)
-- [ ] Add `packageManager` field for Corepack support
-- [ ] Review and update `peerDependencies` if any
+- [x] Audit and remove unused dependencies
+- [x] Standardize version specifiers (prefer `^` for flexibility)
+- [x] Add `packageManager` field for Corepack support
+- [x] Review and update `peerDependencies` if any
 
 ---
 
@@ -133,9 +133,9 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 15. Yarn Workspaces Improvements
 
-- [ ] Consider upgrading to **Yarn 4.x** (Berry) with PnP or node_modules linker
-- [ ] Add `packageManager` field to root `package.json` for Corepack
-- [ ] Configure `.yarnrc.yml` if using Yarn 4
+- [x] Consider upgrading to **Yarn 4.x** (Berry) with PnP or node_modules linker
+- [x] Add `packageManager` field to root `package.json` for Corepack
+- [x] Configure `.yarnrc.yml` if using Yarn 4
 
 ### 16. Security & Auditing
 

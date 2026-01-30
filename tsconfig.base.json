@@ -8,7 +8,7 @@
     "isolatedModules": true,
     "incremental": true,
     "resolveJsonModule": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "moduleResolution": "node",
     "noEmit": false,
     "noFallthroughCasesInSwitch": true,

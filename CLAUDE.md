@@ -140,3 +140,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Add missing configuration files (.editorconfig, .nvmrc, engines, Dependabot)~~ Done
 - ~~Improve Git Hooks (Husky 9.x, lint-staged, pre-push tests, commitlint)~~ Done
 - ~~Update dev app dependencies (zustand 5.x, Radix UI latest, @testing-library/react 16.x)~~ Done
+- ~~Package.json cleanup (unused deps, packageManager field for Corepack)~~ Done
