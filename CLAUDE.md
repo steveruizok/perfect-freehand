@@ -23,6 +23,12 @@ yarn build:packages
 
 # Lint the library
 cd packages/perfect-freehand && yarn lint
+
+# Format code with Prettier
+yarn format
+
+# Check formatting without making changes
+yarn format:check
 ```
 
 ## Architecture
@@ -68,7 +74,9 @@ The `StrokeOptions` interface controls stroke appearance:
 | `vitest.config.ts` | Vitest test runner configuration |
 | `packages/perfect-freehand/rolldown.config.mjs` | Rolldown bundler config for library |
 | `packages/dev/vite.config.ts` | Vite config for dev app |
-| `package.json` | Contains Prettier config, workspace definitions |
+| `.prettierrc` | Prettier formatting configuration |
+| `.prettierignore` | Files/directories to exclude from Prettier |
+| `package.json` | Workspace definitions and scripts |
 | `.github/workflows/main.yml` | CI pipeline (build + test on Node 18/20/22) |
 | `.github/workflows/publish.yml` | Automated npm publish on GitHub release |
 | `.husky/pre-commit` | Git pre-commit hook |
@@ -109,3 +117,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - ~~Upgrade TypeScript to 5.x with `strict: true`~~ Done
 - ~~Upgrade ESLint to 9.x with flat config~~ Done
 - ~~Modernize CI/CD pipeline (actions v4, Node matrix, caching, publish workflow)~~ Done
+- ~~Extract Prettier config, add format scripts, integrate into CI~~ Done

@@ -85,10 +85,10 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 9. Prettier Configuration
 
-- [ ] Extract Prettier config from `package.json` to `.prettierrc`
-- [ ] Add `.prettierignore` file
-- [ ] Add `format` and `format:check` scripts
-- [ ] Integrate Prettier check into CI pipeline
+- [x] Extract Prettier config from `package.json` to `.prettierrc`
+- [x] Add `.prettierignore` file
+- [x] Add `format` and `format:check` scripts
+- [x] Integrate Prettier check into CI pipeline
 
 ### 10. Upgrade TypeDoc (0.21.9 → 0.25.x)
 

@@ -28,6 +28,8 @@
     "build": "yarn build:packages && cd packages/dev && yarn build",
     "build:packages": "node build.mjs && cd packages/perfect-freehand && yarn build",
     "publish:patch": "yarn build:packages && npm publish ./packages/perfect-freehand",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "postinstall": "husky install"
   },
   "devDependencies": {
@@ -42,16 +44,11 @@
     "husky": "^7.0.0",
     "jsdom": "^26.0.0",
     "lazyrepo": "0.0.0-alpha.27",
+    "prettier": "^3.4.0",
     "tslib": "^2.3.0",
     "typedoc": "^0.21.9",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.23.0",
     "vitest": "^3.0.0"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "semi": false,
-    "printWidth": 80
   }
 }
