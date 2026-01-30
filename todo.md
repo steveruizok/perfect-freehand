@@ -27,10 +27,10 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 3. Upgrade ESLint (7.32.0 → 9.x)
 
-- [ ] Upgrade `eslint` to `^9.x`
-- [ ] Upgrade `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to `^7.x` or `^8.x`
-- [ ] Migrate from `.eslintrc.js` to **flat config** (`eslint.config.js`)
-- [ ] Consider adding `eslint-config-prettier` to avoid conflicts
+- [x] Upgrade `eslint` to `^9.x`
+- [x] Upgrade `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to `^7.x` or `^8.x`
+- [x] Migrate from `.eslintrc.js` to **flat config** (`eslint.config.js`)
+- [x] Consider adding `eslint-config-prettier` to avoid conflicts
 
 ### 4. Migrate to Vitest
 
@@ -165,7 +165,7 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 | ----------- | ------------------ | ------ | ---------- |
 | TypeScript  | 5.7.0              | 5.7+   | Up to date |
 | lazyrepo    | 0.0.0-alpha.27     | alpha  | Up to date |
-| ESLint      | 7.32.0             | 9.x    | 2 major    |
+| ESLint      | 9.x                | 9.x    | Up to date |
 | Jest        | 27.1.0             | 29.x   | 2 major    |
 | TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
 | Husky       | 7.0.0              | 9.x    | 2 major    |

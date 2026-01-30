@@ -63,7 +63,7 @@ The `StrokeOptions` interface controls stroke appearance:
 |------|---------|
 | `tsconfig.base.json` | Shared TypeScript config (extended by packages) |
 | `tsconfig.json` | Root TypeScript config |
-| `.eslintrc.js` | ESLint configuration (legacy format) |
+| `eslint.config.mjs` | ESLint configuration (flat config format) |
 | `lazy.config.js` | lazyrepo task orchestration config |
 | `package.json` | Contains Jest config, Prettier config, workspace definitions |
 | `.github/workflows/main.yml` | CI pipeline (build + test) |
@@ -85,7 +85,7 @@ The `StrokeOptions` interface controls stroke appearance:
 |------|---------|-------|
 | TypeScript | 5.7.0 | `strict: true` in tsconfig |
 | lazyrepo | 0.0.0-alpha.27 | Task orchestration and caching |
-| ESLint | 7.32.0 | Legacy `.eslintrc.js` format |
+| ESLint | 9.x | Flat config `eslint.config.mjs` with typescript-eslint |
 | Jest | 27.1.0 | With ts-jest and Babel |
 | Husky | 7.0.0 | Pre-commit hook only |
 | @types/node | 20.11.0 | Updated |
@@ -97,4 +97,4 @@ See `todo.md` for the full modernization roadmap. Key changes:
 - Migrate Jest → Vitest
 - Migrate esbuild scripts → Rolldown (library) and Vite (dev app)
 - ~~Upgrade TypeScript to 5.x with `strict: true`~~ Done
-- Upgrade ESLint to 9.x with flat config
+- ~~Upgrade ESLint to 9.x with flat config~~ Done
