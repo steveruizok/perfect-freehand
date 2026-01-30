@@ -1,7 +1,6 @@
 {
   "version": "1.2.2",
   "name": "perfect-freehand",
-  "private": false,
   "description": "Draw perfect pressure-sensitive freehand strokes.",
   "author": {
     "name": "Steve Ruiz",
@@ -50,7 +49,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@types/jest": "^27.0.1",
-    "@types/node": "^15.0.1",
+    "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "babel-jest": "^27.1.0",
@@ -61,6 +60,6 @@
     "ts-jest": "^27.0.5",
     "tslib": "^2.3.0",
     "typedoc": "^0.21.9",
-    "typescript": "^4.4.2"
+    "typescript": "^5.7.0"
   }
 }

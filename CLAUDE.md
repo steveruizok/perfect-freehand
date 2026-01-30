@@ -54,3 +54,47 @@ The `StrokeOptions` interface controls stroke appearance:
 - `streamline` - Point interpolation amount
 - `simulatePressure` - Auto-calculate pressure from velocity
 - `start`/`end` - Tapering and cap options
+
+## Current Tooling & Configuration
+
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `tsconfig.base.json` | Shared TypeScript config (extended by packages) |
+| `tsconfig.json` | Root TypeScript config |
+| `.eslintrc.js` | ESLint configuration (legacy format) |
+| `lerna.json` | Lerna monorepo config (to be replaced) |
+| `package.json` | Contains Jest config, Prettier config, workspace definitions |
+| `.github/workflows/main.yml` | CI pipeline (build + test) |
+| `.husky/pre-commit` | Git pre-commit hook |
+
+### Build System
+
+**Library (`packages/perfect-freehand/`):**
+- Uses custom esbuild scripts in `scripts/build.js` and `scripts/dev.js`
+- Outputs to `dist/` directory
+
+**Dev App (`packages/dev/`):**
+- Uses esbuild via `esbuild.config.mjs`
+- Includes `esbuild-css-modules-plugin` for CSS modules
+
+### Current Dependency Versions (as of last audit)
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| TypeScript | 5.7.0 | `strict: true` in tsconfig |
+| Lerna | 3.15.0 | Only used for `start` and `publish` scripts |
+| ESLint | 7.32.0 | Legacy `.eslintrc.js` format |
+| Jest | 27.1.0 | With ts-jest and Babel |
+| Husky | 7.0.0 | Pre-commit hook only |
+| @types/node | 20.11.0 | Updated |
+
+## Modernization
+
+See `todo.md` for the full modernization roadmap. Key changes:
+- Replace Lerna with lazyrepo (keep yarn workspaces)
+- Migrate Jest → Vitest
+- Migrate esbuild scripts → Rolldown (library) and Vite (dev app)
+- Upgrade TypeScript to 5.x with `strict: true`
+- Upgrade ESLint to 9.x with flat config

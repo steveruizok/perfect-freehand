@@ -8,10 +8,10 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 1. Upgrade TypeScript (4.4.2 → 5.x)
 
-- [ ] Update `typescript` to `^5.3.0` or later
-- [ ] Enable `strict: true` in `tsconfig.base.json` (currently disabled)
-- [ ] Review and update any deprecated compiler options
-- [ ] Update `@types/node` from `^15.0.1` to `^20.x`
+- [x] Update `typescript` to `^5.3.0` or later
+- [x] Enable `strict: true` in `tsconfig.base.json` (currently disabled)
+- [x] Review and update any deprecated compiler options
+- [x] Update `@types/node` from `^15.0.1` to `^20.x`
 
 ### 2. Replace Lerna with Lazyrepo
 
@@ -163,11 +163,11 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 | Tool        | Current | Latest | Gap     |
 | ----------- | ------- | ------ | ------- |
-| TypeScript  | 4.4.2   | 5.3+   | 1 major |
+| TypeScript  | 5.7.0   | 5.7+   | Up to date |
 | Lerna       | 3.15.0  | 8.x    | 5 major |
 | ESLint      | 7.32.0  | 9.x    | 2 major |
 | Jest        | 27.1.0  | 29.x   | 2 major |
 | TypeDoc     | 0.21.9  | 0.25.x | 4 minor |
 | Husky       | 7.0.0   | 9.x    | 2 major |
-| @types/node | 15.0.1  | 20.x   | 5 major |
+| @types/node | 20.11.0 | 20.x   | Up to date |
 | Babel       | 7.15.0  | 7.23.x | 8 minor |
