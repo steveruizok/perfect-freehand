@@ -109,10 +109,10 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 12. Improve Git Hooks (Husky)
 
-- [ ] Update `husky` to `^9.x`
-- [ ] Add `lint-staged` for faster pre-commit checks (only lint changed files)
-- [ ] Add a pre-push hook for running tests before push
-- [ ] Consider adding commit message linting with `commitlint`
+- [x] Update `husky` to `^9.x`
+- [x] Add `lint-staged` for faster pre-commit checks (only lint changed files)
+- [x] Add a pre-push hook for running tests before push
+- [x] Consider adding commit message linting with `commitlint`
 
 ### 13. Dev App Dependencies
 
@@ -162,14 +162,14 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ## Current Versions Reference
 
-| Tool        | Current            | Latest | Gap        |
-| ----------- | ------------------ | ------ | ---------- |
-| TypeScript  | 5.7.0              | 5.7+   | Up to date |
-| lazyrepo    | 0.0.0-alpha.27     | alpha  | Up to date |
-| ESLint      | 9.x                | 9.x    | Up to date |
-| Vitest      | 3.0.0              | 3.x    | Up to date |
-| Rolldown    | 1.0.0-rc.2         | 1.x RC | Up to date |
-| Vite        | 6.0.0+             | 6.x    | Up to date |
-| TypeDoc     | 0.28.x             | 0.28.x | Up to date |
-| Husky       | 7.0.0              | 9.x    | 2 major    |
-| @types/node | 20.11.0            | 20.x   | Up to date |
+| Tool        | Current        | Latest | Gap        |
+| ----------- | -------------- | ------ | ---------- |
+| TypeScript  | 5.7.0          | 5.7+   | Up to date |
+| lazyrepo    | 0.0.0-alpha.27 | alpha  | Up to date |
+| ESLint      | 9.x            | 9.x    | Up to date |
+| Vitest      | 3.0.0          | 3.x    | Up to date |
+| Rolldown    | 1.0.0-rc.2     | 1.x RC | Up to date |
+| Vite        | 6.0.0+         | 6.x    | Up to date |
+| TypeDoc     | 0.28.x         | 0.28.x | Up to date |
+| Husky       | 9.1.x          | 9.x    | Up to date |
+| @types/node | 20.11.0        | 20.x   | Up to date |
