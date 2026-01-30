@@ -10,3 +10,6 @@ coverage
 *.log
 
 .vercel
+
+# lazyrepo
+.lazy

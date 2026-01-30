@@ -15,15 +15,15 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ### 2. Replace Lerna with Lazyrepo
 
-- [ ] Remove Lerna (it's 4+ major versions behind)
-- [ ] Keep **Yarn workspaces** for dependency management (already configured)
-- [ ] Add **lazyrepo** for task orchestration and caching
+- [x] Remove Lerna (it's 4+ major versions behind)
+- [x] Keep **Yarn workspaces** for dependency management (already configured)
+- [x] Add **lazyrepo** for task orchestration and caching
   - Simpler than Turborepo/Nx
   - Works well with yarn workspaces
   - Reference: tldraw/tldraw uses this setup
-- [ ] Create `lazy.config.js` for build/test task definitions
-- [ ] Remove `lerna.json`
-- [ ] Remove `lerna` dependency
+- [x] Create `lazy.config.js` for build/test task definitions
+- [x] Remove `lerna.json`
+- [x] Remove `lerna` dependency
 
 ### 3. Upgrade ESLint (7.32.0 → 9.x)
 
@@ -161,13 +161,13 @@ This document outlines infrastructure and tooling improvements for the perfect-f
 
 ## Current Versions Reference
 
-| Tool        | Current | Latest | Gap     |
-| ----------- | ------- | ------ | ------- |
-| TypeScript  | 5.7.0   | 5.7+   | Up to date |
-| Lerna       | 3.15.0  | 8.x    | 5 major |
-| ESLint      | 7.32.0  | 9.x    | 2 major |
-| Jest        | 27.1.0  | 29.x   | 2 major |
-| TypeDoc     | 0.21.9  | 0.25.x | 4 minor |
-| Husky       | 7.0.0   | 9.x    | 2 major |
-| @types/node | 20.11.0 | 20.x   | Up to date |
-| Babel       | 7.15.0  | 7.23.x | 8 minor |
+| Tool        | Current            | Latest | Gap        |
+| ----------- | ------------------ | ------ | ---------- |
+| TypeScript  | 5.7.0              | 5.7+   | Up to date |
+| lazyrepo    | 0.0.0-alpha.27     | alpha  | Up to date |
+| ESLint      | 7.32.0             | 9.x    | 2 major    |
+| Jest        | 27.1.0             | 29.x   | 2 major    |
+| TypeDoc     | 0.21.9             | 0.25.x | 4 minor    |
+| Husky       | 7.0.0              | 9.x    | 2 major    |
+| @types/node | 20.11.0            | 20.x   | Up to date |
+| Babel       | 7.15.0             | 7.23.x | 8 minor    |
