@@ -13,3 +13,6 @@ coverage
 
 # lazyrepo
 .lazy
+
+# Yarn
+.yarn/install-state.gz
