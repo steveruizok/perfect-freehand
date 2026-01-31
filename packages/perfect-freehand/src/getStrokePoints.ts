@@ -9,6 +9,14 @@ import type { StrokeOptions, StrokePoint, Vec2 } from './types'
 import { add, dist, isEqual, lrp, sub, uni } from './vec'
 
 /**
+ * Check if a pressure value is valid (defined and non-negative).
+ * Returns false for undefined, NaN, and negative values.
+ */
+function isValidPressure(pressure: number | undefined): pressure is number {
+  return pressure != null && pressure >= 0
+}
+
+/**
  * ## getStrokePoints
  * @description Get an array of points as objects with an adjusted point, pressure, vector, distance, and runningLength.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional in both cases.
@@ -65,7 +73,7 @@ export function getStrokePoints<
   const strokePoints: StrokePoint[] = [
     {
       point: [pts[0][0], pts[0][1]],
-      pressure: pts[0][2] >= 0 ? pts[0][2] : DEFAULT_FIRST_PRESSURE,
+      pressure: isValidPressure(pts[0][2]) ? pts[0][2] : DEFAULT_FIRST_PRESSURE,
       vector: [...UNIT_OFFSET],
       distance: 0,
       runningLength: 0,
@@ -117,7 +125,7 @@ export function getStrokePoints<
       // The adjusted point
       point,
       // The input pressure (or default if not specified)
-      pressure: pts[i][2] >= 0 ? pts[i][2] : DEFAULT_PRESSURE,
+      pressure: isValidPressure(pts[i][2]) ? pts[i][2] : DEFAULT_PRESSURE,
       // The vector from the current point to the previous point
       vector: uni(sub(prev.point, point)),
       // The distance between the current point and the previous point
