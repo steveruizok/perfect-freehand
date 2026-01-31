@@ -6,7 +6,10 @@ import {
   UNIT_OFFSET,
 } from './constants'
 import type { StrokeOptions, StrokePoint, Vec2 } from './types'
-import { add, dist, isEqual, lrp, sub, uni } from './vec'
+import { add, dist, isEqual, lrp, subInto, uni } from './vec'
+
+// Scratch buffer for allocation-free vector calculation in hot loop
+const _vectorDiff: Vec2 = [0, 0]
 
 /**
  * Check if a pressure value is valid (defined and non-negative).
@@ -121,13 +124,15 @@ export function getStrokePoints<
       // TODO: Backfill the missing points so that tapering works correctly.
     }
     // Create a new strokepoint (it will be the new "previous" one).
+    // Use scratch buffer for vector difference to reduce allocations
+    subInto(_vectorDiff, prev.point, point)
     prev = {
       // The adjusted point
       point,
       // The input pressure (or default if not specified)
       pressure: isValidPressure(pts[i][2]) ? pts[i][2] : DEFAULT_PRESSURE,
       // The vector from the current point to the previous point
-      vector: uni(sub(prev.point, point)),
+      vector: uni(_vectorDiff),
       // The distance between the current point and the previous point
       distance,
       // The total distance so far
