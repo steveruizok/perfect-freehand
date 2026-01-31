@@ -28,6 +28,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "dev": "lazy run start",
     "start": "lazy run start",
     "build": "yarn build:packages && cd packages/dev && yarn build",
     "build:packages": "node build.mjs && cd packages/perfect-freehand && yarn build",
