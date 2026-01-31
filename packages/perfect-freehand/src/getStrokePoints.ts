@@ -1,5 +1,11 @@
+import {
+  DEFAULT_FIRST_PRESSURE,
+  DEFAULT_PRESSURE,
+  MIN_STREAMLINE_T,
+  STREAMLINE_T_RANGE,
+} from './constants'
+import type { StrokeOptions, StrokePoint, Vec2 } from './types'
 import { add, dist, isEqual, lrp, sub, uni } from './vec'
-import type { StrokeOptions, StrokePoint } from './types'
 
 /**
  * ## getStrokePoints
@@ -25,12 +31,16 @@ export function getStrokePoints<
   if (points.length === 0) return []
 
   // Find the interpolation level between points.
-  const t = 0.15 + (1 - streamline) * 0.85
+  const t = MIN_STREAMLINE_T + (1 - streamline) * STREAMLINE_T_RANGE
 
   // Whatever the input is, make sure that the points are in number[][].
   let pts = Array.isArray(points[0])
     ? (points as T[])
-    : (points as K[]).map(({ x, y, pressure = 0.5 }) => [x, y, pressure])
+    : (points as K[]).map(({ x, y, pressure = DEFAULT_PRESSURE }) => [
+        x,
+        y,
+        pressure,
+      ])
 
   // Add extra points between the two, to help avoid "dash" lines
   // for strokes with tapered start and ends. Don't mutate the
@@ -39,14 +49,14 @@ export function getStrokePoints<
     const last = pts[1]
     pts = pts.slice(0, -1)
     for (let i = 1; i < 5; i++) {
-      pts.push(lrp(pts[0], last, i / 4))
+      pts.push(lrp(pts[0] as Vec2, last as Vec2, i / 4))
     }
   }
 
   // If there's only one point, add another point at a 1pt offset.
   // Don't mutate the input array!
   if (pts.length === 1) {
-    pts = [...pts, [...add(pts[0], [1, 1]), ...pts[0].slice(2)]]
+    pts = [...pts, [...add(pts[0] as Vec2, [1, 1]), ...pts[0].slice(2)]]
   }
 
   // The strokePoints array will hold the points for the stroke.
@@ -54,7 +64,7 @@ export function getStrokePoints<
   const strokePoints: StrokePoint[] = [
     {
       point: [pts[0][0], pts[0][1]],
-      pressure: pts[0][2] >= 0 ? pts[0][2] : 0.25,
+      pressure: pts[0][2] >= 0 ? pts[0][2] : DEFAULT_FIRST_PRESSURE,
       vector: [1, 1],
       distance: 0,
       runningLength: 0,
@@ -75,15 +85,15 @@ export function getStrokePoints<
 
   // Iterate through all of the points, creating StrokePoints.
   for (let i = 1; i < pts.length; i++) {
-    const point =
+    const point: Vec2 =
       isComplete && i === max
         ? // If we're at the last point, and `options.last` is true,
           // then add the actual input point.
-          pts[i].slice(0, 2)
+          [pts[i][0], pts[i][1]]
         : // Otherwise, using the t calculated from the streamline
           // option, interpolate a new point between the previous
           // point the current point.
-          lrp(prev.point, pts[i], t)
+          lrp(prev.point, pts[i] as Vec2, t)
 
     // If the new point is the same as the previous point, skip ahead.
     if (isEqual(prev.point, point)) continue
@@ -105,8 +115,8 @@ export function getStrokePoints<
     prev = {
       // The adjusted point
       point,
-      // The input pressure (or .5 if not specified)
-      pressure: pts[i][2] >= 0 ? pts[i][2] : 0.5,
+      // The input pressure (or default if not specified)
+      pressure: pts[i][2] >= 0 ? pts[i][2] : DEFAULT_PRESSURE,
       // The vector from the current point to the previous point
       vector: uni(sub(prev.point, point)),
       // The distance between the current point and the previous point
