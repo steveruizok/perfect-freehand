@@ -14,5 +14,8 @@ coverage
 # lazyrepo
 .lazy
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # Yarn
 .yarn/install-state.gz
