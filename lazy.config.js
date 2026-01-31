@@ -4,14 +4,26 @@ export default {
     // Build the library packages
     build: {
       cache: {
-        inputs: ['src/**/*', 'rolldown.config.mjs', 'package.json', 'tsconfig.json', 'tsconfig.build.json'],
+        inputs: [
+          'src/**/*',
+          'rolldown.config.mjs',
+          'package.json',
+          'tsconfig.json',
+          'tsconfig.build.json',
+        ],
         outputs: ['dist/**/*'],
       },
     },
     // Run tests
     test: {
       cache: {
-        inputs: ['src/**/*', '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+        inputs: [
+          'src/**/*',
+          '**/*.test.ts',
+          '**/*.test.tsx',
+          '**/*.spec.ts',
+          '**/*.spec.tsx',
+        ],
         outputs: [],
         inheritsInputFromDependencies: true,
       },

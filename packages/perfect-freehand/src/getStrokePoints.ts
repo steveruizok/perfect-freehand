@@ -17,7 +17,7 @@ import type { StrokeOptions, StrokePoint } from './types'
  */
 export function getStrokePoints<
   T extends number[],
-  K extends { x: number; y: number; pressure?: number }
+  K extends { x: number; y: number; pressure?: number },
 >(points: (T | K)[], options = {} as StrokeOptions): StrokePoint[] {
   const { streamline = 0.5, size = 16, last: isComplete = false } = options
 

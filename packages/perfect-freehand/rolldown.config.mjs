@@ -1,3 +1,4 @@
+/* global console */
 import { defineConfig } from 'rolldown'
 import { readFileSync } from 'fs'
 import { gzipSync } from 'zlib'
@@ -14,14 +15,14 @@ function reportSizePlugin() {
     name: 'report-size',
     writeBundle(options, bundle) {
       let totalSize = 0
-      for (const [fileName, chunk] of Object.entries(bundle)) {
+      for (const chunk of Object.values(bundle)) {
         if (chunk.type === 'chunk') {
           totalSize += chunk.code.length
         }
       }
 
       // Find the main chunk for gzip calculation
-      const mainChunk = Object.values(bundle).find(b => b.type === 'chunk')
+      const mainChunk = Object.values(bundle).find((b) => b.type === 'chunk')
       if (mainChunk) {
         const gzipped = gzipSync(mainChunk.code)
         console.log(

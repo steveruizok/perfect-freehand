@@ -4,50 +4,50 @@
 version: 2
 updates:
   # npm dependencies
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: 'weekly'
+      day: 'monday'
     open-pull-requests-limit: 10
     groups:
       # Group minor/patch updates for dev dependencies
       dev-dependencies:
-        dependency-type: "development"
+        dependency-type: 'development'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
       # Group TypeScript-related packages
       typescript:
         patterns:
-          - "typescript"
-          - "@types/*"
-          - "typescript-eslint"
+          - 'typescript'
+          - '@types/*'
+          - 'typescript-eslint'
       # Group testing packages
       testing:
         patterns:
-          - "vitest"
-          - "@testing-library/*"
-          - "jsdom"
+          - 'vitest'
+          - '@testing-library/*'
+          - 'jsdom'
       # Group ESLint packages
       eslint:
         patterns:
-          - "eslint"
-          - "eslint-*"
-          - "@eslint/*"
+          - 'eslint'
+          - 'eslint-*'
+          - '@eslint/*'
     labels:
-      - "dependencies"
+      - 'dependencies'
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
 
   # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: 'weekly'
+      day: 'monday'
     labels:
-      - "dependencies"
-      - "github-actions"
+      - 'dependencies'
+      - 'github-actions'
     commit-message:
-      prefix: "chore(ci)"
+      prefix: 'chore(ci)'
