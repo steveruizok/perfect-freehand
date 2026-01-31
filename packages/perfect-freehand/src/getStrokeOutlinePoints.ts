@@ -1,26 +1,37 @@
+import {
+  CORNER_CAP_SEGMENTS,
+  END_CAP_SEGMENTS,
+  END_NOISE_THRESHOLD,
+  FIXED_PI,
+  MIN_RADIUS,
+  START_CAP_SEGMENTS,
+} from './constants'
 import { getStrokeRadius } from './getStrokeRadius'
-import type { StrokeOptions, StrokePoint } from './types'
+import { simulatePressure } from './simulatePressure'
+import type { StrokeOptions, StrokePoint, Vec2 } from './types'
 import {
   add,
+  addInto,
   dist2,
   dpr,
-  lrp,
+  lrpInto,
   mul,
+  mulInto,
   neg,
   per,
+  perInto,
   prj,
   rotAround,
+  rotAroundInto,
   sub,
+  subInto,
   uni,
 } from './vec'
 
-const { min, PI } = Math
-
-// This is the rate of change for simulated pressure. It could be an option.
-const RATE_OF_PRESSURE_CHANGE = 0.275
-
-// Browser strokes seem to be off if PI is regular, a tiny offset seems to fix it
-const FIXED_PI = PI + 0.0001
+// Scratch buffers for allocation-free hot loop calculations
+const _offset: Vec2 = [0, 0]
+const _tl: Vec2 = [0, 0]
+const _tr: Vec2 = [0, 0]
 
 /**
  * ## getStrokeOutlinePoints
@@ -39,12 +50,12 @@ const FIXED_PI = PI + 0.0001
 export function getStrokeOutlinePoints(
   points: StrokePoint[],
   options: Partial<StrokeOptions> = {} as Partial<StrokeOptions>
-): number[][] {
+): Vec2[] {
   const {
     size = 16,
     smoothing = 0.5,
     thinning = 0.5,
-    simulatePressure = true,
+    simulatePressure: shouldSimulatePressure = true,
     easing = (t) => t,
     start = {},
     end = {},
@@ -83,22 +94,17 @@ export function getStrokeOutlinePoints(
   const minDistance = Math.pow(size * smoothing, 2)
 
   // Our collected left and right points
-  const leftPts: number[][] = []
-  const rightPts: number[][] = []
+  const leftPts: Vec2[] = []
+  const rightPts: Vec2[] = []
 
-  // Previous pressure (start with average of first five pressures,
+  // Previous pressure (start with average of first ten pressures,
   // in order to prevent fat starts for every line. Drawn lines
   // almost always start slow!
   let prevPressure = points.slice(0, 10).reduce((acc, curr) => {
     let pressure = curr.pressure
 
-    if (simulatePressure) {
-      // Speed of change - how fast should the the pressure changing?
-      const sp = min(1, curr.distance / size)
-      // Rate of change - how much of a change is there?
-      const rp = min(1, 1 - sp)
-      // Accelerate the pressure
-      pressure = min(1, acc + (rp - acc) * (sp * RATE_OF_PRESSURE_CHANGE))
+    if (shouldSimulatePressure) {
+      pressure = simulatePressure(acc, curr.distance, size)
     }
 
     return (acc + pressure) / 2
@@ -123,14 +129,12 @@ export function getStrokeOutlinePoints(
   let pr = pl
 
   // Temporary left and right points
-  let tl = pl
-  let tr = pr
+  let tl: Vec2 = pl
+  let tr: Vec2 = pr
 
   // Keep track of whether the previous point is a sharp corner
   // ... so that we don't detect the same corner twice
   let isPrevPointSharpCorner = false
-
-  // let short = true
 
   /*
     Find the outline's left and right points
@@ -144,7 +148,10 @@ export function getStrokeOutlinePoints(
     const { point, vector, distance, runningLength } = points[i]
 
     // Removes noise from the end of the line
-    if (i < points.length - 1 && totalLength - runningLength < 3) {
+    if (
+      i < points.length - 1 &&
+      totalLength - runningLength < END_NOISE_THRESHOLD
+    ) {
       continue
     }
 
@@ -153,20 +160,15 @@ export function getStrokeOutlinePoints(
 
       If not thinning, the current point's radius will be half the size; or
       otherwise, the size will be based on the current (real or simulated)
-      pressure. 
+      pressure.
     */
 
     if (thinning) {
-      if (simulatePressure) {
+      if (shouldSimulatePressure) {
         // If we're simulating pressure, then do so based on the distance
         // between the current point and the previous point, and the size
         // of the stroke. Otherwise, use the input pressure.
-        const sp = min(1, distance / size)
-        const rp = min(1, 1 - sp)
-        pressure = min(
-          1,
-          prevPressure + (rp - prevPressure) * (sp * RATE_OF_PRESSURE_CHANGE)
-        )
+        pressure = simulatePressure(prevPressure, distance, size)
       }
 
       radius = getStrokeRadius(size, thinning, pressure, easing)
@@ -182,7 +184,7 @@ export function getStrokeOutlinePoints(
       Apply tapering
 
       If the current length is within the taper distance at either the
-      start or the end, calculate the taper strengths. Apply the smaller 
+      start or the end, calculate the taper strengths. Apply the smaller
       of the two taper strengths to the radius.
     */
 
@@ -196,7 +198,7 @@ export function getStrokeOutlinePoints(
         ? taperEndEase((totalLength - runningLength) / taperEnd)
         : 1
 
-    radius = Math.max(0.01, radius * Math.min(ts, te))
+    radius = Math.max(MIN_RADIUS, radius * Math.min(ts, te))
 
     /* Add points to left and right */
 
@@ -221,13 +223,22 @@ export function getStrokeOutlinePoints(
       // Considering saving these and drawing them later? So that we can avoid
       // crossing future points.
 
-      const offset = mul(per(prevVector), radius)
+      // Use mutable operations for the offset calculation
+      perInto(_offset, prevVector)
+      mulInto(_offset, _offset, radius)
 
-      for (let step = 1 / 13, t = 0; t <= 1; t += step) {
-        tl = rotAround(sub(point, offset), point, FIXED_PI * t)
+      const step = 1 / CORNER_CAP_SEGMENTS
+      for (let t = 0; t <= 1; t += step) {
+        // Calculate left point: rotate (point - offset) around point
+        subInto(_tl, point, _offset)
+        rotAroundInto(_tl, _tl, point, FIXED_PI * t)
+        tl = [_tl[0], _tl[1]]
         leftPts.push(tl)
 
-        tr = rotAround(add(point, offset), point, FIXED_PI * -t)
+        // Calculate right point: rotate (point + offset) around point
+        addInto(_tr, point, _offset)
+        rotAroundInto(_tr, _tr, point, FIXED_PI * -t)
+        tr = [_tr[0], _tr[1]]
         rightPts.push(tr)
       }
 
@@ -244,32 +255,38 @@ export function getStrokeOutlinePoints(
 
     // Handle the last point
     if (i === points.length - 1) {
-      const offset = mul(per(vector), radius)
-      leftPts.push(sub(point, offset))
-      rightPts.push(add(point, offset))
+      perInto(_offset, vector)
+      mulInto(_offset, _offset, radius)
+      leftPts.push(sub(point, _offset))
+      rightPts.push(add(point, _offset))
       continue
     }
 
-    /* 
+    /*
       Add regular points
 
       Project points to either side of the current point, using the
-      calculated size as a distance. If a point's distance to the 
+      calculated size as a distance. If a point's distance to the
       previous point on that side greater than the minimum distance
       (or if the corner is kinda sharp), add the points to the side's
       points array.
     */
 
-    const offset = mul(per(lrp(nextVector, vector, nextDpr)), radius)
+    // Use mutable operations for offset calculation
+    lrpInto(_offset, nextVector, vector, nextDpr)
+    perInto(_offset, _offset)
+    mulInto(_offset, _offset, radius)
 
-    tl = sub(point, offset)
+    subInto(_tl, point, _offset)
+    tl = [_tl[0], _tl[1]]
 
     if (i <= 1 || dist2(pl, tl) > minDistance) {
       leftPts.push(tl)
       pl = tl
     }
 
-    tr = add(point, offset)
+    addInto(_tr, point, _offset)
+    tr = [_tr[0], _tr[1]]
 
     if (i <= 1 || dist2(pr, tr) > minDistance) {
       rightPts.push(tr)
@@ -283,26 +300,26 @@ export function getStrokeOutlinePoints(
 
   /*
     Drawing caps
-    
+
     Now that we have our points on either side of the line, we need to
     draw caps at the start and end. Tapered lines don't have caps, but
     may have dots for very short lines.
   */
 
-  const firstPoint = points[0].point.slice(0, 2)
+  const firstPoint: Vec2 = [points[0].point[0], points[0].point[1]]
 
-  const lastPoint =
+  const lastPoint: Vec2 =
     points.length > 1
-      ? points[points.length - 1].point.slice(0, 2)
+      ? [points[points.length - 1].point[0], points[points.length - 1].point[1]]
       : add(points[0].point, [1, 1])
 
-  const startCap: number[][] = []
+  const startCap: Vec2[] = []
 
-  const endCap: number[][] = []
+  const endCap: Vec2[] = []
 
-  /* 
+  /*
     Draw a dot for very short or completed strokes
-    
+
     If the line is too short to gather left or right points and if the line is
     not tapered on either side, draw a dot. If the line is tapered, then only
     draw a dot if the line is both very short and complete. If we draw a dot,
@@ -316,8 +333,9 @@ export function getStrokeOutlinePoints(
         uni(per(sub(firstPoint, lastPoint))),
         -(firstRadius || radius)
       )
-      const dotPts: number[][] = []
-      for (let step = 1 / 13, t = step; t <= 1; t += step) {
+      const dotPts: Vec2[] = []
+      const step = 1 / START_CAP_SEGMENTS
+      for (let t = step; t <= 1; t += step) {
         dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
       }
       return dotPts
@@ -336,7 +354,8 @@ export function getStrokeOutlinePoints(
       // The start point is tapered, noop
     } else if (capStart) {
       // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
-      for (let step = 1 / 13, t = step; t <= 1; t += step) {
+      const step = 1 / START_CAP_SEGMENTS
+      for (let t = step; t <= 1; t += step) {
         const pt = rotAround(rightPts[0], firstPoint, FIXED_PI * t)
         startCap.push(pt)
       }
@@ -372,7 +391,8 @@ export function getStrokeOutlinePoints(
     } else if (capEnd) {
       // Draw the round end cap
       const start = prj(lastPoint, direction, radius)
-      for (let step = 1 / 29, t = step; t < 1; t += step) {
+      const step = 1 / END_CAP_SEGMENTS
+      for (let t = step; t < 1; t += step) {
         endCap.push(rotAround(start, lastPoint, FIXED_PI * 3 * t))
       }
     } else {
@@ -388,8 +408,8 @@ export function getStrokeOutlinePoints(
   }
 
   /*
-    Return the points in the correct winding order: begin on the left side, then 
-    continue around the end cap, then come back along the right side, and finally 
+    Return the points in the correct winding order: begin on the left side, then
+    continue around the end cap, then come back along the right side, and finally
     complete the start cap.
   */
 

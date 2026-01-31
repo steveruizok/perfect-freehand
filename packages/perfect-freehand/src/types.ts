@@ -1,4 +1,9 @@
 /**
+ * A 2D vector represented as a fixed-length tuple [x, y].
+ */
+export type Vec2 = [number, number]
+
+/**
  * The options object for `getStroke` or `getStrokePoints`.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional in both cases.
  * @param options (optional) An object with options.
@@ -36,9 +41,9 @@ export interface StrokeOptions {
  * The points returned by `getStrokePoints`, and the input for `getStrokeOutlinePoints`.
  */
 export interface StrokePoint {
-  point: number[]
+  point: Vec2
   pressure: number
   distance: number
-  vector: number[]
+  vector: Vec2
   runningLength: number
 }
