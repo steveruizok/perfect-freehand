@@ -67,3 +67,9 @@ export const DEFAULT_FIRST_PRESSURE = 0.25
  * Default pressure for subsequent points when no pressure is provided.
  */
 export const DEFAULT_PRESSURE = 0.5
+
+/**
+ * Unit offset vector used as placeholder for initial vector
+ * and for creating a second point when only one point is provided.
+ */
+export const UNIT_OFFSET: [number, number] = [1, 1]

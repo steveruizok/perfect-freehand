@@ -3,6 +3,7 @@ import {
   DEFAULT_PRESSURE,
   MIN_STREAMLINE_T,
   STREAMLINE_T_RANGE,
+  UNIT_OFFSET,
 } from './constants'
 import type { StrokeOptions, StrokePoint, Vec2 } from './types'
 import { add, dist, isEqual, lrp, sub, uni } from './vec'
@@ -56,7 +57,7 @@ export function getStrokePoints<
   // If there's only one point, add another point at a 1pt offset.
   // Don't mutate the input array!
   if (pts.length === 1) {
-    pts = [...pts, [...add(pts[0] as Vec2, [1, 1]), ...pts[0].slice(2)]]
+    pts = [...pts, [...add(pts[0] as Vec2, UNIT_OFFSET), ...pts[0].slice(2)]]
   }
 
   // The strokePoints array will hold the points for the stroke.
@@ -65,7 +66,7 @@ export function getStrokePoints<
     {
       point: [pts[0][0], pts[0][1]],
       pressure: pts[0][2] >= 0 ? pts[0][2] : DEFAULT_FIRST_PRESSURE,
-      vector: [1, 1],
+      vector: [...UNIT_OFFSET],
       distance: 0,
       runningLength: 0,
     },
