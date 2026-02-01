@@ -39,7 +39,7 @@
     "@types/node": "^20.11.0",
     "@types/react": "^18.0.10",
     "@types/react-dom": "^18.0.5",
-    "@vitejs/plugin-react": "^4.3.0",
+    "@vitejs/plugin-react": "^5.1.2",
     "perfect-freehand": "^1.2.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
