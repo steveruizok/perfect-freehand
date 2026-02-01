@@ -1972,16 +1972,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tldraw/intersect@npm:^0.1.3":
-  version: 0.1.4
-  resolution: "@tldraw/intersect@npm:0.1.4"
-  dependencies:
-    "@tldraw/vec": "npm:^0.1.3"
-  checksum: 10c0/3d87b4c695462a9bac84434599237b160a324dc64897b2f37ff1103b5f4c0ada9a133bc297da5fa55b863ab0ba139a6d8b660f41fcbdc6ca4acec185cb62616e
-  languageName: node
-  linkType: hard
-
-"@tldraw/intersect@npm:latest":
+"@tldraw/intersect@npm:^1.9.2, @tldraw/intersect@npm:latest":
   version: 1.9.2
   resolution: "@tldraw/intersect@npm:1.9.2"
   dependencies:
@@ -2938,7 +2929,7 @@ __metadata:
     "@radix-ui/react-label": "npm:^2.1.0"
     "@radix-ui/react-slider": "npm:^1.2.0"
     "@tldraw/core": "npm:^0.1.19"
-    "@tldraw/intersect": "npm:^0.1.3"
+    "@tldraw/intersect": "npm:^1.9.2"
     "@tldraw/vec": "npm:^0.1.3"
     "@types/node": "npm:^20.11.0"
     "@types/react": "npm:^18.0.10"
