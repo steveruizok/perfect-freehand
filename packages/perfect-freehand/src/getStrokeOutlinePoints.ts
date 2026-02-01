@@ -34,6 +34,85 @@ const _tl: Vec2 = [0, 0]
 const _tr: Vec2 = [0, 0]
 
 /**
+ * Draw a dot (circle) for very short strokes.
+ */
+function drawDot(center: Vec2, radius: number): Vec2[] {
+  const offsetPoint = add(center, [1, 1])
+  const start = prj(center, uni(per(sub(center, offsetPoint))), -radius)
+  const dotPts: Vec2[] = []
+  const step = 1 / START_CAP_SEGMENTS
+  for (let t = step; t <= 1; t += step) {
+    dotPts.push(rotAround(start, center, FIXED_PI * 2 * t))
+  }
+  return dotPts
+}
+
+/**
+ * Draw a rounded start cap by rotating points from right to left around the start point.
+ */
+function drawRoundStartCap(
+  center: Vec2,
+  rightPoint: Vec2,
+  segments: number
+): Vec2[] {
+  const cap: Vec2[] = []
+  const step = 1 / segments
+  for (let t = step; t <= 1; t += step) {
+    cap.push(rotAround(rightPoint, center, FIXED_PI * t))
+  }
+  return cap
+}
+
+/**
+ * Draw a flat start cap with squared-off edges.
+ */
+function drawFlatStartCap(
+  center: Vec2,
+  leftPoint: Vec2,
+  rightPoint: Vec2
+): Vec2[] {
+  const cornersVector = sub(leftPoint, rightPoint)
+  const offsetA = mul(cornersVector, 0.5)
+  const offsetB = mul(cornersVector, 0.51)
+  return [
+    sub(center, offsetA),
+    sub(center, offsetB),
+    add(center, offsetB),
+    add(center, offsetA),
+  ]
+}
+
+/**
+ * Draw a rounded end cap (1.5 turns to handle sharp end turns correctly).
+ */
+function drawRoundEndCap(
+  center: Vec2,
+  direction: Vec2,
+  radius: number,
+  segments: number
+): Vec2[] {
+  const cap: Vec2[] = []
+  const start = prj(center, direction, radius)
+  const step = 1 / segments
+  for (let t = step; t < 1; t += step) {
+    cap.push(rotAround(start, center, FIXED_PI * 3 * t))
+  }
+  return cap
+}
+
+/**
+ * Draw a flat end cap with squared-off edges.
+ */
+function drawFlatEndCap(center: Vec2, direction: Vec2, radius: number): Vec2[] {
+  return [
+    add(center, mul(direction, radius)),
+    add(center, mul(direction, radius * 0.99)),
+    sub(center, mul(direction, radius * 0.99)),
+    sub(center, mul(direction, radius)),
+  ]
+}
+
+/**
  * ## getStrokeOutlinePoints
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
  * @param points An array of StrokePoints as returned from `getStrokePoints`.
@@ -320,93 +399,35 @@ export function getStrokeOutlinePoints(
 
   const endCap: Vec2[] = []
 
-  /*
-    Draw a dot for very short or completed strokes
-
-    If the line is too short to gather left or right points and if the line is
-    not tapered on either side, draw a dot. If the line is tapered, then only
-    draw a dot if the line is both very short and complete. If we draw a dot,
-    we can just return those points.
-  */
-
+  // Draw a dot for very short or completed strokes
   if (points.length === 1) {
     if (!(taperStart || taperEnd) || isComplete) {
-      const start = prj(
-        firstPoint,
-        uni(per(sub(firstPoint, lastPoint))),
-        -(firstRadius || radius)
-      )
-      const dotPts: Vec2[] = []
-      const step = 1 / START_CAP_SEGMENTS
-      for (let t = step; t <= 1; t += step) {
-        dotPts.push(rotAround(start, firstPoint, FIXED_PI * 2 * t))
-      }
-      return dotPts
+      return drawDot(firstPoint, firstRadius || radius)
     }
   } else {
-    /*
-    Draw a start cap
-
-    Unless the line has a tapered start, or unless the line has a tapered end
-    and the line is very short, draw a start cap around the first point. Use
-    the distance between the second left and right point for the cap's radius.
-    Finally remove the first left and right points. :psyduck:
-  */
-
+    // Draw start cap (unless tapered)
     if (taperStart || (taperEnd && points.length === 1)) {
       // The start point is tapered, noop
     } else if (capStart) {
-      // Draw the round cap - add thirteen points rotating the right point around the start point to the left point
-      const step = 1 / START_CAP_SEGMENTS
-      for (let t = step; t <= 1; t += step) {
-        const pt = rotAround(rightPts[0], firstPoint, FIXED_PI * t)
-        startCap.push(pt)
-      }
-    } else {
-      // Draw the flat cap - add a point to the left and right of the start point
-      const cornersVector = sub(leftPts[0], rightPts[0])
-      const offsetA = mul(cornersVector, 0.5)
-      const offsetB = mul(cornersVector, 0.51)
-
       startCap.push(
-        sub(firstPoint, offsetA),
-        sub(firstPoint, offsetB),
-        add(firstPoint, offsetB),
-        add(firstPoint, offsetA)
+        ...drawRoundStartCap(firstPoint, rightPts[0], START_CAP_SEGMENTS)
       )
+    } else {
+      startCap.push(...drawFlatStartCap(firstPoint, leftPts[0], rightPts[0]))
     }
 
-    /*
-    Draw an end cap
-
-    If the line does not have a tapered end, and unless the line has a tapered
-    start and the line is very short, draw a cap around the last point. Finally,
-    remove the last left and right points. Otherwise, add the last point. Note
-    that This cap is a full-turn-and-a-half: this prevents incorrect caps on
-    sharp end turns.
-  */
-
+    // Draw end cap (unless tapered)
     const direction = per(neg(points[points.length - 1].vector))
 
     if (taperEnd || (taperStart && points.length === 1)) {
       // Tapered end - push the last point to the line
       endCap.push(lastPoint)
     } else if (capEnd) {
-      // Draw the round end cap
-      const start = prj(lastPoint, direction, radius)
-      const step = 1 / END_CAP_SEGMENTS
-      for (let t = step; t < 1; t += step) {
-        endCap.push(rotAround(start, lastPoint, FIXED_PI * 3 * t))
-      }
-    } else {
-      // Draw the flat end cap
-
       endCap.push(
-        add(lastPoint, mul(direction, radius)),
-        add(lastPoint, mul(direction, radius * 0.99)),
-        sub(lastPoint, mul(direction, radius * 0.99)),
-        sub(lastPoint, mul(direction, radius))
+        ...drawRoundEndCap(lastPoint, direction, radius, END_CAP_SEGMENTS)
       )
+    } else {
+      endCap.push(...drawFlatEndCap(lastPoint, direction, radius))
     }
   }
 
