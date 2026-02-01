@@ -2121,13 +2121,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prop-types@npm:*":
-  version: 15.7.15
-  resolution: "@types/prop-types@npm:15.7.15"
-  checksum: 10c0/b59aad1ad19bf1733cf524fd4e618196c6c7690f48ee70a327eb450a42aab8e8a063fbe59ca0a5701aebe2d92d582292c0fb845ea57474f6a15f6994b0e260b2
-  languageName: node
-  linkType: hard
-
 "@types/react-dom@npm:^18.0.5":
   version: 18.3.7
   resolution: "@types/react-dom@npm:18.3.7"
@@ -2137,13 +2130,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18.0.10":
-  version: 18.3.27
-  resolution: "@types/react@npm:18.3.27"
+"@types/react@npm:^19.2.10":
+  version: 19.2.10
+  resolution: "@types/react@npm:19.2.10"
   dependencies:
-    "@types/prop-types": "npm:*"
     csstype: "npm:^3.2.2"
-  checksum: 10c0/a761d2f58de03d0714806cc65d32bb3d73fb33a08dd030d255b47a295e5fff2a775cf1c20b786824d8deb6454eaccce9bc6998d9899c14fc04bbd1b0b0b72897
+  checksum: 10c0/17b96203a79ad3fa3cee8f1f1f324b93f005bc125755e29ac149402807275feaf3f00a4e65b8405f633923ac993da5737fd9800d27ee49911f3ed51dc27478f9
   languageName: node
   linkType: hard
 
@@ -2941,11 +2933,11 @@ __metadata:
     "@tldraw/intersect": "npm:^0.1.3"
     "@tldraw/vec": "npm:^0.1.3"
     "@types/node": "npm:^20.11.0"
-    "@types/react": "npm:^18.0.10"
+    "@types/react": "npm:^19.2.10"
     "@types/react-dom": "npm:^18.0.5"
     "@vitejs/plugin-react": "npm:^4.3.0"
     perfect-freehand: "npm:^1.2.0"
-    react: "npm:^18.1.0"
+    react: "npm:^19.2.4"
     react-dom: "npm:^18.1.0"
     react-hotkeys-hook: "npm:^3.4.0"
     rko: "npm:^0.5.25"
@@ -4926,12 +4918,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.1.0":
-  version: 18.3.1
-  resolution: "react@npm:18.3.1"
-  dependencies:
-    loose-envify: "npm:^1.1.0"
-  checksum: 10c0/283e8c5efcf37802c9d1ce767f302dd569dd97a70d9bb8c7be79a789b9902451e0d16334b05d73299b20f048cbc3c7d288bbbde10b701fa194e2089c237dbea3
+"react@npm:^19.2.4":
+  version: 19.2.4
+  resolution: "react@npm:19.2.4"
+  checksum: 10c0/cd2c9ff67a720799cc3b38a516009986f7fc4cb8d3e15716c6211cf098d1357ee3e348ab05ad0600042bbb0fd888530ba92e329198c92eafa0994f5213396596
   languageName: node
   linkType: hard
 
