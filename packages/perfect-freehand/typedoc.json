@@ -1,0 +1,46 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "tsconfig": "tsconfig.build.json",
+  "out": "docs",
+  "name": "perfect-freehand",
+  "readme": "../../README.md",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "gitRevision": "{branch}",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "sort": ["source-order"],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": false
+  },
+  "blockTags": [
+    "@description",
+    "@param",
+    "@returns",
+    "@example",
+    "@see",
+    "@since",
+    "@deprecated"
+  ],
+  "highlightLanguages": [
+    "bash",
+    "console",
+    "css",
+    "html",
+    "javascript",
+    "json",
+    "jsonc",
+    "jsx",
+    "tsx",
+    "typescript"
+  ]
+}

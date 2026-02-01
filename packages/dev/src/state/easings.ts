@@ -26,10 +26,10 @@ export const EASINGS: Record<Easing, (t: number) => number> = {
     t <= 0
       ? 0
       : t >= 1
-      ? 1
-      : t < 0.5
-      ? Math.pow(2, 20 * t - 10) / 2
-      : (2 - Math.pow(2, -20 * t + 10)) / 2,
+        ? 1
+        : t < 0.5
+          ? Math.pow(2, 20 * t - 10) / 2
+          : (2 - Math.pow(2, -20 * t + 10)) / 2,
 }
 
 export const EASING_STRINGS: Record<Easing, string> = {

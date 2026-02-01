@@ -1,7 +1,6 @@
 import type { StrokeOptions } from '../types'
 import { getStroke } from '../getStroke'
 import inputs from './inputs.json'
-import { med } from '../vec'
 
 const { onePoint, twoPoints, twoEqualPoints, manyPoints, withDuplicates } =
   inputs
@@ -14,7 +13,9 @@ function getRng(seed = ''): () => number {
 
   function next() {
     const t = x ^ (x << 11)
-    ;(x = y), (y = z), (z = w)
+    x = y
+    y = z
+    z = w
     w ^= ((w >>> 19) ^ t ^ (t >>> 8)) >>> 0
     return w / 0x100000000
   }

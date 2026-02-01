@@ -1,4 +1,4 @@
-import type { StrokeOptions } from './types'
+import type { StrokeOptions, Vec2 } from './types'
 import { getStrokeOutlinePoints } from './getStrokeOutlinePoints'
 import { getStrokePoints } from './getStrokePoints'
 
@@ -20,6 +20,6 @@ import { getStrokePoints } from './getStrokePoints'
 export function getStroke(
   points: (number[] | { x: number; y: number; pressure?: number })[],
   options: StrokeOptions = {} as StrokeOptions
-): number[][] {
+): Vec2[] {
   return getStrokeOutlinePoints(getStrokePoints(points, options), options)
 }

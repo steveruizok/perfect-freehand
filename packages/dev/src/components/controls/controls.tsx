@@ -263,8 +263,8 @@ export function Controls() {
                 style.taperStart === true
                   ? 100
                   : style.taperStart === false
-                  ? 0
-                  : style.taperStart
+                    ? 0
+                    : style.taperStart
               )
             ),
           ]}
@@ -281,15 +281,18 @@ export function Controls() {
           onPointerDown={handleTaperStartChangeStart}
           onPointerUp={handleStyleChangeComplete}
         />
-        {style.taperStart <= 0 && (
+        {(style.taperStart === false || style.taperStart === 0) && (
           <Checkbox
             name="Cap Start"
-            disabled={style.taperStart > 0}
+            disabled={
+              typeof style.taperStart === 'number' && style.taperStart > 0
+            }
             checked={style.taperStart === 0 && style.capStart}
             onCheckedChange={handleCapStartChange}
           />
         )}
-        {style.taperStart > 0 && (
+        {(style.taperStart === true ||
+          (typeof style.taperStart === 'number' && style.taperStart > 0)) && (
           <Select
             name="Easing Start"
             value={style.easingStart}
@@ -314,8 +317,8 @@ export function Controls() {
                 style.taperEnd === true
                   ? 100
                   : style.taperEnd === false
-                  ? 0
-                  : style.taperEnd
+                    ? 0
+                    : style.taperEnd
               )
             ),
           ]}
@@ -332,15 +335,16 @@ export function Controls() {
               : undefined
           }
         />
-        {style.taperEnd <= 0 && (
+        {(style.taperEnd === false || style.taperEnd === 0) && (
           <Checkbox
             name="Cap End"
-            disabled={style.taperEnd > 0}
+            disabled={typeof style.taperEnd === 'number' && style.taperEnd > 0}
             checked={style.taperEnd === 0 && style.capEnd}
             onCheckedChange={handleCapEndChange}
           />
         )}
-        {style.taperEnd > 0 && (
+        {(style.taperEnd === true ||
+          (typeof style.taperEnd === 'number' && style.taperEnd > 0)) && (
           <Select
             name="Easing End"
             value={style.easingEnd}

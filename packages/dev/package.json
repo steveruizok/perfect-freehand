@@ -20,40 +20,33 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "node ./esbuild.config.mjs --dev tsc --watch",
-    "build": "yarn clean && node ./esbuild.config.mjs && tsc --project tsconfig.build.json  --emitDeclarationOnly --outDir dist/types",
+    "start": "vite",
+    "build": "yarn clean && vite build",
+    "preview": "vite preview",
     "clean": "rm -rf dist"
   },
   "files": [
     "src"
   ],
   "devDependencies": {
-    "@modulz/radix-icons": "^4.0.0",
-    "@radix-ui/react-checkbox": "^0.1.0",
-    "@radix-ui/react-icons": "^1.0.3",
-    "@radix-ui/react-label": "^0.1.0",
-    "@radix-ui/react-slider": "^0.1.0",
+    "@radix-ui/react-checkbox": "^1.1.0",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
     "@tldraw/core": "^0.1.19",
     "@tldraw/intersect": "^0.1.3",
     "@tldraw/vec": "^0.1.3",
-    "@types/node": "^14.14.35",
+    "@types/node": "^20.11.0",
     "@types/react": "^18.0.10",
     "@types/react-dom": "^18.0.5",
-    "concurrently": "6.0.1",
-    "create-serve": "1.0.1",
-    "css-tree": "^1.1.3",
-    "esbuild": "^0.12.21",
-    "esbuild-css-modules-plugin": "^2.0.8",
-    "husky": "^7.0.0",
-    "jest": "^27.0.6",
+    "@vitejs/plugin-react": "^4.3.0",
     "perfect-freehand": "^1.2.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-hotkeys-hook": "^3.4.0",
-    "rimraf": "3.0.2",
     "rko": "^0.5.25",
-    "tslib": "^2.3.1",
-    "typescript": "^4.3.5",
-    "zustand": "^4.0.0-rc.1"
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "zustand": "^5.0.0"
   }
 }

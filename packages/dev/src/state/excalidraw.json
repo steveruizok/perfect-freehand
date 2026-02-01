@@ -24,9 +24,7 @@
       "seed": 114976664,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "-EHziqjGHk4B1NuZHwn03"
-      ]
+      "boundElementIds": ["-EHziqjGHk4B1NuZHwn03"]
     },
     {
       "type": "rectangle",
@@ -49,9 +47,7 @@
       "seed": 1283029736,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "dwe3nNsrVJUtqhWKpk2nX"
-      ]
+      "boundElementIds": ["dwe3nNsrVJUtqhWKpk2nX"]
     },
     {
       "type": "freedraw",
@@ -76,21 +72,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -302,
-          -70
-        ]
+        [0, 0],
+        [-302, -70]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0.07999999821186066
-      ]
+      "pressures": [0, 0.07999999821186066]
     },
     {
       "type": "freedraw",
@@ -115,31 +102,14 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          6.363636363636374,
-          -7.272727272727252
-        ],
-        [
-          9.090909090909122,
-          -12.727272727272748
-        ],
-        [
-          -57.27272727272725,
-          196.36363636363637
-        ]
+        [0, 0],
+        [6.363636363636374, -7.272727272727252],
+        [9.090909090909122, -12.727272727272748],
+        [-57.27272727272725, 196.36363636363637]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "pressures": [0, 0, 0, 0]
     },
     {
       "type": "freedraw",
@@ -164,21 +134,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -102.63157894736838,
-          211.40350877192986
-        ]
+        [0, 0],
+        [-102.63157894736838, 211.40350877192986]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0
-      ]
+      "pressures": [0, 0]
     },
     {
       "type": "freedraw",
@@ -203,21 +164,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -168.98734177215186,
-          -70.8860759493673
-        ]
+        [0, 0],
+        [-168.98734177215186, -70.8860759493673]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0.07999999821186066
-      ]
+      "pressures": [0, 0.07999999821186066]
     },
     {
       "type": "freedraw",
@@ -242,21 +194,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -178.48101265822777,
-          -73.41772151898749
-        ]
+        [0, 0],
+        [-178.48101265822777, -73.41772151898749]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0.07999999821186066
-      ]
+      "pressures": [0, 0.07999999821186066]
     },
     {
       "type": "freedraw",
@@ -281,21 +224,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -156.96202531645565,
-          -48.7341772151899
-        ]
+        [0, 0],
+        [-156.96202531645565, -48.7341772151899]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0.07999999821186066
-      ]
+      "pressures": [0, 0.07999999821186066]
     },
     {
       "type": "freedraw",
@@ -320,36 +254,15 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          5.696202531645554,
-          -5.6962025316456675
-        ],
-        [
-          6.962025316455652,
-          -5.6962025316456675
-        ],
-        [
-          7.5949367088607005,
-          -5.6962025316456675
-        ],
-        [
-          -134.17721518987338,
-          -84.17721518987355
-        ]
+        [0, 0],
+        [5.696202531645554, -5.6962025316456675],
+        [6.962025316455652, -5.6962025316456675],
+        [7.5949367088607005, -5.6962025316456675],
+        [-134.17721518987338, -84.17721518987355]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0,
-        0,
-        0,
-        0.07999999821186066
-      ]
+      "pressures": [0, 0, 0, 0, 0.07999999821186066]
     },
     {
       "type": "freedraw",
@@ -374,21 +287,12 @@
       "strokeSharpness": "round",
       "boundElementIds": [],
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          73.29192546583846,
-          -152.17391304347825
-        ]
+        [0, 0],
+        [73.29192546583846, -152.17391304347825]
       ],
       "lastCommittedPoint": null,
       "simulatePressure": false,
-      "pressures": [
-        0,
-        0
-      ]
+      "pressures": [0, 0]
     },
     {
       "type": "arrow",
@@ -422,14 +326,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          144.28571428571433,
-          -70
-        ]
+        [0, 0],
+        [144.28571428571433, -70]
       ]
     },
     {
@@ -464,14 +362,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          370.8053915248326,
-          -30.658310758948005
-        ]
+        [0, 0],
+        [370.8053915248326, -30.658310758948005]
       ]
     },
     {
@@ -587,14 +479,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -385.71428571428567,
-          15.324638305051167
-        ]
+        [0, 0],
+        [-385.71428571428567, 15.324638305051167]
       ]
     },
     {
@@ -629,14 +515,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -112.85714285714278,
-          136.36251141618027
-        ]
+        [0, 0],
+        [-112.85714285714278, 136.36251141618027]
       ]
     },
     {
@@ -660,10 +540,7 @@
       "seed": 783218152,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "JdK63HbC67f4clxAgYQB8",
-        "Z0n4R_iIfG53FrM11qr_B"
-      ],
+      "boundElementIds": ["JdK63HbC67f4clxAgYQB8", "Z0n4R_iIfG53FrM11qr_B"],
       "fontSize": 28,
       "fontFamily": 1,
       "text": "you can select them\nby clicking on these ends",

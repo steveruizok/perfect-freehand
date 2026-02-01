@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+packages/*/dist/
+
+# Yarn
+.yarn/
+.pnp.*
+
+# Generated files
+*.lock
+yarn.lock
+package-lock.json
+
+# Coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+
+# Documentation (auto-generated)
+docs/
