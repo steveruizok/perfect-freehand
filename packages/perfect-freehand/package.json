@@ -36,6 +36,7 @@
     "start": "rolldown --config rolldown.config.mjs --watch & tsc --watch --incremental --emitDeclarationOnly --declarationMap --outDir dist/types",
     "build": "yarn clean && rolldown --config rolldown.config.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly --outDir dist/types",
     "lint": "eslint src/",
+    "bench": "vitest bench",
     "clean": "rm -rf dist",
     "ts-node": "ts-node",
     "docs": "typedoc"

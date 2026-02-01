@@ -12,5 +12,8 @@ export default defineConfig({
     alias: {
       'perfect-freehand': './packages/perfect-freehand/src',
     },
+    benchmark: {
+      include: ['packages/**/src/**/*.bench.ts'],
+    },
   },
 })
