@@ -1958,17 +1958,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tldraw/core@npm:^0.1.19":
-  version: 0.1.21
-  resolution: "@tldraw/core@npm:0.1.21"
+"@tldraw/core@npm:^1.23.2":
+  version: 1.23.2
+  resolution: "@tldraw/core@npm:1.23.2"
   dependencies:
-    "@tldraw/intersect": "npm:latest"
-    "@tldraw/vec": "npm:latest"
-    "@use-gesture/react": "npm:^10.1.3"
+    "@tldraw/intersect": "npm:^1.9.2"
+    "@tldraw/vec": "npm:^1.9.2"
+    "@use-gesture/react": "npm:^10.2.19"
+    perfect-freehand: "npm:^1.1.0"
   peerDependencies:
     react: ">=16.8"
-    react-dom: ^16.8 || ^17.0
-  checksum: 10c0/c1d67c7246036532d09fa3c6eee0ba0efe37d4a93eddd4a762cafafa5fc1b03f45207ee9c36a56b82a94d60a721fc70c77cd85c69fa2347374962a34ba37de14
+    react-dom: ">=16.8"
+  checksum: 10c0/8a6bbff9f744e8335a8a0e26dd03b847a52d064c0f2ba03386e652a13a8d8d87b9905c3186c0356e90433d02e86b4507b671b51a66aa084cbfd1b39d45e4482e
   languageName: node
   linkType: hard
 
@@ -1981,7 +1982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tldraw/intersect@npm:latest":
+"@tldraw/intersect@npm:^1.9.2":
   version: 1.9.2
   resolution: "@tldraw/intersect@npm:1.9.2"
   dependencies:
@@ -1997,7 +1998,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tldraw/vec@npm:^1.9.2, @tldraw/vec@npm:latest":
+"@tldraw/vec@npm:^1.9.2":
   version: 1.9.2
   resolution: "@tldraw/vec@npm:1.9.2"
   checksum: 10c0/3c17784d415fcad74a0711c018aeeed48880cb69bce2fb4a9ea14af41a9ee910adad9459eae71aaceef6749dff8cf8cadeae9aebf3992c985a09981468fc4db2
@@ -2296,7 +2297,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@use-gesture/react@npm:^10.1.3":
+"@use-gesture/react@npm:^10.2.19":
   version: 10.3.1
   resolution: "@use-gesture/react@npm:10.3.1"
   dependencies:
@@ -2937,7 +2938,7 @@ __metadata:
     "@radix-ui/react-icons": "npm:^1.3.0"
     "@radix-ui/react-label": "npm:^2.1.0"
     "@radix-ui/react-slider": "npm:^1.2.0"
-    "@tldraw/core": "npm:^0.1.19"
+    "@tldraw/core": "npm:^1.23.2"
     "@tldraw/intersect": "npm:^0.1.3"
     "@tldraw/vec": "npm:^0.1.3"
     "@types/node": "npm:^20.11.0"
@@ -4792,7 +4793,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"perfect-freehand@npm:^1.2.0, perfect-freehand@workspace:packages/perfect-freehand":
+"perfect-freehand@npm:^1.1.0, perfect-freehand@npm:^1.2.0, perfect-freehand@workspace:packages/perfect-freehand":
   version: 0.0.0-use.local
   resolution: "perfect-freehand@workspace:packages/perfect-freehand"
   dependencies:
