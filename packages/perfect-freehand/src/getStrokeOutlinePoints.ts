@@ -129,6 +129,24 @@ function computeTaperDistance(
 }
 
 /**
+ * Compute the initial pressure by averaging the first few points.
+ * This prevents "fat starts" since drawn lines almost always start slow.
+ */
+function computeInitialPressure(
+  points: StrokePoint[],
+  shouldSimulatePressure: boolean,
+  size: number
+): number {
+  return points.slice(0, 10).reduce((acc, curr) => {
+    let pressure = curr.pressure
+    if (shouldSimulatePressure) {
+      pressure = simulatePressure(acc, curr.distance, size)
+    }
+    return (acc + pressure) / 2
+  }, points[0].pressure)
+}
+
+/**
  * ## getStrokeOutlinePoints
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
  * @param points An array of StrokePoints as returned from `getStrokePoints`.
@@ -181,18 +199,12 @@ export function getStrokeOutlinePoints(
   const leftPts: Vec2[] = []
   const rightPts: Vec2[] = []
 
-  // Previous pressure (start with average of first ten pressures,
-  // in order to prevent fat starts for every line. Drawn lines
-  // almost always start slow!
-  let prevPressure = points.slice(0, 10).reduce((acc, curr) => {
-    let pressure = curr.pressure
-
-    if (shouldSimulatePressure) {
-      pressure = simulatePressure(acc, curr.distance, size)
-    }
-
-    return (acc + pressure) / 2
-  }, points[0].pressure)
+  // Previous pressure (averaged from first few points to prevent fat starts)
+  let prevPressure = computeInitialPressure(
+    points,
+    shouldSimulatePressure,
+    size
+  )
 
   // The current radius
   let radius = getStrokeRadius(
@@ -230,12 +242,10 @@ export function getStrokeOutlinePoints(
   for (let i = 0; i < points.length; i++) {
     let { pressure } = points[i]
     const { point, vector, distance, runningLength } = points[i]
+    const isLastPoint = i === points.length - 1
 
     // Removes noise from the end of the line
-    if (
-      i < points.length - 1 &&
-      totalLength - runningLength < END_NOISE_THRESHOLD
-    ) {
+    if (!isLastPoint && totalLength - runningLength < END_NOISE_THRESHOLD) {
       continue
     }
 
@@ -297,9 +307,8 @@ export function getStrokeOutlinePoints(
       draw a cap at the current point.
     */
 
-    const nextVector = (i < points.length - 1 ? points[i + 1] : points[i])
-      .vector
-    const nextDpr = i < points.length - 1 ? dpr(vector, nextVector) : 1.0
+    const nextVector = (!isLastPoint ? points[i + 1] : points[i]).vector
+    const nextDpr = !isLastPoint ? dpr(vector, nextVector) : 1.0
     const prevDpr = dpr(vector, prevVector)
 
     const isPointSharpCorner = prevDpr < 0 && !isPrevPointSharpCorner
@@ -341,7 +350,7 @@ export function getStrokeOutlinePoints(
     isPrevPointSharpCorner = false
 
     // Handle the last point
-    if (i === points.length - 1) {
+    if (isLastPoint) {
       perInto(_offset, vector)
       mulInto(_offset, _offset, radius)
       leftPts.push(sub(point, _offset))
