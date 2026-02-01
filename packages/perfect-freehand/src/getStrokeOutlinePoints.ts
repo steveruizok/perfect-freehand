@@ -125,12 +125,12 @@ export function getStrokeOutlinePoints(
   let prevVector = points[0].vector
 
   // Previous left and right points
-  let pl = points[0].point
-  let pr = pl
+  let prevLeftPoint = points[0].point
+  let prevRightPoint = prevLeftPoint
 
   // Temporary left and right points
-  let tl: Vec2 = pl
-  let tr: Vec2 = pr
+  let tempLeftPoint: Vec2 = prevLeftPoint
+  let tempRightPoint: Vec2 = prevRightPoint
 
   // Keep track of whether the previous point is a sharp corner
   // ... so that we don't detect the same corner twice
@@ -188,17 +188,20 @@ export function getStrokeOutlinePoints(
       of the two taper strengths to the radius.
     */
 
-    const ts =
+    const taperStartStrength =
       runningLength < taperStart
         ? taperStartEase(runningLength / taperStart)
         : 1
 
-    const te =
+    const taperEndStrength =
       totalLength - runningLength < taperEnd
         ? taperEndEase((totalLength - runningLength) / taperEnd)
         : 1
 
-    radius = Math.max(MIN_RADIUS, radius * Math.min(ts, te))
+    radius = Math.max(
+      MIN_RADIUS,
+      radius * Math.min(taperStartStrength, taperEndStrength)
+    )
 
     /* Add points to left and right */
 
@@ -232,18 +235,18 @@ export function getStrokeOutlinePoints(
         // Calculate left point: rotate (point - offset) around point
         subInto(_tl, point, _offset)
         rotAroundInto(_tl, _tl, point, FIXED_PI * t)
-        tl = [_tl[0], _tl[1]]
-        leftPts.push(tl)
+        tempLeftPoint = [_tl[0], _tl[1]]
+        leftPts.push(tempLeftPoint)
 
         // Calculate right point: rotate (point + offset) around point
         addInto(_tr, point, _offset)
         rotAroundInto(_tr, _tr, point, FIXED_PI * -t)
-        tr = [_tr[0], _tr[1]]
-        rightPts.push(tr)
+        tempRightPoint = [_tr[0], _tr[1]]
+        rightPts.push(tempRightPoint)
       }
 
-      pl = tl
-      pr = tr
+      prevLeftPoint = tempLeftPoint
+      prevRightPoint = tempRightPoint
 
       if (isNextPointSharpCorner) {
         isPrevPointSharpCorner = true
@@ -278,19 +281,19 @@ export function getStrokeOutlinePoints(
     mulInto(_offset, _offset, radius)
 
     subInto(_tl, point, _offset)
-    tl = [_tl[0], _tl[1]]
+    tempLeftPoint = [_tl[0], _tl[1]]
 
-    if (i <= 1 || dist2(pl, tl) > minDistance) {
-      leftPts.push(tl)
-      pl = tl
+    if (i <= 1 || dist2(prevLeftPoint, tempLeftPoint) > minDistance) {
+      leftPts.push(tempLeftPoint)
+      prevLeftPoint = tempLeftPoint
     }
 
     addInto(_tr, point, _offset)
-    tr = [_tr[0], _tr[1]]
+    tempRightPoint = [_tr[0], _tr[1]]
 
-    if (i <= 1 || dist2(pr, tr) > minDistance) {
-      rightPts.push(tr)
-      pr = tr
+    if (i <= 1 || dist2(prevRightPoint, tempRightPoint) > minDistance) {
+      rightPts.push(tempRightPoint)
+      prevRightPoint = tempRightPoint
     }
 
     // Set variables for next iteration
