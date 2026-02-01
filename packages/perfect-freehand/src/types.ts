@@ -4,6 +4,33 @@
 export type Vec2 = [number, number]
 
 /**
+ * An input point as a tuple [x, y] or [x, y, pressure].
+ * Pressure is optional and defaults to 0.5.
+ *
+ * @example
+ * ```ts
+ * const point: InputPoint = [100, 200]
+ * const pointWithPressure: InputPoint = [100, 200, 0.8]
+ * ```
+ */
+export type InputPoint = [number, number] | [number, number, number]
+
+/**
+ * An input point as an object with x, y, and optional pressure.
+ *
+ * @example
+ * ```ts
+ * const point: InputPointObject = { x: 100, y: 200 }
+ * const pointWithPressure: InputPointObject = { x: 100, y: 200, pressure: 0.8 }
+ * ```
+ */
+export interface InputPointObject {
+  x: number
+  y: number
+  pressure?: number
+}
+
+/**
  * The options object for `getStroke` or `getStrokePoints`.
  * @param points An array of points (as `[x, y, pressure]` or `{x, y, pressure}`). Pressure is optional in both cases.
  * @param options (optional) An object with options.

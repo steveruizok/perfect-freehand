@@ -266,40 +266,32 @@ While `getStroke` returns an array of points representing the outline of a strok
 
 The function below will turn the points returned by `getStroke` into SVG path data.
 
-```js
-const average = (a, b) => (a + b) / 2
+```ts
+type Point = [number, number]
 
-function getSvgPathFromStroke(points, closed = true) {
-  const len = points.length
+function getSvgPathFromStroke(stroke: Point[], closed = true): string {
+  if (stroke.length < 4) return ''
 
-  if (len < 4) {
-    return ``
+  const avg = (a: Point, b: Point): Point => [
+    (a[0] + b[0]) / 2,
+    (a[1] + b[1]) / 2,
+  ]
+
+  let d = `M${stroke[0][0].toFixed(2)},${stroke[0][1].toFixed(2)}`
+  d += ` Q${stroke[1][0].toFixed(2)},${stroke[1][1].toFixed(2)}`
+  d += ` ${avg(stroke[1], stroke[2])
+    .map((n) => n.toFixed(2))
+    .join(',')}`
+  d += ' T'
+
+  for (let i = 2; i < stroke.length - 1; i++) {
+    d += `${avg(stroke[i], stroke[i + 1])
+      .map((n) => n.toFixed(2))
+      .join(',')} `
   }
 
-  let a = points[0]
-  let b = points[1]
-  const c = points[2]
-
-  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
-    2
-  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
-    b[1],
-    c[1]
-  ).toFixed(2)} T`
-
-  for (let i = 2, max = len - 1; i < max; i++) {
-    a = points[i]
-    b = points[i + 1]
-    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
-      2
-    )} `
-  }
-
-  if (closed) {
-    result += 'Z'
-  }
-
-  return result
+  if (closed) d += 'Z'
+  return d
 }
 ```
 
@@ -327,25 +319,27 @@ ctx.fill(myPath)
 
 ### Flattening
 
-By default, the polygon's paths include self-crossings. You may wish to remove these crossings and render a stroke as a "flattened" polygon. To do this, install the [`polygon-clipping`](https://github.com/mfogel/polygon-clipping) package and use the following function together with the `getSvgPathFromStroke`.
+By default, the polygon's paths may include self-crossings (when the stroke loops back on itself). You may wish to remove these crossings and render a stroke as a "flattened" polygon. To do this, install the [`polygon-clipping`](https://github.com/mfogel/polygon-clipping) package and use the following function together with `getSvgPathFromStroke`.
 
-```js
+```ts
 import polygonClipping from 'polygon-clipping'
 
-function getFlatSvgPathFromStroke(stroke) {
-  const faces = polygonClipping.union([stroke])
+type Point = [number, number]
 
-  const d = []
+function getFlatSvgPathFromStroke(stroke: Point[]): string {
+  // polygon-clipping expects a 3D array: [polygon][ring][point]
+  const polygon: polygonClipping.Polygon = [stroke]
 
-  faces.forEach((face) =>
-    face.forEach((points) => {
-      d.push(getSvgPathFromStroke(points))
-    })
-  )
+  // Union with itself to remove self-intersections
+  const faces = polygonClipping.union([polygon])
 
-  return d.join(' ')
+  return faces
+    .flatMap((face) => face.map((ring) => getSvgPathFromStroke(ring)))
+    .join(' ')
 }
 ```
+
+**Note:** If you encounter the error `"Input geometry is not a valid Polygon or MultiPolygon"`, ensure your stroke has enough points (at least 4) and that the points form a valid polygon. Very short strokes or strokes that are essentially a single line may not work with flattening.
 
 ## Development & Contributions
 
