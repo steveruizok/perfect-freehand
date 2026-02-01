@@ -113,6 +113,22 @@ function drawFlatEndCap(center: Vec2, direction: Vec2, radius: number): Vec2[] {
 }
 
 /**
+ * Compute the taper distance from a taper option value.
+ * - false or undefined: no taper (0)
+ * - true: taper the full length (max of size and totalLength)
+ * - number: use that exact taper distance
+ */
+function computeTaperDistance(
+  taper: boolean | number | undefined,
+  size: number,
+  totalLength: number
+): number {
+  if (taper === false || taper === undefined) return 0
+  if (taper === true) return Math.max(size, totalLength)
+  return taper
+}
+
+/**
  * ## getStrokeOutlinePoints
  * @description Get an array of points (as `[x, y]`) representing the outline of a stroke.
  * @param points An array of StrokePoints as returned from `getStrokePoints`.
@@ -155,19 +171,8 @@ export function getStrokeOutlinePoints(
   // The total length of the line
   const totalLength = points[points.length - 1].runningLength
 
-  const taperStart =
-    start.taper === false
-      ? 0
-      : start.taper === true
-        ? Math.max(size, totalLength)
-        : (start.taper as number)
-
-  const taperEnd =
-    end.taper === false
-      ? 0
-      : end.taper === true
-        ? Math.max(size, totalLength)
-        : (end.taper as number)
+  const taperStart = computeTaperDistance(start.taper, size, totalLength)
+  const taperEnd = computeTaperDistance(end.taper, size, totalLength)
 
   // The minimum allowed distance between points (squared)
   const minDistance = Math.pow(size * smoothing, 2)
