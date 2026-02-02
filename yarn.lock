@@ -2948,10 +2948,10 @@ __metadata:
     react: "npm:^18.1.0"
     react-dom: "npm:^18.1.0"
     react-hotkeys-hook: "npm:^3.4.0"
-    rko: "npm:^0.5.25"
+    rko: "npm:^0.6.5"
     typescript: "npm:^5.7.0"
     vite: "npm:^6.0.0"
-    zustand: "npm:^5.0.0"
+    zustand: "npm:^5.0.11"
   languageName: unknown
   linkType: soft
 
@@ -3785,12 +3785,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb-keyval@npm:^5.1.3":
-  version: 5.1.5
-  resolution: "idb-keyval@npm:5.1.5"
-  dependencies:
-    safari-14-idb-fix: "npm:^1.0.6"
-  checksum: 10c0/03144676ee92eeb010bf1072c19100d99642c96b55d20bd59242976fc8603d82a30fb58c8e89ef0511e8dbe038afe87955d03306fb7c3ea1338aea41de4f33a9
+"idb-keyval@npm:^6.0.3":
+  version: 6.2.2
+  resolution: "idb-keyval@npm:6.2.2"
+  checksum: 10c0/b52f0d2937cc2ec9f1da536b0b5c0875af3043ca210714beaffead4ec1f44f2ad322220305fd024596203855224d9e3523aed83e971dfb62ddc21b5b1721aeef
   languageName: node
   linkType: hard
 
@@ -4997,16 +4995,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rko@npm:^0.5.25":
-  version: 0.5.25
-  resolution: "rko@npm:0.5.25"
+"rko@npm:^0.6.5":
+  version: 0.6.5
+  resolution: "rko@npm:0.6.5"
   dependencies:
-    idb-keyval: "npm:^5.1.3"
-    zustand: "npm:^3.5.9"
+    idb-keyval: "npm:^6.0.3"
+    zustand: "npm:^3.6.4"
   peerDependencies:
-    react: ^17.0.2
-    react-dom: ^17.0.2
-  checksum: 10c0/a32fccb015b7080dec3b8a7cac8e73eb89437f43dce0a69e7d319e93217aa989524ef29066b58770b7e7512f7af3db59fe9bfa874de5ba419669945ad3dc5b75
+    react: ">=16.8"
+    react-dom: ^16.8 || ^17.0
+  checksum: 10c0/5d06f4cbbbb9fce72303e92fc4db51e149718acaf9f06752cd1a792ab24324acf4e6d40f7063f3097813b039e7cf0794ede7119b0f27f5ac28bd57cfb36f6430
   languageName: node
   linkType: hard
 
@@ -5156,13 +5154,6 @@ __metadata:
   version: 0.8.0
   resolution: "rrweb-cssom@npm:0.8.0"
   checksum: 10c0/56f2bfd56733adb92c0b56e274c43f864b8dd48784d6fe946ef5ff8d438234015e59ad837fc2ad54714b6421384141c1add4eb569e72054e350d1f8a50b8ac7b
-  languageName: node
-  linkType: hard
-
-"safari-14-idb-fix@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "safari-14-idb-fix@npm:1.0.6"
-  checksum: 10c0/bf8378d6f5f0f36bc9f99acfa910bd5ab83c06e874c4f316ac57fb93a7cd2159e503df05365dabacc06d42ff2ed7d61add835f14d703639784233ba5eca3ba31
   languageName: node
   linkType: hard
 
@@ -6134,7 +6125,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:^3.5.9":
+"zustand@npm:^3.6.4":
   version: 3.7.2
   resolution: "zustand@npm:3.7.2"
   peerDependencies:
@@ -6146,9 +6137,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:^5.0.0":
-  version: 5.0.10
-  resolution: "zustand@npm:5.0.10"
+"zustand@npm:^5.0.11":
+  version: 5.0.11
+  resolution: "zustand@npm:5.0.11"
   peerDependencies:
     "@types/react": ">=18.0.0"
     immer: ">=9.0.6"
@@ -6163,6 +6154,6 @@ __metadata:
       optional: true
     use-sync-external-store:
       optional: true
-  checksum: 10c0/e6ddabf2b44f2c0b7362b0f549cb457d25516caa4c0465132037b62b6173552a43d48bb494c1707286f8d60b389fa249eb4242aa810f1c1d4b4d0b96df789cb8
+  checksum: 10c0/61836b48dac5978c9d1b8289d5162a151bee77828371b9aba6431a079b77faca0635ba53da3f7b331295fbc4e78318a109a4527f7a051cb63abfe79b69ccbecf
   languageName: node
   linkType: hard
