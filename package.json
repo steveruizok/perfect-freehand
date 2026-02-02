@@ -57,13 +57,13 @@
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "husky": "^9.1.0",
-    "jsdom": "^26.0.0",
+    "jsdom": "^27.4.0",
     "lazyrepo": "0.0.0-alpha.27",
     "lint-staged": "^15.4.0",
     "prettier": "^3.4.0",
     "typedoc": "^0.28.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.23.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.0.18"
   }
 }
