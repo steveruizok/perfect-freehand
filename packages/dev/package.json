@@ -33,7 +33,7 @@
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slider": "^1.2.0",
-    "@tldraw/core": "^0.1.19",
+    "@tldraw/core": "^1.23.2",
     "@tldraw/intersect": "^0.1.3",
     "@tldraw/vec": "^0.1.3",
     "@types/node": "^20.11.0",
