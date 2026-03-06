@@ -121,6 +121,16 @@ export function dpr(A: Vec2, B: Vec2): number {
 }
 
 /**
+ * Cross product
+ * @param A
+ * @param B
+ * @internal
+ */
+export function cpr(A: Vec2, B: Vec2): number {
+  return A[0] * B[1] - A[1] * B[0];
+}
+
+/**
  * Get whether two vectors are equal.
  * @param A
  * @param B
