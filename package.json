@@ -60,10 +60,10 @@
     "jsdom": "^26.0.0",
     "lazyrepo": "0.0.0-alpha.27",
     "lint-staged": "^15.4.0",
-    "prettier": "^3.4.0",
-    "typedoc": "^0.28.0",
+    "prettier": "^3.8.2",
+    "typedoc": "^0.28.19",
     "typescript": "^5.7.0",
-    "typescript-eslint": "^8.23.0",
+    "typescript-eslint": "^8.58.1",
     "vitest": "^3.0.0"
   }
 }
