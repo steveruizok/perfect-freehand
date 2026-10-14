@@ -12,6 +12,7 @@ import type { StrokeOptions, StrokePoint, Vec2 } from './types'
 import {
   add,
   addInto,
+  cpr,
   dist2,
   dpr,
   lrpInto,
@@ -44,7 +45,7 @@ function drawDot(center: Vec2, radius: number): Vec2[] {
   for (let t = step; t <= 1; t += step) {
     dotPts.push(rotAround(start, center, FIXED_PI * 2 * t))
   }
-  return dotPts
+return dotPts
 }
 
 /**
@@ -76,8 +77,8 @@ function drawFlatStartCap(
   const offsetB = mul(cornersVector, 0.51)
   return [
     sub(center, offsetA),
-    sub(center, offsetB),
-    add(center, offsetB),
+    // sub(center, offsetB),
+    // add(center, offsetB),
     add(center, offsetA),
   ]
 }
@@ -94,8 +95,8 @@ function drawRoundEndCap(
   const cap: Vec2[] = []
   const start = prj(center, direction, radius)
   const step = 1 / segments
-  for (let t = step; t < 1; t += step) {
-    cap.push(rotAround(start, center, FIXED_PI * 3 * t))
+  for (let t = step; t <= 1; t += step) {
+    cap.push(rotAround(start, center, FIXED_PI * t))
   }
   return cap
 }
@@ -106,8 +107,8 @@ function drawRoundEndCap(
 function drawFlatEndCap(center: Vec2, direction: Vec2, radius: number): Vec2[] {
   return [
     add(center, mul(direction, radius)),
-    add(center, mul(direction, radius * 0.99)),
-    sub(center, mul(direction, radius * 0.99)),
+    // add(center, mul(direction, radius * 0.99)),
+    // sub(center, mul(direction, radius * 0.99)),
     sub(center, mul(direction, radius)),
   ]
 }
@@ -245,8 +246,8 @@ export function getStrokeOutlinePoints(
     const isLastPoint = i === points.length - 1
 
     // Removes noise from the end of the line
-    if (!isLastPoint && totalLength - runningLength < END_NOISE_THRESHOLD) {
-      continue
+    if (totalLength - runningLength < END_NOISE_THRESHOLD) {
+      // continue
     }
 
     /*
@@ -302,38 +303,40 @@ export function getStrokeOutlinePoints(
     /*
       Handle sharp corners
 
-      Find the difference (dot product) between the current and next vector.
+      Find the angle (dot product) between the current and next vector.
       If the next vector is at more than a right angle to the current vector,
-      draw a cap at the current point.
+      OR the projected radius will be bent back more than the distance away from the current point
+      (causing those projections to cross) draw a cap.
     */
 
-    const nextVector = (!isLastPoint ? points[i + 1] : points[i]).vector
+    const nextPt = (!isLastPoint ? points[i + 1] : points[i]);
+    const nextVector = nextPt.vector
     const nextDpr = !isLastPoint ? dpr(vector, nextVector) : 1.0
-    const prevDpr = dpr(vector, prevVector)
+    const crossPr = cpr(vector, nextVector);
 
-    const isPointSharpCorner = prevDpr < 0 && !isPrevPointSharpCorner
-    const isNextPointSharpCorner = nextDpr !== null && nextDpr < 0
+    const isSharpCorner = nextDpr <= 0 || radius * Math.abs(crossPr) > nextDpr * nextPt.distance;
 
-    if (isPointSharpCorner || isNextPointSharpCorner) {
+    if (isSharpCorner) {
       // It's a sharp corner. Draw a rounded cap and move on to the next point
       // Considering saving these and drawing them later? So that we can avoid
       // crossing future points.
-
+      const cornerCapRot = Math.atan2(crossPr, nextDpr);
+    
       // Use mutable operations for the offset calculation
-      perInto(_offset, prevVector)
+      perInto(_offset, vector)
       mulInto(_offset, _offset, radius)
 
       const step = 1 / CORNER_CAP_SEGMENTS
       for (let t = 0; t <= 1; t += step) {
         // Calculate left point: rotate (point - offset) around point
         subInto(_tl, point, _offset)
-        rotAroundInto(_tl, _tl, point, FIXED_PI * t)
+        rotAroundInto(_tl, _tl, point, (cornerCapRot>0 ? cornerCapRot : (2*Math.PI+cornerCapRot)) * t) 
         tempLeftPoint = [_tl[0], _tl[1]]
         leftPts.push(tempLeftPoint)
 
         // Calculate right point: rotate (point + offset) around point
         addInto(_tr, point, _offset)
-        rotAroundInto(_tr, _tr, point, FIXED_PI * -t)
+        rotAroundInto(_tr, _tr, point, (cornerCapRot>0 ? (2*Math.PI-cornerCapRot) : -cornerCapRot) * -t)
         tempRightPoint = [_tr[0], _tr[1]]
         rightPts.push(tempRightPoint)
       }
@@ -341,9 +344,6 @@ export function getStrokeOutlinePoints(
       prevLeftPoint = tempLeftPoint
       prevRightPoint = tempRightPoint
 
-      if (isNextPointSharpCorner) {
-        isPrevPointSharpCorner = true
-      }
       continue
     }
 
@@ -431,7 +431,7 @@ export function getStrokeOutlinePoints(
     }
 
     // Draw end cap (unless tapered)
-    const direction = per(neg(points[points.length - 1].vector))
+    const direction = per(points[points.length - 1].vector)
 
     if (taperEnd || (taperStart && points.length === 1)) {
       // Tapered end - push the last point to the line

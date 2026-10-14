@@ -105,8 +105,8 @@ export function per(A: Vec2): Vec2 {
  */
 export function perInto(out: Vec2, A: Vec2): Vec2 {
   const temp = A[0]
-  out[0] = A[1]
-  out[1] = -temp
+  out[0] = -A[1]
+  out[1] = temp
   return out
 }
 
@@ -118,6 +118,16 @@ export function perInto(out: Vec2, A: Vec2): Vec2 {
  */
 export function dpr(A: Vec2, B: Vec2): number {
   return A[0] * B[0] + A[1] * B[1]
+}
+
+/**
+ * Cross product
+ * @param A
+ * @param B
+ * @internal
+ */
+export function cpr(A: Vec2, B: Vec2): number {
+  return A[0] * B[1] - A[1] * B[0];
 }
 
 /**

@@ -16,23 +16,23 @@ export const RATE_OF_PRESSURE_CHANGE = 0.275
  * PI with a tiny offset to fix browser rendering artifacts.
  * Some browsers render strokes incorrectly when using exact PI.
  */
-export const FIXED_PI = PI + 0.0001
+export const FIXED_PI = PI;
 
 /**
  * Number of segments for rounded start caps.
  */
-export const START_CAP_SEGMENTS = 13
+export const START_CAP_SEGMENTS = 10
 
 /**
  * Number of segments for rounded end caps.
  * Higher than start caps for smoother appearance at stroke endings.
  */
-export const END_CAP_SEGMENTS = 29
+export const END_CAP_SEGMENTS = 10
 
 /**
  * Number of segments for sharp corner caps.
  */
-export const CORNER_CAP_SEGMENTS = 13
+export const CORNER_CAP_SEGMENTS = 10
 
 /**
  * Pixels to skip at the end of a stroke to reduce noise.

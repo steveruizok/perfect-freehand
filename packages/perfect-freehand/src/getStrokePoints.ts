@@ -125,7 +125,7 @@ export function getStrokePoints<
     }
     // Create a new strokepoint (it will be the new "previous" one).
     // Use scratch buffer for vector difference to reduce allocations
-    subInto(_vectorDiff, prev.point, point)
+    subInto(_vectorDiff, point, prev.point)
     prev = {
       // The adjusted point
       point,
